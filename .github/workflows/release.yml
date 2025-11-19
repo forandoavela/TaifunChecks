@@ -1,0 +1,111 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Decode keystore
+        run: |
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release.keystore
+            echo "Keystore decoded successfully"
+          else
+            echo "Keystore not configured, release APK will be unsigned"
+          fi
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build release APK (signed)
+        run: ./gradlew assembleRelease --stacktrace
+        env:
+          KEYSTORE_FILE: ${{ github.workspace }}/release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Build release AAB (signed) for Google Play
+        run: ./gradlew bundleRelease --stacktrace
+        env:
+          KEYSTORE_FILE: ${{ github.workspace }}/release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Rename APKs and AAB with version
+        run: |
+          mkdir -p release-artifacts
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk release-artifacts/FlightChecks-${{ steps.version.outputs.VERSION }}-release.apk
+          fi
+          if [ -f app/build/outputs/bundle/release/app-release.aab ]; then
+            cp app/build/outputs/bundle/release/app-release.aab release-artifacts/FlightChecks-${{ steps.version.outputs.VERSION }}-release.aab
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: FlightChecks ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## FlightChecks ${{ steps.version.outputs.VERSION }}
+
+            Aviation checklists application.
+
+            ### 📦 Downloads
+            - **Release APK (signed)**: Production build ready for direct installation
+            - **Release AAB (signed)**: Android App Bundle for Google Play Store upload
+
+            ### ✨ Features
+            - Step-by-step and full-list checklist modes
+            - Voice control for hands-free operation
+            - Dark theme and high contrast modes
+            - Custom aviation icons
+            - Haptic feedback for all interactions
+            - YAML-based checklist configuration
+            - Persistent checklist progress
+            - Real-time YAML validation
+
+            ### 📝 Installation
+
+            **For end users (Direct APK installation):**
+            1. Download the release APK
+            2. Enable "Install from unknown sources" in Android settings
+            3. Install the APK
+
+            **For Google Play Store:**
+            1. Download the release AAB file
+            2. Upload to Google Play Console
+            3. The AAB is signed and ready for distribution
+          files: release-artifacts/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apks-${{ steps.version.outputs.VERSION }}
+          path: release-artifacts/
+          retention-days: 30
