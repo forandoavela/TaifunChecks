@@ -1,7 +1,7 @@
 # Política de Privacidad / Privacy Policy
 
-**Última actualización / Last updated**: 2025-11-12
-**Versión / Version**: 1.5.8
+**Última actualización / Last updated**: 2025-11-19
+**Versión / Version**: 1.0.00.00
 
 ---
 
