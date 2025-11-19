@@ -1,0 +1,628 @@
+version: '1.0'
+checklists:
+- id: before_starting_engine
+  titulo: Before Starting Engine
+  categoria: Normal procedures
+  full-list: true
+  pasos:
+  - id: bse1
+    texto: Preflight check COMPLETED
+    icono: check
+  - id: bse2
+    texto: Pedals and back rests ADJUSTED
+    icono: control
+  - id: bse3
+    texto: Seat harness ADJUSTED AND SECURED
+    icono: cinturon
+  - id: bse4
+    texto: Folding doors LOCKED
+    icono: cabina
+  - id: bse5
+    texto: Parking brake SET
+    icono: freno
+  - id: bse6
+    texto: Radio and Nav. equipment OFF
+    icono: radio
+  - id: bse7
+    texto: Fuel shutoff valve OPEN
+    icono: combustible
+  - id: bse8
+    texto: Controls FREE
+    icono: control
+  - id: bse9
+    texto: Airbrakes CHECK
+    icono: aerofreno
+  - id: bse10
+    texto: Altimeter SET
+    icono: altimetro
+    qnh: hPa
+  - id: bse11
+    texto: Instruments SET
+    icono: instrumentos
+
+- id: starting_engine
+  titulo: Starting the Engine
+  categoria: Normal procedures
+  color: '#FFEB3B'
+  pasos:
+  - id: se1
+    texto: Prop "CLIMB" position PULL
+    icono: helice
+  - id: se2
+    texto: Choke (if engine cold) SET
+    icono: estrangulador
+  - id: se3
+    texto: Throttle 2cm (0.8 inch) ADVANCE
+    icono: gases
+  - id: se3note
+    texto: 'Note: Throttle shut when using choke'
+    icono: alerta
+  - id: se4
+    texto: Propeller area CLEAR
+    icono: helice
+  - id: se5
+    texto: Master switch ON
+    icono: interruptor
+  - id: se6
+    texto: Auxiliary fuel pump ON
+    icono: bomba
+  - id: se7
+    texto: Electrical instruments CHECK
+    icono: instrumentos
+  - id: se8
+    texto: Anti collision lights ON
+    icono: luz
+  - id: se9
+    texto: Ignition START
+    icono: ignicion
+  - id: se10
+    texto: RPM 1200 SET
+    icono: motor
+  - id: se11
+    texto: Oil pressure GREEN
+    icono: aceite
+  - id: se11b
+    texto: Engine started
+    icono: motor
+    log: Engine started
+  - id: se12
+    texto: Avionics main switch ON
+    icono: radio
+  - id: se13
+    texto: Radio and Nav. Equipment AS REQUIRED
+    icono: radio
+  - id: se14
+    texto: Charging current CHECK
+    icono: bateria
+
+- id: warm_up
+  titulo: Warm up
+  categoria: Normal procedures
+  color: '#FFEB3B'
+  pasos:
+  - id: wu1
+    texto: 'Run engine at 1200 RPM for 2 minutes'
+    icono: motor
+  - id: wu2
+    texto: 'Accelerate to 1500 RPM for 5-10 minutes'
+    icono: motor
+  - id: wu3
+    texto: 'Oil temperature 50°C CHECK'
+    icono: aceite
+  - id: wu4
+    texto: 'Cylinder Head temperature 130°C CHECK'
+    icono: motor
+
+- id: run_up
+  titulo: Run-up
+  categoria: Normal procedures
+  color: '#FFEB3B'
+  pasos:
+  - id: ru1
+    texto: Parking brake SET
+    icono: freno
+  - id: ru2
+    texto: Elevator SET
+    icono: control
+  - id: ru3
+    texto: Throttle FULL
+    icono: gases
+  - id: ru4
+    texto: 'RPM 2700 ±100 CHECK'
+    icono: motor
+  - id: ru5
+    texto: 'Carburetor heat (↓50 RPM) CHECK'
+    icono: calefaccion
+  - id: ru6
+    texto: Oil pressure CHECK
+    icono: aceite
+  - id: ru7
+    texto: Throttle IDLE
+    icono: gases
+  - id: ru_note
+    texto: 'Note: If only 2000 RPM with full power, prop is at CRUISE position - set to CLIMB'
+    icono: alerta
+
+- id: before_takeoff
+  titulo: Before Takeoff
+  categoria: Normal procedures
+  color: '#FFEB3B'
+  pasos:
+  - id: bt0
+    texto: Engine RUN UP
+    icono: motor
+  - id: bt1
+    texto: Throttle FREE
+    icono: gases
+  - id: bt2
+    texto: Airbrakes LOCKED
+    icono: aerofreno
+  - id: bt3
+    texto: Folding doors LOCKED
+    icono: cabina
+  - id: bt4
+    texto: Emergency jettisoning SECURE
+    icono: seguro
+  - id: bt5
+    texto: Trim NEUTRAL
+    icono: trim
+  - id: bt6
+    texto: Fuel shutoff valve OPEN
+    icono: combustible
+  - id: bt7
+    texto: Carburetor heat OFF
+    icono: calefaccion
+  - id: bt8
+    texto: Auxiliary fuel pump ON
+    icono: bomba
+  - id: bt9
+    texto: Engine instruments CHECK
+    icono: instrumentos
+  - id: bt10
+    texto: Parking brake RELEASED
+    icono: freno
+  - id: bt_note
+    texto: 'Max crosswind: 11 Kts (wet and dry surfaces)'
+    icono: alerta
+
+- id: takeoff_climbing
+  titulo: Takeoff and Climbing
+  categoria: Normal procedures
+  color: '#4CAF50'
+  pasos:
+  - id: tc1
+    texto: Directional Control MAINTAIN
+    icono: control
+  - id: tc2
+    texto: 'Lift tailwheel @ 22 Kts'
+    icono: anemometro
+  - id: tc3
+    texto: 'Lift-off @ 46 Kts'
+    icono: anemometro
+  - id: tc4
+    texto: 'Climb speed 49-60 Kts CHECK'
+    icono: anemometro
+  - id: tc5
+    texto: 'Oil temperature (Max 120°C) CHECK'
+    icono: aceite
+  - id: tc6
+    texto: 'Auxiliary fuel pump @ 300 ft OFF'
+    icono: bomba
+
+- id: horizontal_cruise
+  titulo: Horizontal Flight & Cruise
+  categoria: Normal procedures
+  color: '#2196F3'
+  pasos:
+  - id: hc1
+    texto: 'Throttle 2300 RPM (65 Kts) SET'
+    icono: gases
+  - id: hc2
+    texto: Prop "CRUISE" position PULL
+    icono: helice
+  - id: hc3
+    texto: Prop position CHECK
+    icono: helice
+  - id: hc4
+    texto: Increase airspeed CONTROL
+    icono: anemometro
+  - id: hc5
+    texto: 'Cruise RPM (2000-2800 RPM) SET'
+    icono: motor
+  - id: hc6
+    texto: Carburetor heat AS REQUIRED
+    icono: calefaccion
+
+- id: descent
+  titulo: Descent
+  categoria: Normal procedures
+  color: '#9C27B0'
+  pasos:
+  - id: des1
+    texto: Carburetor heat ON
+    icono: calefaccion
+  - id: des2
+    texto: Throttle IDLE
+    icono: gases
+  - id: des3
+    texto: 'Airspeed (62 Kts) CONTROL'
+    icono: anemometro
+  - id: des4
+    texto: Prop "CLIMB" position PULL
+    icono: helice
+  - id: des5
+    texto: Parking brake released CHECK
+    icono: freno
+
+- id: approach_landing
+  titulo: Approach and Landing
+  categoria: Normal procedures
+  color: '#9C27B0'
+  pasos:
+  - id: al1
+    texto: 'Airspeed (62 Kts) SET'
+    icono: anemometro
+  - id: al2
+    texto: Auxiliary fuel pump ON
+    icono: bomba
+  - id: al3
+    texto: Airbrakes AS REQUIRED
+    icono: aerofreno
+  - id: al4
+    texto: In 3-point attitude TOUCH DOWN
+    icono: aterrizaje
+  - id: al5
+    texto: Airbrakes OUT
+    icono: aerofreno
+  - id: al6
+    texto: Toe Brakes (With Care) APPLY
+    icono: freno
+
+- id: engine_shutdown
+  titulo: Engine Shutdown
+  categoria: Normal procedures
+  color: '#9C27B0'
+  pasos:
+  - id: es1
+    texto: Avionic main switch OFF
+    icono: radio
+  - id: es2
+    texto: Auxiliary fuel pump OFF
+    icono: bomba
+  - id: es3
+    texto: All electrical consumers OFF
+    icono: interruptor
+  - id: es4
+    texto: Throttle (For Cooling) IDLE
+    icono: gases
+  - id: es5
+    texto: 'Cylinder head temperature (150°C) CHECK'
+    icono: motor
+  - id: es6
+    texto: Ignition OFF
+    icono: ignicion
+  - id: es6b
+    texto: Engine stopped
+    icono: motor
+    log: Engine stopped
+  - id: es7
+    texto: Master switch OFF
+    icono: interruptor
+  - id: es8
+    texto: Parking brake SET
+    icono: freno
+
+- id: soaring_flight
+  titulo: Soaring Flight
+  categoria: Glider procedures
+  color: '#1976D2'
+  pasos:
+  - id: sf_note
+    texto: 'Switch off unnecessary electrical equipment to ensure sufficient power to restart'
+    icono: alerta
+  - id: sf1
+    texto: 'Best Glide ratio: 1:28 @ 62 Kts (IAS)'
+    icono: anemometro
+  - id: sf2
+    texto: 'Min sink rate: 217 fpm @ 58 Kts (IAS)'
+    icono: anemometro
+  - id: sf3
+    texto: 'Best Thermaling speed: 51 Kts (IAS)'
+    icono: anemometro
+
+- id: engine_shutdown_flight
+  titulo: Engine Shutdown in Flight
+  categoria: Glider procedures
+  color: '#1976D2'
+  pasos:
+  - id: esf1
+    texto: Throttle IDLE
+    icono: gases
+  - id: esf2
+    texto: 'Airspeed (54 Kts) MAINTAIN'
+    icono: anemometro
+  - id: esf3
+    texto: 'Cylinder head temperature (150°C) CHECK'
+    icono: motor
+  - id: esf4
+    texto: Avionic main switch OFF
+    icono: radio
+  - id: esf5
+    texto: Ignition OFF
+    icono: ignicion
+  - id: esf5b
+    texto: Engine stopped - glider
+    icono: motor
+    log: Engine stopped - glider
+  - id: esf6
+    texto: Feather propeller PULL/ROTATE
+    icono: helice
+  - id: esf7
+    texto: Avionic main switch ON
+    icono: radio
+  - id: esf8
+    texto: Unnecessary electrical equipment OFF
+    icono: interruptor
+  - id: esf_caution
+    texto: '⚠️ CAUTION: Propeller may only be feathered with ENGINE OFF and PROPELLER WINDMILLING'
+    icono: alerta
+
+- id: air_start_normal
+  titulo: Air Start (Normal)
+  categoria: Glider procedures
+  color: '#1976D2'
+  pasos:
+  - id: asn1
+    texto: Unfeather propeller ROTATE/PUSH
+    icono: helice
+  - id: asn2
+    texto: Avionic main switch OFF
+    icono: radio
+  - id: asn3
+    texto: 'Airspeed (65 Kts) MAINTAIN'
+    icono: anemometro
+  - id: asn4
+    texto: Choke AS REQUIRED
+    icono: estrangulador
+  - id: asn5
+    texto: Throttle AS REQUIRED
+    icono: gases
+  - id: asn6
+    texto: Ignition START
+    icono: ignicion
+  - id: asn6b
+    texto: Engine started - glider
+    icono: motor
+    log: Engine started - glider
+  - id: asn7
+    texto: Avionic main switch ON
+    icono: radio
+  - id: asn_caution
+    texto: '⚠️ DO NOT apply HIGH POWER at low engine temperature. Use WARM-UP technique'
+    icono: alerta
+
+- id: air_start_dive
+  titulo: Air Start (Dive)
+  categoria: Glider procedures
+  color: '#1976D2'
+  pasos:
+  - id: asd1
+    texto: Avionic main switch OFF
+    icono: radio
+  - id: asd2
+    texto: Ignition ON
+    icono: ignicion
+  - id: asd3
+    texto: 'Increase airspeed (85 Kts) CONTROL'
+    icono: anemometro
+  - id: asd4
+    texto: Unfeather propeller (unlock and push slowly) ROTATE/PUSH
+    icono: helice
+  - id: asd4b
+    texto: Engine started - glider
+    icono: motor
+    log: Engine started - glider
+  - id: asd5
+    texto: Increase airspeed CONTROL
+    icono: anemometro
+  - id: asd6
+    texto: Avionic main switch ON
+    icono: radio
+  - id: asd_caution
+    texto: '⚠️ DO NOT apply HIGH POWER at low engine temperature. Use WARM-UP technique'
+    icono: alerta
+
+- id: performance_loading
+  titulo: Performance Data - Loading
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pl1
+    texto: 'Max All Up Weight: 850 kg'
+    icono: balanza
+  - id: pl2
+    texto: 'Empty Weight: 650 kg'
+    icono: balanza
+  - id: pl3
+    texto: 'Useful Load: 200 kg'
+    icono: balanza
+  - id: pl4
+    texto: 'Max Fuel Capacity (100 litres): 70 kg'
+    icono: combustible
+  - id: pl5
+    texto: 'C of G Limits: 271mm to 427mm Aft of Datum'
+    icono: balanza
+  - id: pl6
+    texto: 'Solo-Flight Minimum: 70 kg'
+    icono: balanza
+  - id: pl7
+    texto: 'Solo-Flight Maximum: 110 kg'
+    icono: balanza
+  - id: pl8
+    texto: 'Dual-Flights Maximum (2 x 110): 220 kg'
+    icono: balanza
+  - id: pl_warning
+    texto: '⚠️ WARNING: MAUW of 850 kg MUST NOT BE EXCEEDED'
+    icono: alerta
+
+- id: performance_speeds
+  titulo: Performance Data - Airspeed Limitations
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: ps1
+    texto: 'VNE - Max Airspeed (Calm Air): 130 kts'
+    icono: anemometro
+  - id: ps2
+    texto: 'VB - Max Airspeed (Rough Air): 92 kts'
+    icono: anemometro
+  - id: ps3
+    texto: 'VM - Maneuvering Speed: 92 kts'
+    icono: anemometro
+  - id: ps4
+    texto: 'VLE - Max Airspeed (With Airbrakes): 130 kts'
+    icono: anemometro
+  - id: ps5
+    texto: 'VS1 - Stall Speed (With Airbrakes): 43 kts'
+    icono: anemometro
+  - id: ps6
+    texto: 'VS0 - Stall Speed (No Airbrakes): 39 kts'
+    icono: anemometro
+
+- id: performance_takeoff
+  titulo: Performance Data - Takeoff Distance (ISA)
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pt1
+    texto: 'Ground roll: 214 m'
+    icono: pista
+  - id: pt2
+    texto: 'To 15m (50 ft): 348 m'
+    icono: pista
+  - id: pt3
+    texto: 'Liftoff airspeed: 46 kts'
+    icono: anemometro
+  - id: pt4
+    texto: 'Crossing 15m: 51 kts'
+    icono: anemometro
+
+- id: performance_landing
+  titulo: Performance Data - Landing Distance
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pld1
+    texto: 'Landing roll: 205 m'
+    icono: pista
+  - id: pld2
+    texto: 'From 15m (50 ft): 390 m'
+    icono: pista
+  - id: pld3
+    texto: 'Approach airspeed: 62 kts'
+    icono: anemometro
+  - id: pld4
+    texto: 'Touchdown airspeed: 41-46 kts'
+    icono: anemometro
+
+- id: performance_climb
+  titulo: Performance Data - Climb Schedule
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pc1
+    texto: 'Vertical speed prop in "CLIMB": 570 fpm'
+    icono: subida
+  - id: pc2
+    texto: '@ Optimum airspeed: 59 kts'
+    icono: anemometro
+  - id: pc3
+    texto: 'Maximum angle of climb: 49 kts'
+    icono: anemometro
+  - id: pc4
+    texto: 'Vertical speed prop in "CRUISE": 392 fpm'
+    icono: subida
+  - id: pc5
+    texto: '@ Optimum airspeed: 67 kts'
+    icono: anemometro
+  - id: pc6
+    texto: 'Service ceiling: 16,500 ft'
+    icono: altimetro
+
+- id: performance_cruise_speeds
+  titulo: Performance Data - Cruise & Stall Speeds
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pcs1
+    texto: 'Cruise: 2800 RPM (Max continuous power): 103 kts'
+    icono: anemometro
+  - id: pcs2
+    texto: 'Stall level flight full power: 38 kts'
+    icono: anemometro
+  - id: pcs3
+    texto: 'Stall 30° bank full power: 40 kts'
+    icono: anemometro
+  - id: pcs4
+    texto: 'Stall level flight power idle: 39 kts'
+    icono: anemometro
+  - id: pcs5
+    texto: 'Stall 30° bank power idle: 42 kts'
+    icono: anemometro
+  - id: pcs6
+    texto: 'Stall level flight propeller feathered: 40 kts'
+    icono: anemometro
+  - id: pcs7
+    texto: 'Stall 30° bank propeller feathered: 43 kts'
+    icono: anemometro
+  - id: pcs8
+    texto: 'Stall airbrakes fully extended: 43 kts'
+    icono: anemometro
+
+- id: performance_gliding
+  titulo: Performance Data - Gliding Performance
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pg1
+    texto: 'Gross weight: 850 kg'
+    icono: balanza
+  - id: pg2
+    texto: 'Wing load: 44.7 kg/m²'
+    icono: balanza
+  - id: pg3
+    texto: 'Best Glide ratio: 1:28 @ 62 kts'
+    icono: anemometro
+  - id: pg4
+    texto: 'Minimum sink rate: 217 fpm @ 58 kts'
+    icono: anemometro
+  - id: pg5
+    texto: 'Best Thermal Airspeed: 51 kts'
+    icono: anemometro
+
+- id: performance_fuel
+  titulo: Performance Data - Fuel Consumption
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: pf_note
+    texto: 'At 3300 ft (1000m) and MAUW (850 kg)'
+    icono: alerta
+  - id: pf1
+    texto: '2800 RPM: 103 kts (VTAS) - 17 l/hr'
+    icono: combustible
+  - id: pf2
+    texto: '2600 RPM: 95 kts (VTAS) - 13.5 l/hr'
+    icono: combustible
+  - id: pf3
+    texto: '2400 RPM: 87 kts (VTAS) - 10.5 l/hr'
+    icono: combustible
+  - id: pf4
+    texto: '2200 RPM: 80 kts (VTAS) - 8.8 l/hr'
+    icono: combustible
+  - id: pf5
+    texto: '2000 RPM: 72 kts (VTAS) - 7.2 l/hr'
+    icono: combustible
+  - id: pf6
+    texto: '1800 RPM: 65 kts (VTAS) - 7.0 l/hr'
+    icono: combustible

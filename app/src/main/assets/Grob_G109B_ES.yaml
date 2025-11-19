@@ -1,0 +1,628 @@
+version: '1.0'
+checklists:
+- id: antes_arrancar_motor
+  titulo: Antes de arrancar el motor
+  categoria: Procedimientos normales
+  full-list: true
+  pasos:
+  - id: bse1
+    texto: Chequeo prevuelo COMPLETADO
+    icono: check
+  - id: bse2
+    texto: Pedales y respaldos AJUSTADOS
+    icono: control
+  - id: bse3
+    texto: Arnés de asiento AJUSTADO Y ASEGURADO
+    icono: cinturon
+  - id: bse4
+    texto: Puertas plegables CERRADAS
+    icono: cabina
+  - id: bse5
+    texto: Freno de estacionamiento PUESTO
+    icono: freno
+  - id: bse6
+    texto: Radio y equipo de navegación APAGADOS
+    icono: radio
+  - id: bse7
+    texto: Válvula de combustible ABIERTA
+    icono: combustible
+  - id: bse8
+    texto: Controles LIBRES
+    icono: control
+  - id: bse9
+    texto: Frenos aerodinámicos VERIFICAR
+    icono: aerofreno
+  - id: bse10
+    texto: Altímetro AJUSTADO
+    icono: altimetro
+    qnh: hPa
+  - id: bse11
+    texto: Instrumentos AJUSTADOS
+    icono: instrumentos
+
+- id: arranque_motor
+  titulo: Arranque del motor
+  categoria: Procedimientos normales
+  color: '#FFEB3B'
+  pasos:
+  - id: se1
+    texto: Hélice posición "CLIMB" TIRAR
+    icono: helice
+  - id: se2
+    texto: Estrangulador (si motor frío) PONER
+    icono: estrangulador
+  - id: se3
+    texto: Gases 2cm (0,8 pulgadas) AVANZAR
+    icono: gases
+  - id: se3note
+    texto: 'Nota: Gases cerrados cuando se usa estrangulador'
+    icono: alerta
+  - id: se4
+    texto: Área de la hélice LIBRE
+    icono: helice
+  - id: se5
+    texto: Interruptor principal ON
+    icono: interruptor
+  - id: se6
+    texto: Bomba auxiliar de combustible ON
+    icono: bomba
+  - id: se7
+    texto: Instrumentos eléctricos VERIFICAR
+    icono: instrumentos
+  - id: se8
+    texto: Luces anticolisión ON
+    icono: luz
+  - id: se9
+    texto: Ignición ARRANQUE
+    icono: ignicion
+  - id: se10
+    texto: RPM 1200 AJUSTAR
+    icono: motor
+  - id: se11
+    texto: Presión de aceite VERDE
+    icono: aceite
+  - id: se11b
+    texto: Motor encendido
+    icono: motor
+    log: Motor encendido
+  - id: se12
+    texto: Interruptor principal aviónica ON
+    icono: radio
+  - id: se13
+    texto: Radio y equipo de navegación SEGÚN NECESIDAD
+    icono: radio
+  - id: se14
+    texto: Corriente de carga VERIFICAR
+    icono: bateria
+
+- id: calentamiento
+  titulo: Calentamiento
+  categoria: Procedimientos normales
+  color: '#FFEB3B'
+  pasos:
+  - id: wu1
+    texto: 'Motor a 1200 RPM durante 2 minutos'
+    icono: motor
+  - id: wu2
+    texto: 'Acelerar a 1500 RPM durante 5-10 minutos'
+    icono: motor
+  - id: wu3
+    texto: 'Temperatura aceite 50°C VERIFICAR'
+    icono: aceite
+  - id: wu4
+    texto: 'Temperatura culatas 130°C VERIFICAR'
+    icono: motor
+
+- id: prueba_motor
+  titulo: Prueba de motor
+  categoria: Procedimientos normales
+  color: '#FFEB3B'
+  pasos:
+  - id: ru1
+    texto: Freno de estacionamiento PUESTO
+    icono: freno
+  - id: ru2
+    texto: Timón de profundidad AJUSTAR
+    icono: control
+  - id: ru3
+    texto: Gases MÁXIMO
+    icono: gases
+  - id: ru4
+    texto: 'RPM 2700 ±100 VERIFICAR'
+    icono: motor
+  - id: ru5
+    texto: 'Calefacción carburador (↓50 RPM) VERIFICAR'
+    icono: calefaccion
+  - id: ru6
+    texto: Presión de aceite VERIFICAR
+    icono: aceite
+  - id: ru7
+    texto: Gases RALENTÍ
+    icono: gases
+  - id: ru_note
+    texto: 'Nota: Si solo 2000 RPM con potencia máxima, hélice está en CRUISE - ajustar a CLIMB'
+    icono: alerta
+
+- id: antes_despegue
+  titulo: Antes del despegue
+  categoria: Procedimientos normales
+  color: '#FFEB3B'
+  pasos:
+  - id: bt0
+    texto: Motor PRUEBA REALIZADA
+    icono: motor
+  - id: bt1
+    texto: Gases LIBRE
+    icono: gases
+  - id: bt2
+    texto: Frenos aerodinámicos BLOQUEADOS
+    icono: aerofreno
+  - id: bt3
+    texto: Puertas plegables CERRADAS
+    icono: cabina
+  - id: bt4
+    texto: Eyección de emergencia ASEGURADA
+    icono: seguro
+  - id: bt5
+    texto: Compensador NEUTRAL
+    icono: trim
+  - id: bt6
+    texto: Válvula de combustible ABIERTA
+    icono: combustible
+  - id: bt7
+    texto: Calefacción carburador OFF
+    icono: calefaccion
+  - id: bt8
+    texto: Bomba auxiliar combustible ON
+    icono: bomba
+  - id: bt9
+    texto: Instrumentos motor VERIFICAR
+    icono: instrumentos
+  - id: bt10
+    texto: Freno de estacionamiento LIBERADO
+    icono: freno
+  - id: bt_note
+    texto: 'Viento cruzado máx: 11 Kts (superficies húmedas y secas)'
+    icono: alerta
+
+- id: despegue_ascenso
+  titulo: Despegue y ascenso
+  categoria: Procedimientos normales
+  color: '#4CAF50'
+  pasos:
+  - id: tc1
+    texto: Control direccional MANTENER
+    icono: control
+  - id: tc2
+    texto: 'Levantar rueda de cola @ 22 Kts'
+    icono: anemometro
+  - id: tc3
+    texto: 'Despegue @ 46 Kts'
+    icono: anemometro
+  - id: tc4
+    texto: 'Velocidad de ascenso 49-60 Kts VERIFICAR'
+    icono: anemometro
+  - id: tc5
+    texto: 'Temperatura aceite (Máx 120°C) VERIFICAR'
+    icono: aceite
+  - id: tc6
+    texto: 'Bomba auxiliar combustible @ 300 ft OFF'
+    icono: bomba
+
+- id: vuelo_horizontal_crucero
+  titulo: Vuelo horizontal y crucero
+  categoria: Procedimientos normales
+  color: '#2196F3'
+  pasos:
+  - id: hc1
+    texto: 'Gases 2300 RPM (65 Kts) AJUSTAR'
+    icono: gases
+  - id: hc2
+    texto: Hélice posición "CRUISE" TIRAR
+    icono: helice
+  - id: hc3
+    texto: Posición hélice VERIFICAR
+    icono: helice
+  - id: hc4
+    texto: Aumentar velocidad CONTROLAR
+    icono: anemometro
+  - id: hc5
+    texto: 'RPM crucero (2000-2800 RPM) AJUSTAR'
+    icono: motor
+  - id: hc6
+    texto: Calefacción carburador SEGÚN NECESIDAD
+    icono: calefaccion
+
+- id: descenso
+  titulo: Descenso
+  categoria: Procedimientos normales
+  color: '#9C27B0'
+  pasos:
+  - id: des1
+    texto: Calefacción carburador ON
+    icono: calefaccion
+  - id: des2
+    texto: Gases RALENTÍ
+    icono: gases
+  - id: des3
+    texto: 'Velocidad (62 Kts) CONTROLAR'
+    icono: anemometro
+  - id: des4
+    texto: Hélice posición "CLIMB" TIRAR
+    icono: helice
+  - id: des5
+    texto: Freno de estacionamiento liberado VERIFICAR
+    icono: freno
+
+- id: aproximacion_aterrizaje
+  titulo: Aproximación y aterrizaje
+  categoria: Procedimientos normales
+  color: '#9C27B0'
+  pasos:
+  - id: al1
+    texto: 'Velocidad (62 Kts) AJUSTAR'
+    icono: anemometro
+  - id: al2
+    texto: Bomba auxiliar combustible ON
+    icono: bomba
+  - id: al3
+    texto: Frenos aerodinámicos SEGÚN NECESIDAD
+    icono: aerofreno
+  - id: al4
+    texto: En actitud de 3 puntos TOMAR TIERRA
+    icono: aterrizaje
+  - id: al5
+    texto: Frenos aerodinámicos EXTENDER
+    icono: aerofreno
+  - id: al6
+    texto: Frenos de pie (Con cuidado) APLICAR
+    icono: freno
+
+- id: apagado_motor
+  titulo: Apagado del motor
+  categoria: Procedimientos normales
+  color: '#9C27B0'
+  pasos:
+  - id: es1
+    texto: Interruptor principal aviónica OFF
+    icono: radio
+  - id: es2
+    texto: Bomba auxiliar combustible OFF
+    icono: bomba
+  - id: es3
+    texto: Todos los consumidores eléctricos OFF
+    icono: interruptor
+  - id: es4
+    texto: Gases (Para enfriamiento) RALENTÍ
+    icono: gases
+  - id: es5
+    texto: 'Temperatura culatas (150°C) VERIFICAR'
+    icono: motor
+  - id: es6
+    texto: Ignición OFF
+    icono: ignicion
+  - id: es6b
+    texto: Motor apagado
+    icono: motor
+    log: Motor apagado
+  - id: es7
+    texto: Interruptor principal OFF
+    icono: interruptor
+  - id: es8
+    texto: Freno de estacionamiento PUESTO
+    icono: freno
+
+- id: vuelo_planeo
+  titulo: Vuelo a vela
+  categoria: Procedimientos de planeo
+  color: '#1976D2'
+  pasos:
+  - id: sf_note
+    texto: 'Apagar equipos eléctricos innecesarios para asegurar energía suficiente para arrancar'
+    icono: alerta
+  - id: sf1
+    texto: 'Mejor fineza: 1:28 @ 62 Kts (IAS)'
+    icono: anemometro
+  - id: sf2
+    texto: 'Mínima tasa de descenso: 217 fpm @ 58 Kts (IAS)'
+    icono: anemometro
+  - id: sf3
+    texto: 'Mejor velocidad térmica: 51 Kts (IAS)'
+    icono: anemometro
+
+- id: apagado_motor_vuelo
+  titulo: Apagado del motor en vuelo
+  categoria: Procedimientos de planeo
+  color: '#1976D2'
+  pasos:
+  - id: esf1
+    texto: Gases RALENTÍ
+    icono: gases
+  - id: esf2
+    texto: 'Velocidad (54 Kts) MANTENER'
+    icono: anemometro
+  - id: esf3
+    texto: 'Temperatura culatas (150°C) VERIFICAR'
+    icono: motor
+  - id: esf4
+    texto: Interruptor principal aviónica OFF
+    icono: radio
+  - id: esf5
+    texto: Ignición OFF
+    icono: ignicion
+  - id: esf5b
+    texto: Motor apagado - vela
+    icono: motor
+    log: Motor apagado - vela
+  - id: esf6
+    texto: Abanderar hélice TIRAR/GIRAR
+    icono: helice
+  - id: esf7
+    texto: Interruptor principal aviónica ON
+    icono: radio
+  - id: esf8
+    texto: Equipos eléctricos innecesarios OFF
+    icono: interruptor
+  - id: esf_caution
+    texto: '⚠️ PRECAUCIÓN: La hélice solo puede abanderarse con MOTOR APAGADO y HÉLICE MOLINETE'
+    icono: alerta
+
+- id: arranque_aire_normal
+  titulo: Arranque en el aire (Normal)
+  categoria: Procedimientos de planeo
+  color: '#1976D2'
+  pasos:
+  - id: asn1
+    texto: Desabanderar hélice GIRAR/EMPUJAR
+    icono: helice
+  - id: asn2
+    texto: Interruptor principal aviónica OFF
+    icono: radio
+  - id: asn3
+    texto: 'Velocidad (65 Kts) MANTENER'
+    icono: anemometro
+  - id: asn4
+    texto: Estrangulador SEGÚN NECESIDAD
+    icono: estrangulador
+  - id: asn5
+    texto: Gases SEGÚN NECESIDAD
+    icono: gases
+  - id: asn6
+    texto: Ignición ARRANQUE
+    icono: ignicion
+  - id: asn6b
+    texto: Motor encendido - vela
+    icono: motor
+    log: Motor encendido - vela
+  - id: asn7
+    texto: Interruptor principal aviónica ON
+    icono: radio
+  - id: asn_caution
+    texto: '⚠️ NO aplicar ALTA POTENCIA con motor frío. Usar técnica de CALENTAMIENTO'
+    icono: alerta
+
+- id: arranque_aire_picado
+  titulo: Arranque en el aire (Picado)
+  categoria: Procedimientos de planeo
+  color: '#1976D2'
+  pasos:
+  - id: asd1
+    texto: Interruptor principal aviónica OFF
+    icono: radio
+  - id: asd2
+    texto: Ignición ON
+    icono: ignicion
+  - id: asd3
+    texto: 'Aumentar velocidad (85 Kts) CONTROLAR'
+    icono: anemometro
+  - id: asd4
+    texto: Desabanderar hélice (desbloquear y empujar lentamente) GIRAR/EMPUJAR
+    icono: helice
+  - id: asd4b
+    texto: Motor encendido - vela
+    icono: motor
+    log: Motor encendido - vela
+  - id: asd5
+    texto: Aumentar velocidad CONTROLAR
+    icono: anemometro
+  - id: asd6
+    texto: Interruptor principal aviónica ON
+    icono: radio
+  - id: asd_caution
+    texto: '⚠️ NO aplicar ALTA POTENCIA con motor frío. Usar técnica de CALENTAMIENTO'
+    icono: alerta
+
+- id: rendimiento_cargas
+  titulo: Datos de rendimiento - Cargas
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pl1
+    texto: 'Peso máximo al despegue: 850 kg'
+    icono: balanza
+  - id: pl2
+    texto: 'Peso vacío: 650 kg'
+    icono: balanza
+  - id: pl3
+    texto: 'Carga útil: 200 kg'
+    icono: balanza
+  - id: pl4
+    texto: 'Capacidad máx combustible (100 litros): 70 kg'
+    icono: combustible
+  - id: pl5
+    texto: 'Límites centro gravedad: 271mm a 427mm detrás del datum'
+    icono: balanza
+  - id: pl6
+    texto: 'Vuelo solo mínimo: 70 kg'
+    icono: balanza
+  - id: pl7
+    texto: 'Vuelo solo máximo: 110 kg'
+    icono: balanza
+  - id: pl8
+    texto: 'Vuelo dual máximo (2 x 110): 220 kg'
+    icono: balanza
+  - id: pl_warning
+    texto: '⚠️ ADVERTENCIA: NO SE DEBE EXCEDER el MTOW de 850 kg'
+    icono: alerta
+
+- id: rendimiento_velocidades
+  titulo: Datos de rendimiento - Limitaciones de velocidad
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: ps1
+    texto: 'VNE - Velocidad máx (Aire tranquilo): 130 kts'
+    icono: anemometro
+  - id: ps2
+    texto: 'VB - Velocidad máx (Aire turbulento): 92 kts'
+    icono: anemometro
+  - id: ps3
+    texto: 'VM - Velocidad de maniobra: 92 kts'
+    icono: anemometro
+  - id: ps4
+    texto: 'VLE - Velocidad máx (Con frenos): 130 kts'
+    icono: anemometro
+  - id: ps5
+    texto: 'VS1 - Velocidad pérdida (Con frenos): 43 kts'
+    icono: anemometro
+  - id: ps6
+    texto: 'VS0 - Velocidad pérdida (Sin frenos): 39 kts'
+    icono: anemometro
+
+- id: rendimiento_despegue
+  titulo: Datos de rendimiento - Distancia de despegue (ISA)
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pt1
+    texto: 'Carrera de despegue: 214 m'
+    icono: pista
+  - id: pt2
+    texto: 'Hasta 15m (50 ft): 348 m'
+    icono: pista
+  - id: pt3
+    texto: 'Velocidad de despegue: 46 kts'
+    icono: anemometro
+  - id: pt4
+    texto: 'Cruzando 15m: 51 kts'
+    icono: anemometro
+
+- id: rendimiento_aterrizaje
+  titulo: Datos de rendimiento - Distancia de aterrizaje
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pld1
+    texto: 'Carrera de aterrizaje: 205 m'
+    icono: pista
+  - id: pld2
+    texto: 'Desde 15m (50 ft): 390 m'
+    icono: pista
+  - id: pld3
+    texto: 'Velocidad de aproximación: 62 kts'
+    icono: anemometro
+  - id: pld4
+    texto: 'Velocidad de toma: 41-46 kts'
+    icono: anemometro
+
+- id: rendimiento_ascenso
+  titulo: Datos de rendimiento - Programa de ascenso
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pc1
+    texto: 'Velocidad vertical hélice en "CLIMB": 570 fpm'
+    icono: subida
+  - id: pc2
+    texto: '@ Velocidad óptima: 59 kts'
+    icono: anemometro
+  - id: pc3
+    texto: 'Ángulo máximo de ascenso: 49 kts'
+    icono: anemometro
+  - id: pc4
+    texto: 'Velocidad vertical hélice en "CRUISE": 392 fpm'
+    icono: subida
+  - id: pc5
+    texto: '@ Velocidad óptima: 67 kts'
+    icono: anemometro
+  - id: pc6
+    texto: 'Techo de servicio: 16.500 ft'
+    icono: altimetro
+
+- id: rendimiento_crucero_perdida
+  titulo: Datos de rendimiento - Velocidades crucero y pérdida
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pcs1
+    texto: 'Crucero: 2800 RPM (Potencia continua máx): 103 kts'
+    icono: anemometro
+  - id: pcs2
+    texto: 'Pérdida vuelo nivelado potencia máx: 38 kts'
+    icono: anemometro
+  - id: pcs3
+    texto: 'Pérdida viraje 30° potencia máx: 40 kts'
+    icono: anemometro
+  - id: pcs4
+    texto: 'Pérdida vuelo nivelado ralentí: 39 kts'
+    icono: anemometro
+  - id: pcs5
+    texto: 'Pérdida viraje 30° ralentí: 42 kts'
+    icono: anemometro
+  - id: pcs6
+    texto: 'Pérdida vuelo nivelado hélice abanderada: 40 kts'
+    icono: anemometro
+  - id: pcs7
+    texto: 'Pérdida viraje 30° hélice abanderada: 43 kts'
+    icono: anemometro
+  - id: pcs8
+    texto: 'Pérdida frenos totalmente extendidos: 43 kts'
+    icono: anemometro
+
+- id: rendimiento_planeo
+  titulo: Datos de rendimiento - Rendimiento en planeo
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pg1
+    texto: 'Peso bruto: 850 kg'
+    icono: balanza
+  - id: pg2
+    texto: 'Carga alar: 44,7 kg/m²'
+    icono: balanza
+  - id: pg3
+    texto: 'Mejor fineza: 1:28 @ 62 kts'
+    icono: anemometro
+  - id: pg4
+    texto: 'Mínima tasa de descenso: 217 fpm @ 58 kts'
+    icono: anemometro
+  - id: pg5
+    texto: 'Mejor velocidad térmica: 51 kts'
+    icono: anemometro
+
+- id: rendimiento_combustible
+  titulo: Datos de rendimiento - Consumo de combustible
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: pf_note
+    texto: 'A 3300 ft (1000m) y MTOW (850 kg)'
+    icono: alerta
+  - id: pf1
+    texto: '2800 RPM: 103 kts (VTAS) - 17 l/h'
+    icono: combustible
+  - id: pf2
+    texto: '2600 RPM: 95 kts (VTAS) - 13,5 l/h'
+    icono: combustible
+  - id: pf3
+    texto: '2400 RPM: 87 kts (VTAS) - 10,5 l/h'
+    icono: combustible
+  - id: pf4
+    texto: '2200 RPM: 80 kts (VTAS) - 8,8 l/h'
+    icono: combustible
+  - id: pf5
+    texto: '2000 RPM: 72 kts (VTAS) - 7,2 l/h'
+    icono: combustible
+  - id: pf6
+    texto: '1800 RPM: 65 kts (VTAS) - 7,0 l/h'
+    icono: combustible

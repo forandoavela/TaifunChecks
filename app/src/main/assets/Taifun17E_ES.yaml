@@ -1,0 +1,311 @@
+version: 0.1
+checklists:
+  - id: chequeos_diarios
+    titulo: "Chequeos diarios"
+    full-list: true
+    categoria: "Procedimientos normales"
+    pasos:
+      - { id: cd1, texto: "¿Llave de contacto retirada?", icono: "llave" }
+      - { id: cd12, texto: "Hélice y cono. Prueba rango completo – MANU–FEATHER → MANU–MAX RPM", icono: "helice" }
+      - { id: cd2, texto: "Cubierta de la cabina limpia, cierre operativo", icono: "cabina" }
+      - { id: cd3, texto: "Flaps (ala izquierda)", icono: "flaps" }
+      - { id: cd4, texto: "Aerofreno (ala izquierda)", icono: "aerofreno" }
+      - { id: cd5, texto: "Alerón (ala izquierda)", icono: "aleron" }
+      - { id: cd6, texto: "Luz de posición (ala izquierda)", icono: "luz" }
+      - { id: cd7, texto: "Tubo de Pitot", icono: "pitot" }
+      - { id: cd8, texto: "Suministro de combustible, tapa del depósito (ala izquierda)", icono: "combustible" }
+      - { id: cd9, texto: "Drenaje de agua del tanque, ventilación del tanque (ala izquierda)", icono: "combustible" }
+      - { id: cd9r, texto: "Drenaje de agua del tanque, ventilación del tanque (ala derecha)", icono: "combustible" }
+      - { id: cd8r, texto: "Suministro de combustible, tapa del depósito (ala derecha)", icono: "combustible" }
+      - { id: cd6r, texto: "Luz de posición (ala derecha)", icono: "luz" }
+      - { id: cd5r, texto: "Alerón (ala derecha)", icono: "aleron" }
+      - { id: cd4r, texto: "Aerofreno (ala derecha)", icono: "aerofreno" }
+      - { id: cd3r, texto: "Flaps (ala derecha)", icono: "flaps" }
+      - { id: cd10, texto: "Carenado del motor", icono: "motor" }
+      - { id: cd11, texto: "Lubricante", icono: "aceite" }
+      - { id: cd13, texto: "Chequeo a 5m: tren de aterrizaje, timón, alas", icono: "inspeccion" }
+      - { id: cd14, texto: "Tren de aterrizaje, suspensión, presión neumáticos", icono: "tren" }
+      - { id: cd15, texto: "Antenas", icono: "antena" }
+      - { id: cd16, texto: "Puerto de presión estática", icono: "puerto" }
+      - { id: cd17, texto: "Timón, luz de posición", icono: "timon" }
+      - { id: cd18, texto: "Timón de profundidad asegurado, compensador", icono: "profundidad" }
+      - { id: cd19, texto: "Pasadores de control", icono: "control" }
+      - { id: cd20, texto: "Cierre central de las alas", icono: "alas" }
+      - { id: cd21, texto: "¿Perfil de ala limpio? Retirar agua/hielo/nieve", icono: "alas" }
+      - { id: cd22, texto: "Elementos de control y funcionamiento en cabina", icono: "cabina" }
+  - id: inspeccion_pre_arranque
+    titulo: "Inspección antes de arrancar"
+    full-list: true
+    categoria: "Procedimientos normales"
+    pasos:
+      - { id: ipa1, texto: "Chequeo pre-vuelo HECHO", icono: "check" }
+      - { id: ipa2, texto: "Preparación de vuelo COMPLETA", icono: "vuelo" }
+      - { id: ipa3, texto: "Documentación VERIFICADA Y A BORDO", icono: "documento" }
+      - { id: ipa4, texto: "Suministro de combustible CONTROLADO", icono: "combustible" }
+      - { id: ipa5, texto: "Suministro de lubricante CONTROLADO", icono: "aceite" }
+      - { id: ipa6, texto: "Carga ASEGURADA", icono: "carga" }
+      - { id: ipa7, texto: "Peso/centro de gravedad CONTROLADOS", icono: "balanza" }
+      - { id: ipa8, texto: "Controles LIBRES Y SIN PROBLEMAS", icono: "control" }
+      - { id: ipa9, texto: "Cúpula CERRADA Y BLOQUEADA", icono: "cabina" }
+      - { id: ipa10, texto: "Cinturones ABROCHADOS", icono: "cinturon" }
+      - { id: ipa11, texto: "Paso de gasolina ABIERTO", icono: "combustible" }
+      - { id: ipa12, texto: "Selector batería MÁS CARGADA (1 Ó 2)", icono: "bateria" }
+      - { id: ipa13, texto: "Interruptor principal ENCENDIDA", icono: "interruptor" }
+      - { id: ipa14, texto: "Tren de aterrizaje DESPLEGADO (VERDE)", icono: "tren" }
+      - { id: ipa15, texto: "Radio y equipos auxiliares APAGADOS", icono: "radio" }
+      - { id: ipa16, texto: "Estrobo ENCENDIDA", icono: "luz" }
+      - { id: ipa17, texto: "Freno de rueda APLICADO", icono: "freno" }
+  - id: arranque
+    titulo: "Arranque"
+    categoria: "Procedimientos normales"
+    color: "#FFEB3B"
+    pasos:
+      - { id: a1, texto: "Estrangulador ATRÁS (si aceite < 55°C)", icono: "estrangulador" }
+      - { id: a2, texto: "Gases 2CM ADELANTE", icono: "gases" }
+      - { id: a3, texto: "Hélice LUZ VERDE ENCENDIDA", icono: "helice" }
+      - { id: a4, texto: "Instrumentos y CO VERIFICADOS", icono: "instrumentos" }
+      - { id: a5, texto: "Hélice LIBRE", icono: "helice" }
+      - { id: a6, texto: "Interruptor principal ENCENDIDO", icono: "interruptor" }
+      - { id: a7, texto: "Estrobo ENCENDIDA", icono: "luz" }
+      - { id: a8, texto: "Bomba de gasolina ENCENDIDA", icono: "bomba" }
+      - { id: a9, texto: "Ignición ENCENDIDA", icono: "ignicion" }
+      - { id: a10, texto: "Luz indicadora del generador ENCENDIDA", icono: "generador" }
+      - { id: a11, texto: "Botón de arranque PRESIONAR y SOLTAR", icono: "boton" }
+      - { id: a12, texto: "Presión del aceite COMPROBAR (si no sube en 10s, apagar motor)", icono: "aceite" }
+      - { id: a13, texto: "Motor encendido", icono: "motor", log: "Motor encendido" }
+
+  - id: calentamiento
+    titulo: "Calentamiento"
+    categoria: "Procedimientos normales"
+    color: "#FFEB3B"
+    pasos:
+      - { id: cal1, texto: "Estrangulador y Gas aprox. 1000 rpm", icono: "gases" }
+      - { id: cal2, texto: "Luz generador APAGADA", icono: "generador" }
+      - { id: cal3, texto: "Bomba de combustible APAGADA", icono: "bomba" }
+      - { id: cal4, texto: "Selector batería AMBAS (1+2)", icono: "bateria" }
+      - { id: cal5, texto: "Radio, FLARM y navegación ENCENDIDAS", icono: "radio" }
+      - { id: cal6, texto: "Transponder STANDBY", icono: "transponder" }
+      - { id: cal7, texto: "Giróscopo y Horizonte ENCENDIDOS", icono: "instrumentos" }
+      - { id: cal8, texto: "Calentamiento: 1500 rpm (2 mins), 2000 rpm (hasta aceite 50°C)", icono: "motor" }
+      - { id: cal9, texto: "Gas BAJAR a 1000 rpm", icono: "gases" }
+      - { id: cal10, texto: "Tapa de refrigeración ABIERTA", icono: "refrigeracion" }
+      - { id: cal11, texto: "Control presión y temperatura de aceite", icono: "aceite" }
+  - id: rodaje
+    titulo: "Rodaje"
+    categoria: "Procedimientos normales"
+    color: "#FFEB3B"
+    pasos:
+      - { id: ro1, texto: "Temperatura de aceite >50°C", icono: "aceite" }
+      - { id: ro2, texto: "Frenos VERIFICADOS", icono: "freno" }
+      - { id: ro3, texto: "Instrumentos AJUSTADOS / VERIFICADOS", icono: "instrumentos" }
+      - { id: ro4, texto: "Altímetro QNH", icono: "altimetro", altitud: "ft", qnh: "hPa" }
+      - { id: ro5, texto: "Controles LIBRES", icono: "control" }
+      - { id: ro6, texto: "Trimado NEUTRAL", icono: "trim" }
+      - { id: ro7, texto: "Flaps 15°", icono: "flaps" }
+
+  - id: prueba_motor
+    titulo: "Prueba de motor"
+    categoria: "Procedimientos normales"
+    color: "#FFEB3B"
+    pasos:
+      - { id: pm1, texto: "Temperatura de aceite >50°C", icono: "aceite" }
+      - { id: pm2, texto: "Freno APLICADO", icono: "freno" }
+      - { id: pm3, texto: "Gas 1200 rpm", icono: "gases" }
+      - { id: pm4, texto: "Hélice MANU – FEATHER (caída de 200 rpm)", icono: "helice" }
+      - { id: pm5, texto: "Hélice MANU – MAX RPM (1200 rpm)", icono: "helice" }
+      - { id: pm6, texto: "Gas 2300 rpm", icono: "gases" }
+      - { id: pm7, texto: "Hélice AUTO – STOP – 2000 (luz verde apagada, 2000 rpm)", icono: "helice" }
+      - { id: pm8, texto: "Hélice AUTO – STOP – 3000 (luz verde encendida)", icono: "helice" }
+      - { id: pm9, texto: "Instrumentos motor RANGO VERDE", icono: "instrumentos" }
+      - { id: pm10, texto: "Gas AUMENTAR hasta 2950 ±100", icono: "gases" }
+      - { id: pm11, texto: "Gas BAJAR a 1000 rpm", icono: "gases" }
+
+  - id: comprobacion_pre_lanzamiento
+    titulo: "Comprobación pre-lanzamiento"
+    categoria: "Procedimientos normales"
+    color: "#FFEB3B"
+    pasos:
+      - { id: cpl1, texto: "Acelerador LIBRE", icono: "gases" }
+      - { id: cpl2, texto: "Paso de gasolina ABIERTO", icono: "combustible" }
+      - { id: cpl3, texto: "Bomba de gasolina ENCENDIDA", icono: "bomba" }
+      - { id: cpl4, texto: "Luces de aterrizaje ENCENDIDAS", icono: "luz" }
+      - { id: cpl5, texto: "Transponder ENCENDIDO / MODO ALT", icono: "transponder" }
+      - { id: cpl6, texto: "Brújula electrónica AJUSTADA", icono: "brujula" }
+      - { id: cpl7, texto: "Aerofrenos BLOQUEADOS", icono: "aerofreno" }
+      - { id: cpl8, texto: "Flaps +15°", icono: "flaps" }
+      - { id: cpl9, texto: "Cabina CERRADA Y BLOQUEADA", icono: "cabina" }
+      - { id: cpl10, texto: "Compensador NEUTRAL", icono: "trim" }
+      - { id: cpl11, texto: "Instrumentación motor CONTROLADA", icono: "instrumentos" }
+      - { id: cpl12, texto: "Viento cruzado <20 km/h", icono: "viento" }
+  - id: despegue_y_ascenso
+    titulo: "Despegue y ascenso"
+    categoria: "Procedimientos normales"
+    color: "#4CAF50"
+    pasos:
+      - { id: da1, texto: "Anemómetro vivo 40 km/h", icono: "anemometro" }
+      - { id: da2, texto: "Despegue 80 km/h", icono: "vuelo" }
+      - { id: da3, texto: "Ascenso 105 km/h", icono: "vuelo" }
+      - { id: da4, texto: "Si temperatura aceite alta: 120 km/h para refrigeración", icono: "aceite" }
+      - { id: da5, texto: "Ascenso inicial: presión de carga 26''", icono: "motor" }
+      - { id: da6, texto: "Ascenso inicial: RPM 2800", icono: "motor" }
+      - { id: da7, texto: "Flaps +8°", icono: "flaps" }
+      - { id: da8, texto: "Tren de aterrizaje REPLEGAR", icono: "tren" }
+      - { id: da9, texto: "IAS 120-130 km/h", icono: "anemometro" }
+      - { id: da10, texto: "A 500 pies: bomba de gasolina APAGADA", icono: "bomba" }
+      - { id: da11, texto: "A 500 pies: luces de aterrizaje APAGADAS", icono: "luz" }
+      - { id: da12, texto: "A 1000 pies: presión de carga 20''", icono: "motor" }
+      - { id: da13, texto: "A 1000 pies: RPM 2600", icono: "motor" }
+
+  - id: aproximacion_aterrizaje
+    titulo: "Aproximación al aterrizaje"
+    categoria: "Procedimientos normales"
+    color: "#9C27B0"
+    pasos:
+      - { id: aa1, texto: "Altímetro QNH", icono: "altimetro" }
+      - { id: aa2, texto: "Giroscopio CONFIGURADO", icono: "instrumentos" }
+      - { id: aa3, texto: "Bomba de combustible ENCENDIDA", icono: "bomba" }
+      - { id: aa4, texto: "Luces de aterrizaje ENCENDIDAS", icono: "luz" }
+      - { id: aa5, texto: "Hélice AUTO – STOP – 3000 (verde)", icono: "helice" }
+      - { id: aa6, texto: "Presión de carga 13''", icono: "motor" }
+      - { id: aa7, texto: "IAS 110-120 km/h", icono: "anemometro" }
+      - { id: aa8, texto: "Tren de aterrizaje DESPLEGADO", icono: "tren" }
+      - { id: aa9, texto: "Altitud MANTENER", icono: "altimetro" }
+      - { id: aa10, texto: "Flaps 15°", icono: "flaps" }
+      - { id: aa11, texto: "Final: IAS 110-120 km/h, trim ajustado", icono: "anemometro" }
+      - { id: aa12, texto: "Final: flaps +15° o +30°", icono: "flaps" }
+      - { id: aa13, texto: "Tras aterrizar: luces de aterrizaje APAGADAS", icono: "luz" }
+      - { id: aa14, texto: "Tras aterrizar: transponder STANDBY", icono: "transponder" }
+      - { id: aa15, texto: "Tras aterrizar: flaps -8°", icono: "flaps" }
+
+  - id: aparcamiento_apagado
+    titulo: "Aparcamiento y apagado"
+    categoria: "Procedimientos normales"
+    color: "#9C27B0"
+    pasos:
+      - { id: ap1, texto: "Motor ENFRIAR (1000 rpm)", icono: "motor" }
+      - { id: ap2, texto: "Gas RALENTÍ", icono: "gases" }
+      - { id: ap3, texto: "Todos interruptores APAGADOS", icono: "interruptor" }
+      - { id: ap4, texto: "Radio y navegación APAGADOS", icono: "radio" }
+      - { id: ap5, texto: "Transponder APAGADO", icono: "transponder" }
+      - { id: ap6, texto: "Giróscopo y horizonte APAGADOS", icono: "instrumentos" }
+      - { id: ap7, texto: "Estrobo APAGADA", icono: "luz" }
+      - { id: ap8, texto: "Medidor CO APAGADO", icono: "instrumentos" }
+      - { id: ap9, texto: "Interruptor principal APAGADO", icono: "interruptor" }
+      - { id: ap10, texto: "Ignición APAGADA", icono: "ignicion" }
+      - { id: ap10b, texto: "Motor apagado", icono: "motor", log: "Motor apagado" }
+      - { id: ap11, texto: "Llave QUITADA", icono: "llave" }
+      - { id: ap12, texto: "Selector batería OFF", icono: "bateria" }
+      - { id: ap13, texto: "Aeronave SEGURA", icono: "seguro" }
+  - id: vuelo_a_vela_apagar
+    titulo: "Vuelo a vela - Apagado de motor durante el vuelo"
+    categoria: "Procedimientos de vuelo a vela"
+    color: "#1976D2"
+    pasos:
+      - { id: vv1, texto: "Velocidad 100 km/h", icono: "anemometro" }
+      - { id: vv2, texto: "Flaps 0° o +8°", icono: "flaps" }
+      - { id: vv3, texto: "Gases RALENTÍ", icono: "gases" }
+      - { id: vv4, texto: "Aviónica TODO APAGADO", icono: "radio" }
+      - { id: vv5, texto: "Ignición APAGADO", icono: "ignicion" }
+      - { id: vv5b, texto: "Motor apagado - vela", icono: "motor", log: "Motor apagado - vela" }
+      - { id: vv6, texto: "Estrobo APAGADA", icono: "luz" }
+      - { id: vv7, texto: "Interruptor principal VELA", icono: "interruptor" }
+      - { id: vv8, texto: "Selector batería 1 ó 2", icono: "bateria" }
+      - { id: vv9, texto: "Tapa de refrigeración CERRADA", icono: "refrigeracion" }
+      - { id: vv10, texto: "Cuando hélice parada: Hélice ABANDERADA (MANU+FEATHER)", icono: "helice" }
+      - { id: vv11, texto: "Aviónica ENCENDER si necesario", icono: "radio" }
+
+  - id: vuelo_a_vela_encender
+    titulo: "Vuelo a vela - Encendido de motor durante el vuelo"
+    categoria: "Procedimientos de vuelo a vela"
+    color: "#1976D2"
+    pasos:
+      - { id: ve1, texto: "Velocidad 120 km/h", icono: "anemometro" }
+      - { id: ve2, texto: "Tapa de refrigeración ABIERTA", icono: "refrigeracion" }
+      - { id: ve3, texto: "Selector batería MÁS CARGADA (1 ó 2)", icono: "bateria" }
+      - { id: ve4, texto: "Hélice DESPEGUE (MANU+HIGH RPM, hasta 35° ~35s)", icono: "helice" }
+      - { id: ve5, texto: "Hélice AUTO+STOP+3000", icono: "helice" }
+      - { id: ve6, texto: "Aviónica TODO APAGADO", icono: "radio" }
+      - { id: ve7, texto: "Interruptor principal ENCENDIDO", icono: "interruptor" }
+      - { id: ve8, texto: "Estrangulador SI NECESARIO", icono: "estrangulador" }
+      - { id: ve9, texto: "Gases 2CM ADELANTE", icono: "gases" }
+      - { id: ve10, texto: "Ignición ENCENDIDA", icono: "ignicion" }
+      - { id: ve11, texto: "Botón arranque PULSAR", icono: "boton" }
+      - { id: ve12, texto: "Giro VELOCIDAD", icono: "anemometro" }
+      - { id: ve13, texto: "Estrobo ENCENDIDA", icono: "luz" }
+      - { id: ve14, texto: "Si no arranca: Hélice 35° (35s) + IAS 165 km/h (arranque molino de viento)", icono: "helice" }
+      - { id: ve15, texto: "Después de arrancar: presión de aceite VERIFICADA", icono: "aceite" }
+      - { id: ve15b, texto: "Motor encendido - vela", icono: "motor", log: "Motor encendido - vela" }
+      - { id: ve16, texto: "Después de arrancar: aviónica ENCENDIDA", icono: "radio" }
+      - { id: ve17, texto: "Después de arrancar: selector batería AMBAS (1+2)", icono: "bateria" }
+      - { id: ve18, texto: "Después de arrancar: ralentí hasta aceite 50°C", icono: "motor" }
+
+  - id: vuelo_a_vela_velocidades
+    titulo: "Vuelo a vela - Velocidades recomendadas"
+    categoria: "Procedimientos de vuelo a vela"
+    color: "#1976D2"
+    pasos:
+      - { id: vv80, texto: "80-110 km/h: Flaps +8° o +15°", icono: "flaps" }
+      - { id: vv110, texto: "110-150 km/h: Flaps 0°", icono: "flaps" }
+      - { id: vv150, texto: "150-250 km/h: Flaps -8°", icono: "flaps" }
+  - id: emergencia_incendio_motor
+    titulo: "Emergencia - Incendio en el motor"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: em1, texto: "Calefacción APAGADA", icono: "calefaccion" }
+      - { id: em2, texto: "Alimentación de gasolina CERRADA", icono: "combustible" }
+      - { id: em3, texto: "Gases MÁXIMO", icono: "gases" }
+      - { id: em4, texto: "Ignición APAGADA si motor parado", icono: "ignicion" }
+
+  - id: emergencia_barrena
+    titulo: "Emergencia - Detener barrena"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: eb1, texto: "Alerones NEUTROS", icono: "aleron" }
+      - { id: eb2, texto: "Timón COMPLETAMENTE CONTRA rotación", icono: "timon" }
+      - { id: eb3, texto: "Palanca AFLOJAR (posición neutral ligeramente presionada)", icono: "palanca" }
+      - { id: eb4, texto: "Después de parar rotación: timón CENTRADO", icono: "timon" }
+      - { id: eb5, texto: "Después de parar rotación: palanca RECUPERAR suavemente", icono: "palanca" }
+
+  - id: emergencia_salida
+    titulo: "Emergencia - Desprendimiento de cúpula y salida"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: es1, texto: "Ignición APAGADA", icono: "ignicion" }
+      - { id: es2, texto: "Perno rojo en cúpula TIRAR", icono: "cabina" }
+      - { id: es3, texto: "Cúpula ABRIR y EMPUJAR hacia atrás", icono: "cabina" }
+      - { id: es4, texto: "Cinturones DESABROCHADOS", icono: "cinturon" }
+      - { id: es5, texto: "Incorporarse y salir", icono: "salida" }
+      - { id: es6, texto: "Con paracaídas manual: esperar 2-3s antes de abrir", icono: "paracaidas" }
+
+  - id: emergencia_parada_postdespegue
+    titulo: "Emergencia - Parada de motor después del despegue"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: epd1, texto: "Alimentación de gasolina CERRADA", icono: "combustible" }
+      - { id: epd2, texto: "Ignición APAGADA", icono: "ignicion" }
+      - { id: epd3, texto: "Si aterrizaje inevitable en terreno duro: tren de aterrizaje RETRAÍDO", icono: "tren" }
+      - { id: epd4, texto: "Hélice HORIZONTAL", icono: "helice" }
+
+  - id: emergencia_motor_y_al_aire
+    titulo: "Emergencia - Motor y al aire"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: ema1, texto: "Aerofrenos RETRAÍDOS", icono: "aerofreno" }
+      - { id: ema2, texto: "Flaps NO TOCAR", icono: "flaps" }
+      - { id: ema3, texto: "Gas ACELERAR RÁPIDAMENTE", icono: "gases" }
+      - { id: ema4, texto: "IAS 105 km/h", icono: "anemometro" }
+      - { id: ema5, texto: "Flaps CON CUIDADO a +15°", icono: "flaps" }
+
+  - id: emergencia_fallo_helice
+    titulo: "Emergencia - Fallo del ajuste eléctrico en la hélice Mühlbauer"
+    categoria: "Procedimientos de emergencia"
+    color: "#F44336"
+    pasos:
+      - { id: efh1, texto: "Falla en operación con motor: volar con paso fijo o aterrizaje de emergencia", icono: "helice" }
+      - { id: efh2, texto: "Falla en operación a vela: aterrizaje de emergencia", icono: "helice" }
+# Fin de checklists Taifun 17E

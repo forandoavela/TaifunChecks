@@ -1,0 +1,526 @@
+version: '1.0'
+checklists:
+- id: antes_sacar_hangar
+  titulo: Antes de sacar del hangar
+  categoria: Procedimientos normales
+  full-list: true
+  pasos:
+  - id: ash1
+    texto: Documentación (ARC, seguro, inspecciones) VERIFICADA Y OK
+    icono: documento
+  - id: ash2
+    texto: Fundas QUITADAS
+    icono: cabina
+  - id: ash3
+    texto: Interior cabina (asientos, mandos, porta-equipajes) REVISADO
+    icono: cabina
+  - id: ash4
+    texto: Cúpula de la cabina REVISADA
+    icono: cabina
+  - id: ash5
+    texto: Rueda tren principal 1,8 kg/cm² VERIFICADA
+    icono: tren
+  - id: ash6
+    texto: Ruedas auxiliares de plano y rueda de cola 2,5 kg/cm² VERIFICADAS
+    icono: tren
+  - id: ash7
+    texto: Paracaídas PUESTOS
+    icono: paracaidas
+  - id: ash8
+    texto: Máster CONECTADO - Nivel combustible VERIFICADO
+    icono: combustible
+  - id: ash9
+    texto: Máster DESCONECTADO
+    icono: interruptor
+
+- id: revision_exterior
+  titulo: Revisión exterior antes del vuelo
+  categoria: Procedimientos normales
+  full-list: true
+  pasos:
+  - id: re1
+    texto: Freno de aparcamiento BLOQUEADO
+    icono: freno
+  - id: re2
+    texto: Máster OFF
+    icono: interruptor
+  - id: re3
+    texto: Magneto OFF (abajo)
+    icono: ignicion
+  - id: re4
+    texto: Nivel de aceite VERIFICADO (min 1,5 l - máx 2,5 l)
+    icono: aceite
+  - id: re5
+    texto: Varilla medidor aceite BIEN METIDA y tapa CERRADA
+    icono: aceite
+  - id: re6
+    texto: Cable paso hélice y mando VERIFICADOS
+    icono: helice
+  - id: re7
+    texto: Hélice (fisuras, bordes) y cono VERIFICADOS
+    icono: helice
+  - id: re8
+    texto: Palas hélice - Recorrido libre cambio paso y bandera VERIFICADO
+    icono: helice
+  - id: re9
+    texto: Motor (pérdidas aceite, correa, carburador) INSPECCIONADO
+    icono: motor
+  - id: re10
+    texto: Trampilla flujo aire motor y tubo escape VERIFICADOS
+    icono: motor
+  - id: re11
+    texto: Frenos aerodinámicos EXTENDIDOS Y VERIFICADOS
+    icono: aerofreno
+  - id: re12
+    texto: Superficie motovelero (golpes, fisuras, entelado) VERIFICADA
+    icono: inspeccion
+  - id: re13
+    texto: Ala derecha (superficie, alerón, registros, conexiones) VERIFICADA
+    icono: alas
+  - id: re14
+    texto: Freno aerodinámico ala derecha VERIFICADO
+    icono: aerofreno
+  - id: re15
+    texto: Rueda auxiliar plano derecha VERIFICADA
+    icono: tren
+  - id: re16
+    texto: Fuselaje derecho y antena energía total VERIFICADOS
+    icono: inspeccion
+  - id: re17
+    texto: Tren aterrizaje principal VERIFICADO
+    icono: tren
+  - id: re18
+    texto: Nivel combustible VERIFICADO - Tapón BIEN CERRADO
+    icono: combustible
+  - id: re19
+    texto: Funda tubo pitot QUITADA
+    icono: pitot
+  - id: re20
+    texto: Estabilizador horizontal y timón profundidad VERIFICADOS
+    icono: profundidad
+  - id: re21
+    texto: Aleta compensación VERIFICADA
+    icono: trim
+  - id: re22
+    texto: Estabilizador vertical y timón dirección VERIFICADOS
+    icono: timon
+  - id: re23
+    texto: Rueda de cola VERIFICADA
+    icono: tren
+  - id: re24
+    texto: Fuselaje izquierdo VERIFICADO
+    icono: inspeccion
+  - id: re25
+    texto: Ala izquierda (superficie, alerón, registros, conexiones) VERIFICADA
+    icono: alas
+  - id: re26
+    texto: Freno aerodinámico ala izquierda VERIFICADO
+    icono: aerofreno
+  - id: re27
+    texto: Rueda auxiliar plano izquierda VERIFICADA
+    icono: tren
+
+- id: preparacion_prevuelo_cabina
+  titulo: Preparación prevuelo cabina
+  categoria: Procedimientos normales
+  full-list: true
+  pasos:
+  - id: ppc1
+    texto: Lastre según peso piloto VERIFICADO
+    icono: balanza
+  - id: ppc2
+    texto: 'Vuelo monoplaza: Atalajes puesto trasero ASEGURADOS'
+    icono: cinturon
+  - id: ppc3
+    texto: 'Vuelo monoplaza: Magneto puesto trasero EN ON'
+    icono: ignicion
+  - id: ppc4
+    texto: 'Vuelo biplaza: Pedales puesto delantero AJUSTADOS'
+    icono: control
+  - id: ppc5
+    texto: 'Vuelo biplaza: Atalajes delantero ABROCHADOS Y AJUSTADOS'
+    icono: cinturon
+  - id: ppc6
+    texto: 'Vuelo biplaza: Atalajes trasero ABROCHADOS Y AJUSTADOS'
+    icono: cinturon
+
+- id: puesta_marcha
+  titulo: Puesta en marcha
+  categoria: Procedimientos normales
+  full-list: false
+  color: '#FFEB3B'
+  pasos:
+  - id: pm1
+    texto: Cabina CERRADA
+    icono: cabina
+  - id: pm2
+    texto: ¡Frenos PUESTOS Y BLOQUEADOS!
+    icono: freno
+  - id: pm3
+    texto: Persiana ABIERTA
+    icono: refrigeracion
+  - id: pm4
+    texto: Llave combustible ABIERTA
+    icono: combustible
+  - id: pm5
+    texto: Nivel combustible VERIFICADO
+    icono: combustible
+  - id: pm6
+    texto: Calefacción carburador QUITADA
+    icono: calefaccion
+  - id: pm7
+    texto: Paso hélice OFF
+    icono: helice
+  - id: pm8
+    texto: Radio DESCONECTADA
+    icono: radio
+  - id: pm9
+    texto: Máster CONECTADO
+    icono: interruptor
+  - id: pm10
+    texto: Estrangulador COMO REQUIERA
+    icono: estrangulador
+  - id: pm11
+    texto: Gases COMO REQUIERA
+    icono: gases
+  - id: pm12
+    texto: Magneto ON (Ein)
+    icono: ignicion
+  - id: pm13
+    texto: ¡Área hélice LIBRE!
+    icono: helice
+  - id: pm14
+    texto: Starter ACCIONAR
+    icono: boton
+  - id: pm15
+    texto: Presión aceite SUBIENDO
+    icono: aceite
+  - id: pm15b
+    texto: Motor encendido
+    icono: motor
+    log: Motor encendido
+  - id: pm16
+    texto: Radio CONECTADA
+    icono: radio
+  - id: pm17
+    texto: 'Calentamiento inicial: 1.000 rpm (2 min)'
+    icono: motor
+  - id: pm18
+    texto: 'Calentamiento: 1.500 rpm'
+    icono: motor
+
+- id: antes_despegue
+  titulo: Antes del despegue
+  categoria: Procedimientos normales
+  color: '#FFEB3B'
+  pasos:
+  - id: ad1
+    texto: Frenos aerodinámicos COMPROBADOS Y BLOQUEADOS
+    icono: aerofreno
+  - id: ad2
+    texto: Instrumentos COMPROBADOS
+    icono: instrumentos
+  - id: ad3
+    texto: Altímetro CALADO
+    icono: altimetro
+    qnh: hPa
+  - id: ad4
+    texto: Instrumentos motor EN VERDE
+    icono: motor
+  - id: ad5
+    texto: Estrangulador QUITADO
+    icono: estrangulador
+  - id: ad6
+    texto: Paso hélice OFF
+    icono: helice
+  - id: ad7
+    texto: Calefacción carburador QUITADA
+    icono: calefaccion
+  - id: ad8
+    texto: Compensador AJUSTADO
+    icono: trim
+  - id: ad9
+    texto: Persianas ABIERTAS
+    icono: refrigeracion
+  - id: ad10
+    texto: Atalajes ABROCHADOS Y AJUSTADOS
+    icono: cinturon
+  - id: ad11
+    texto: Mandos LIBRES
+    icono: control
+  - id: ad12
+    texto: Cabina CERRADA Y ASEGURADA
+    icono: cabina
+  - id: ad13
+    texto: Espacio libre COMPROBADO
+    icono: inspeccion
+  - id: ad14
+    texto: Viento (manga) VERIFICADO
+    icono: manga
+  - id: ad15
+    texto: Comunicar inicio despegue
+    icono: radio
+
+- id: datos_limites
+  titulo: Datos y límites de servicio
+  categoria: Información técnica
+  color: '#607D8B'
+  pasos:
+  - id: dl1
+    texto: 'Potencia máxima 5 min: 3.550 rpm (60 CV)'
+    icono: motor
+  - id: dl2
+    texto: 'Potencia máxima continua: 2.800 rpm (45 CV)'
+    icono: motor
+  - id: dl3
+    texto: 'Aceite: 2,5 l (mín. 1,5 l)'
+    icono: aceite
+  - id: dl4
+    texto: 'Combustible: 40 l'
+    icono: combustible
+  - id: dl5
+    texto: 'Temp. aceite: mín 50°C (70°C riesgo engelamiento) - máx 120°C'
+    icono: aceite
+  - id: dl6
+    texto: 'Presión aceite: mín 1 kg/cm² (2.500 rpm) - máx 4 kg/cm²'
+    icono: aceite
+  - id: dl7
+    texto: 'VNE: 190 km/h'
+    icono: anemometro
+  - id: dl8
+    texto: 'V Maniobra: 156 km/h'
+    icono: anemometro
+  - id: dl9
+    texto: 'V Ascenso: 90-100 km/h'
+    icono: anemometro
+  - id: dl10
+    texto: 'V Crucero: 130-150 km/h (2.600-2.800 rpm)'
+    icono: anemometro
+  - id: dl11
+    texto: 'V Máxima fineza: 1:26 a 95 km/h'
+    icono: anemometro
+  - id: dl12
+    texto: 'Crucero nominal: 2.800 rpm, 140 km/h, 12 l/h, 3:20 h, 480 km'
+    icono: motor
+  - id: dl13
+    texto: 'Crucero económico: 2.700 rpm, 130 km/h, 10 l/h, 4 h, 525 km'
+    icono: motor
+  - id: dl14
+    texto: 'Peso vacío: 400 kg'
+    icono: balanza
+  - id: dl15
+    texto: 'Peso máx despegue: 610 kg'
+    icono: balanza
+  - id: dl16
+    texto: 'Carga máx asiento: 110 kg'
+    icono: balanza
+  - id: dl17
+    texto: 'Carga máx equipaje: 10 kg'
+    icono: balanza
+  - id: dl18
+    texto: 'Carga mín cabina delantera: 55 kg'
+    icono: balanza
+
+- id: emergencia_despegue_abortar
+  titulo: Emergencia - Abortar despegue en carrera
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: eda1
+    texto: Continuar RECTO
+    icono: control
+  - id: eda2
+    texto: Gases CORTAR
+    icono: gases
+  - id: eda3
+    texto: Frenar A DISCRECIÓN
+    icono: freno
+
+- id: emergencia_despegue_aire_pista
+  titulo: Emergencia - En aire con pista suficiente (fallo motor)
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: edap1
+    texto: Continuar RECTO
+    icono: control
+  - id: edap2
+    texto: Gases CORTAR
+    icono: gases
+  - id: edap3
+    texto: Frenos aerodinámicos SACAR
+    icono: aerofreno
+  - id: edap4
+    texto: Aterrizar y frenar A DISCRECIÓN
+    icono: freno
+
+- id: emergencia_despegue_menos100m
+  titulo: Emergencia - Pasada cabecera <100m altura (fallo motor)
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: ed100_1
+    texto: '¡NO INTENTAR VOLVER A PISTAS!'
+    icono: alerta
+  - id: ed100_2
+    texto: Gases CORTAR
+    icono: gases
+  - id: ed100_3
+    texto: Hélice FRENAR Y ABANDERAR
+    icono: helice
+  - id: ed100_4
+    texto: Velocidad 90 km/h
+    icono: anemometro
+  - id: ed100_5
+    texto: 'Aterrizar: campos al norte (P30/33) o sur carretera Segovia (P15)'
+    icono: aterrizaje
+  - id: ed100_6
+    texto: 'Si da tiempo: Contacto OFF - Llave combustible CERRADA - Máster OFF'
+    icono: interruptor
+
+- id: emergencia_despegue_mas100m
+  titulo: Emergencia - Pasada cabecera >100m altura (fallo motor)
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: ed100m_1
+    texto: Gases CORTAR
+    icono: gases
+  - id: ed100m_2
+    texto: Hélice FRENAR Y ABANDERAR
+    icono: helice
+  - id: ed100m_3
+    texto: Velocidad 90 km/h
+    icono: anemometro
+  - id: ed100m_4
+    texto: Viraje suave 180° - Aterrizar viento en cola pista contraria
+    icono: control
+  - id: ed100m_5
+    texto: 'Si da tiempo: Contacto OFF - Llave combustible CERRADA - Máster OFF'
+    icono: interruptor
+
+- id: emergencia_vuelo_perdida_potencia
+  titulo: Emergencia - Pérdida potencia motor (no se para)
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: evpp1
+    texto: Volver al aeródromo
+    icono: vuelo
+  - id: evpp2
+    texto: Aterrizar por pista más conveniente
+    icono: aterrizaje
+
+- id: emergencia_vuelo_fallo_menos300m
+  titulo: Emergencia - Fallo total motor <300m altura
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: evf300_1
+    texto: Gases CORTAR
+    icono: gases
+  - id: evf300_2
+    texto: Hélice FRENAR Y ABANDERAR
+    icono: helice
+  - id: evf300_3
+    texto: Velocidad 90 km/h
+    icono: anemometro
+  - id: evf300_4
+    texto: 'Asegurar cabina: Contacto OFF - Llave combustible CERRADA - Máster OFF'
+    icono: interruptor
+  - id: evf300_5
+    texto: 'Si cerca aeródromo: aterrizar pista conveniente'
+    icono: aterrizaje
+  - id: evf300_6
+    texto: 'Si no: buscar campo alternativo y aterrizar emergencia'
+    icono: aterrizaje
+  - id: evf300_7
+    texto: Comunicar intenciones
+    icono: radio
+
+- id: emergencia_vuelo_fallo_mas300m
+  titulo: Emergencia - Fallo total motor >300m altura
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: evf300m_1
+    texto: Velocidad 90 km/h
+    icono: anemometro
+  - id: evf300m_2
+    texto: Intentar PONER MOTOR EN MARCHA
+    icono: motor
+  - id: evf300m_3
+    texto: 'Si no arranca: Gases CORTAR'
+    icono: gases
+  - id: evf300m_4
+    texto: 'Si no arranca: Hélice FRENAR Y ABANDERAR'
+    icono: helice
+  - id: evf300m_5
+    texto: 'Si no arranca: Velocidad 90 km/h'
+    icono: anemometro
+  - id: evf300m_6
+    texto: 'Si no arranca: Asegurar cabina (Contacto OFF - Combustible CERRADO - Máster OFF)'
+    icono: interruptor
+  - id: evf300m_7
+    texto: 'Si cerca aeródromo: aterrizar pista conveniente'
+    icono: aterrizaje
+  - id: evf300m_8
+    texto: 'Si no: buscar campo alternativo y aterrizar emergencia'
+    icono: aterrizaje
+  - id: evf300m_9
+    texto: Comunicar intenciones
+    icono: radio
+
+- id: emergencia_fuego
+  titulo: Emergencia - Fuego
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: ef1
+    texto: Gases CORTAR
+    icono: gases
+  - id: ef2
+    texto: Llave combustible CERRADA
+    icono: combustible
+  - id: ef3
+    texto: Hélice FRENAR Y ABANDERAR
+    icono: helice
+  - id: ef4
+    texto: Velocidad 90 km/h
+    icono: anemometro
+  - id: ef5
+    texto: 'Asegurar cabina: Contacto OFF - Llave combustible CERRADA - Máster OFF'
+    icono: interruptor
+  - id: ef6
+    texto: 'Si cerca aeródromo: aterrizar INMEDIATAMENTE pista conveniente'
+    icono: aterrizaje
+  - id: ef7
+    texto: 'Si no: buscar campo y aterrizar INMEDIATAMENTE'
+    icono: aterrizaje
+  - id: ef8
+    texto: Comunicar intenciones
+    icono: radio
+  - id: ef9
+    texto: Considerar RESBALAR para desviar llamas
+    icono: control
+
+- id: emergencia_arranque_vuelo_falla
+  titulo: Emergencia - Falla arranque motor en vuelo con starter
+  categoria: Procedimientos de emergencia
+  color: '#F44336'
+  pasos:
+  - id: eafv1
+    texto: Picar francamente hasta 150 km/h
+    icono: anemometro
+  - id: eafv2
+    texto: Contacto PONER
+    icono: ignicion
+  - id: eafv3
+    texto: Mando bandera hélice SOLTAR LENTAMENTE
+    icono: helice
+  - id: eafv4
+    texto: 'Cuando hélice empiece a girar: Mando bandera SOLTAR DEL TODO'
+    icono: helice
+  - id: eafv5
+    texto: '⚠️ Esta maniobra consume 150-200 metros de altura'
+    icono: alerta

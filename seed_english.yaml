@@ -1,0 +1,291 @@
+version: 0.1
+checklists:
+  - id: daily_checks
+    titulo: "Daily Checks"
+    full-list: true
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: cd1, texto: "Ignition key removed?", icono: "llave" }
+      - { id: cd2, texto: "Cockpit canopy clean, lock operative", icono: "cabina" }
+      - { id: cd3, texto: "Flaps", icono: "flaps" }
+      - { id: cd4, texto: "Airbrake", icono: "aerofreno" }
+      - { id: cd5, texto: "Aileron", icono: "aleron" }
+      - { id: cd6, texto: "Position light", icono: "luz" }
+      - { id: cd7, texto: "Pitot tube", icono: "pitot" }
+      - { id: cd8, texto: "Fuel supply, tank cap", icono: "combustible" }
+      - { id: cd9, texto: "Tank water drain, tank ventilation", icono: "combustible" }
+      - { id: cd10, texto: "Engine cowling", icono: "motor" }
+      - { id: cd11, texto: "Lubricant", icono: "aceite" }
+      - { id: cd12, texto: "Propeller and spinner. Full range test – MANU–FEATHER → MANU–MAX RPM", icono: "helice" }
+      - { id: cd13, texto: "5m check: landing gear, rudder, wings", icono: "inspeccion" }
+      - { id: cd14, texto: "Landing gear, suspension, tire pressure", icono: "tren" }
+      - { id: cd15, texto: "Antennas", icono: "antena" }
+      - { id: cd16, texto: "Static pressure port", icono: "puerto" }
+      - { id: cd17, texto: "Rudder, position light", icono: "timon" }
+      - { id: cd18, texto: "Elevator secured, trim tab", icono: "profundidad" }
+      - { id: cd19, texto: "Control pins", icono: "control" }
+      - { id: cd20, texto: "Wing center lock", icono: "alas" }
+      - { id: cd21, texto: "Wing profile clean? Remove water/ice/snow", icono: "alas" }
+      - { id: cd22, texto: "Cockpit controls and operation", icono: "cabina" }
+
+  - id: pre_start_inspection
+    titulo: "Pre-Start Inspection"
+    full-list: true
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: ipa1, texto: "Pre-flight check DONE", icono: "check" }
+      - { id: ipa2, texto: "Flight preparation COMPLETE", icono: "vuelo" }
+      - { id: ipa3, texto: "Documentation VERIFIED AND ON BOARD", icono: "documento" }
+      - { id: ipa4, texto: "Fuel supply CHECKED", icono: "combustible" }
+      - { id: ipa5, texto: "Lubricant supply CHECKED", icono: "aceite" }
+      - { id: ipa6, texto: "Load SECURED", icono: "carga" }
+      - { id: ipa7, texto: "Weight/center of gravity CHECKED", icono: "balanza" }
+      - { id: ipa8, texto: "Controls FREE AND SMOOTH", icono: "control" }
+      - { id: ipa9, texto: "Canopy CLOSED AND LOCKED", icono: "cabina" }
+      - { id: ipa10, texto: "Seat belts FASTENED", icono: "cinturon" }
+      - { id: ipa11, texto: "Fuel valve OPEN", icono: "combustible" }
+      - { id: ipa12, texto: "Battery selector MORE CHARGED (1 OR 2)", icono: "bateria" }
+      - { id: ipa13, texto: "Master switch ON", icono: "interruptor" }
+      - { id: ipa14, texto: "Landing gear DOWN (GREEN)", icono: "tren" }
+      - { id: ipa15, texto: "Radio and auxiliary equipment OFF", icono: "radio" }
+      - { id: ipa16, texto: "Strobe ON", icono: "luz" }
+      - { id: ipa17, texto: "Wheel brake APPLIED", icono: "freno" }
+
+  - id: engine_start
+    titulo: "Engine Start"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: a1, texto: "Choke BACK (if oil < 55°C)", icono: "estrangulador" }
+      - { id: a2, texto: "Throttle 2CM FORWARD", icono: "gases" }
+      - { id: a3, texto: "Propeller GREEN LIGHT ON", icono: "helice" }
+      - { id: a4, texto: "Instruments and CO CHECKED", icono: "instrumentos" }
+      - { id: a5, texto: "Propeller CLEAR", icono: "helice" }
+      - { id: a6, texto: "Master switch ON", icono: "interruptor" }
+      - { id: a7, texto: "Strobe ON", icono: "luz" }
+      - { id: a8, texto: "Fuel pump ON", icono: "bomba" }
+      - { id: a9, texto: "Ignition ON", icono: "ignicion" }
+      - { id: a10, texto: "Generator indicator light ON", icono: "generador" }
+      - { id: a11, texto: "Starter button PRESS and RELEASE", icono: "boton" }
+      - { id: a12, texto: "Oil pressure CHECK (if not rising in 10s, shut down engine)", icono: "aceite" }
+
+  - id: warm_up
+    titulo: "Warm-up"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: cal1, texto: "Choke and throttle approx. 1000 rpm", icono: "gases" }
+      - { id: cal2, texto: "Generator light OFF", icono: "generador" }
+      - { id: cal3, texto: "Fuel pump OFF", icono: "bomba" }
+      - { id: cal4, texto: "Battery selector BOTH (1+2)", icono: "bateria" }
+      - { id: cal5, texto: "Radio, FLARM and navigation ON", icono: "radio" }
+      - { id: cal6, texto: "Transponder STANDBY", icono: "transponder" }
+      - { id: cal7, texto: "Gyroscope and Horizon ON", icono: "instrumentos" }
+      - { id: cal8, texto: "Warm-up: 1500 rpm (2 mins), 2000 rpm (until oil 50°C)", icono: "motor" }
+      - { id: cal9, texto: "Throttle REDUCE to 1000 rpm", icono: "gases" }
+      - { id: cal10, texto: "Cooling flap OPEN", icono: "refrigeracion" }
+      - { id: cal11, texto: "Check oil pressure and temperature", icono: "aceite" }
+
+  - id: taxi
+    titulo: "Taxi"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: ro1, texto: "Oil temperature >50°C", icono: "aceite" }
+      - { id: ro2, texto: "Brakes CHECKED", icono: "freno" }
+      - { id: ro3, texto: "Instruments SET / CHECKED", icono: "instrumentos" }
+      - { id: ro4, texto: "Altimeter QNH", icono: "altimetro" }
+      - { id: ro5, texto: "Controls FREE", icono: "control" }
+      - { id: ro6, texto: "Trim NEUTRAL", icono: "trim" }
+      - { id: ro7, texto: "Flaps 15°", icono: "flaps" }
+
+  - id: engine_run_up
+    titulo: "Engine Run-up"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: pm1, texto: "Oil temperature >50°C", icono: "aceite" }
+      - { id: pm2, texto: "Brake APPLIED", icono: "freno" }
+      - { id: pm3, texto: "Throttle 1200 rpm", icono: "gases" }
+      - { id: pm4, texto: "Propeller MANU – FEATHER (200 rpm drop)", icono: "helice" }
+      - { id: pm5, texto: "Propeller MANU – MAX RPM (1200 rpm)", icono: "helice" }
+      - { id: pm6, texto: "Throttle 2300 rpm", icono: "gases" }
+      - { id: pm7, texto: "Propeller AUTO – STOP – 2000 (green light off, 2000 rpm)", icono: "helice" }
+      - { id: pm8, texto: "Propeller AUTO – STOP – 3000 (green light on)", icono: "helice" }
+      - { id: pm9, texto: "Engine instruments GREEN RANGE", icono: "instrumentos" }
+      - { id: pm10, texto: "Throttle INCREASE to 2950 ±100", icono: "gases" }
+      - { id: pm11, texto: "Throttle REDUCE to 1000 rpm", icono: "gases" }
+
+  - id: pre_takeoff_check
+    titulo: "Pre-Takeoff Check"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: cpl1, texto: "Throttle FREE", icono: "gases" }
+      - { id: cpl2, texto: "Fuel valve OPEN", icono: "combustible" }
+      - { id: cpl3, texto: "Fuel pump ON", icono: "bomba" }
+      - { id: cpl4, texto: "Landing lights ON", icono: "luz" }
+      - { id: cpl5, texto: "Transponder ON / MODE ALT", icono: "transponder" }
+      - { id: cpl6, texto: "Electronic compass SET", icono: "brujula" }
+      - { id: cpl7, texto: "Airbrakes LOCKED", icono: "aerofreno" }
+      - { id: cpl8, texto: "Flaps +15°", icono: "flaps" }
+      - { id: cpl9, texto: "Canopy CLOSED AND LOCKED", icono: "cabina" }
+      - { id: cpl10, texto: "Trim NEUTRAL", icono: "trim" }
+      - { id: cpl11, texto: "Engine instrumentation CHECKED", icono: "instrumentos" }
+      - { id: cpl12, texto: "Crosswind <20 km/h", icono: "viento" }
+
+  - id: takeoff_and_climb
+    titulo: "Takeoff and Climb"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: da1, texto: "Airspeed indicator alive 40 km/h", icono: "anemometro" }
+      - { id: da2, texto: "Takeoff 80 km/h", icono: "vuelo" }
+      - { id: da3, texto: "Climb 105 km/h", icono: "vuelo" }
+      - { id: da4, texto: "If high oil temperature: 120 km/h for cooling", icono: "aceite" }
+      - { id: da5, texto: "Initial climb: boost pressure 26''", icono: "motor" }
+      - { id: da6, texto: "Initial climb: RPM 2800", icono: "motor" }
+      - { id: da7, texto: "Flaps +8°", icono: "flaps" }
+      - { id: da8, texto: "Landing gear RETRACT", icono: "tren" }
+      - { id: da9, texto: "IAS 120-130 km/h", icono: "anemometro" }
+      - { id: da10, texto: "At 500 feet: fuel pump OFF", icono: "bomba" }
+      - { id: da11, texto: "At 500 feet: landing lights OFF", icono: "luz" }
+      - { id: da12, texto: "At 1000 feet: boost pressure 20''", icono: "motor" }
+      - { id: da13, texto: "At 1000 feet: RPM 2600", icono: "motor" }
+
+  - id: approach_landing
+    titulo: "Approach and Landing"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: aa1, texto: "Altimeter QNH", icono: "altimetro" }
+      - { id: aa2, texto: "Gyroscope SET", icono: "instrumentos" }
+      - { id: aa3, texto: "Fuel pump ON", icono: "bomba" }
+      - { id: aa4, texto: "Landing lights ON", icono: "luz" }
+      - { id: aa5, texto: "Propeller AUTO – STOP – 3000 (green)", icono: "helice" }
+      - { id: aa6, texto: "Boost pressure 13''", icono: "motor" }
+      - { id: aa7, texto: "IAS 110-120 km/h", icono: "anemometro" }
+      - { id: aa8, texto: "Landing gear DOWN", icono: "tren" }
+      - { id: aa9, texto: "Altitude MAINTAIN", icono: "altimetro" }
+      - { id: aa10, texto: "Flaps 15°", icono: "flaps" }
+      - { id: aa11, texto: "Final: IAS 110-120 km/h, trim set", icono: "anemometro" }
+      - { id: aa12, texto: "Final: flaps +15° or +30°", icono: "flaps" }
+      - { id: aa13, texto: "After landing: landing lights OFF", icono: "luz" }
+      - { id: aa14, texto: "After landing: transponder STANDBY", icono: "transponder" }
+      - { id: aa15, texto: "After landing: flaps -8°", icono: "flaps" }
+
+  - id: parking_shutdown
+    titulo: "Parking and Shutdown"
+    categoria: "Normal Procedures"
+    pasos:
+      - { id: ap1, texto: "Engine COOL DOWN (1000 rpm)", icono: "motor" }
+      - { id: ap2, texto: "Throttle IDLE", icono: "gases" }
+      - { id: ap3, texto: "All switches OFF", icono: "interruptor" }
+      - { id: ap4, texto: "Radio and navigation OFF", icono: "radio" }
+      - { id: ap5, texto: "Transponder OFF", icono: "transponder" }
+      - { id: ap6, texto: "Gyroscope and horizon OFF", icono: "instrumentos" }
+      - { id: ap7, texto: "Strobe OFF", icono: "luz" }
+      - { id: ap8, texto: "CO meter OFF", icono: "instrumentos" }
+      - { id: ap9, texto: "Master switch OFF", icono: "interruptor" }
+      - { id: ap10, texto: "Ignition OFF", icono: "ignicion" }
+      - { id: ap11, texto: "Key REMOVED", icono: "llave" }
+      - { id: ap12, texto: "Battery selector OFF", icono: "bateria" }
+      - { id: ap13, texto: "Aircraft SECURED", icono: "seguro" }
+
+  - id: soaring_engine_shutdown
+    titulo: "Soaring - Engine Shutdown During Flight"
+    categoria: "Soaring Procedures"
+    pasos:
+      - { id: vv1, texto: "Speed 100 km/h", icono: "anemometro" }
+      - { id: vv2, texto: "Flaps 0° or +8°", icono: "flaps" }
+      - { id: vv3, texto: "Throttle IDLE", icono: "gases" }
+      - { id: vv4, texto: "Avionics ALL OFF", icono: "radio" }
+      - { id: vv5, texto: "Ignition OFF", icono: "ignicion" }
+      - { id: vv6, texto: "Strobe OFF", icono: "luz" }
+      - { id: vv7, texto: "Master switch SOAR", icono: "interruptor" }
+      - { id: vv8, texto: "Battery selector 1 or 2", icono: "bateria" }
+      - { id: vv9, texto: "Cooling flap CLOSED", icono: "refrigeracion" }
+      - { id: vv10, texto: "When propeller stopped: Propeller FEATHERED (MANU+FEATHER)", icono: "helice" }
+      - { id: vv11, texto: "Avionics ON if necessary", icono: "radio" }
+
+  - id: soaring_engine_restart
+    titulo: "Soaring - Engine Restart During Flight"
+    categoria: "Soaring Procedures"
+    pasos:
+      - { id: ve1, texto: "Speed 120 km/h", icono: "anemometro" }
+      - { id: ve2, texto: "Cooling flap OPEN", icono: "refrigeracion" }
+      - { id: ve3, texto: "Battery selector MORE CHARGED (1 or 2)", icono: "bateria" }
+      - { id: ve4, texto: "Propeller TAKEOFF (MANU+HIGH RPM, to 35° ~35s)", icono: "helice" }
+      - { id: ve5, texto: "Propeller AUTO+STOP+3000", icono: "helice" }
+      - { id: ve6, texto: "Avionics ALL OFF", icono: "radio" }
+      - { id: ve7, texto: "Master switch ON", icono: "interruptor" }
+      - { id: ve8, texto: "Choke IF NECESSARY", icono: "estrangulador" }
+      - { id: ve9, texto: "Throttle 2CM FORWARD", icono: "gases" }
+      - { id: ve10, texto: "Ignition ON", icono: "ignicion" }
+      - { id: ve11, texto: "Starter button PRESS", icono: "boton" }
+      - { id: ve12, texto: "Turn SPEED", icono: "anemometro" }
+      - { id: ve13, texto: "Strobe ON", icono: "luz" }
+      - { id: ve14, texto: "If doesn't start: Propeller 35° (35s) + IAS 165 km/h (windmill start)", icono: "helice" }
+      - { id: ve15, texto: "After starting: oil pressure CHECKED", icono: "aceite" }
+      - { id: ve16, texto: "After starting: avionics ON", icono: "radio" }
+      - { id: ve17, texto: "After starting: battery selector BOTH (1+2)", icono: "bateria" }
+      - { id: ve18, texto: "After starting: idle until oil 50°C", icono: "motor" }
+
+  - id: soaring_speeds
+    titulo: "Soaring - Recommended Speeds"
+    categoria: "Soaring Procedures"
+    pasos:
+      - { id: vv80, texto: "80-110 km/h: Flaps +8° or +15°", icono: "flaps" }
+      - { id: vv110, texto: "110-150 km/h: Flaps 0°", icono: "flaps" }
+      - { id: vv150, texto: "150-250 km/h: Flaps -8°", icono: "flaps" }
+
+  - id: emergency_engine_fire
+    titulo: "Emergency - Engine Fire"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: em1, texto: "Heating OFF", icono: "calefaccion" }
+      - { id: em2, texto: "Fuel supply CLOSED", icono: "combustible" }
+      - { id: em3, texto: "Throttle MAXIMUM", icono: "gases" }
+      - { id: em4, texto: "Ignition OFF if engine stopped", icono: "ignicion" }
+
+  - id: emergency_spin
+    titulo: "Emergency - Spin Recovery"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: eb1, texto: "Ailerons NEUTRAL", icono: "aleron" }
+      - { id: eb2, texto: "Rudder FULLY AGAINST rotation", icono: "timon" }
+      - { id: eb3, texto: "Stick RELEASE (neutral position slightly pressed)", icono: "palanca" }
+      - { id: eb4, texto: "After rotation stops: rudder CENTERED", icono: "timon" }
+      - { id: eb5, texto: "After rotation stops: stick RECOVER smoothly", icono: "palanca" }
+
+  - id: emergency_bailout
+    titulo: "Emergency - Canopy Jettison and Bailout"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: es1, texto: "Ignition OFF", icono: "ignicion" }
+      - { id: es2, texto: "Red pin on canopy PULL", icono: "cabina" }
+      - { id: es3, texto: "Canopy OPEN and PUSH backwards", icono: "cabina" }
+      - { id: es4, texto: "Seat belts UNFASTENED", icono: "cinturon" }
+      - { id: es5, texto: "Stand up and exit", icono: "salida" }
+      - { id: es6, texto: "With manual parachute: wait 2-3s before opening", icono: "paracaidas" }
+
+  - id: emergency_engine_failure_after_takeoff
+    titulo: "Emergency - Engine Failure After Takeoff"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: epd1, texto: "Fuel supply CLOSED", icono: "combustible" }
+      - { id: epd2, texto: "Ignition OFF", icono: "ignicion" }
+      - { id: epd3, texto: "If inevitable landing on hard terrain: landing gear RETRACTED", icono: "tren" }
+      - { id: epd4, texto: "Propeller HORIZONTAL", icono: "helice" }
+
+  - id: emergency_power_and_airborne
+    titulo: "Emergency - Power Loss and Airborne"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: ema1, texto: "Airbrakes RETRACTED", icono: "aerofreno" }
+      - { id: ema2, texto: "Flaps DON'T TOUCH", icono: "flaps" }
+      - { id: ema3, texto: "Throttle ACCELERATE RAPIDLY", icono: "gases" }
+      - { id: ema4, texto: "IAS 105 km/h", icono: "anemometro" }
+      - { id: ema5, texto: "Flaps CAREFULLY to +15°", icono: "flaps" }
+
+  - id: emergency_propeller_failure
+    titulo: "Emergency - Mühlbauer Propeller Electric Adjustment Failure"
+    categoria: "Emergency Procedures"
+    pasos:
+      - { id: efh1, texto: "Failure in powered operation: fly with fixed pitch or emergency landing", icono: "helice" }
+      - { id: efh2, texto: "Failure in soaring operation: emergency landing", icono: "helice" }
+
+# End of Taifun 17E checklists

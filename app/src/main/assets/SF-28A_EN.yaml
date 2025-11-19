@@ -1,0 +1,526 @@
+version: '1.0'
+checklists:
+- id: before_removing_hangar
+  titulo: Before removing from hangar
+  categoria: Normal procedures
+  full-list: true
+  pasos:
+  - id: ash1
+    texto: Documentation (ARC, insurance, inspections) VERIFIED AND OK
+    icono: documento
+  - id: ash2
+    texto: Covers REMOVED
+    icono: cabina
+  - id: ash3
+    texto: Cabin interior (seats, controls, baggage compartment) CHECKED
+    icono: cabina
+  - id: ash4
+    texto: Cabin canopy CHECKED
+    icono: cabina
+  - id: ash5
+    texto: Main landing gear wheel 1.8 kg/cm² VERIFIED
+    icono: tren
+  - id: ash6
+    texto: Wing auxiliary wheels and tail wheel 2.5 kg/cm² VERIFIED
+    icono: tren
+  - id: ash7
+    texto: Parachutes ON
+    icono: paracaidas
+  - id: ash8
+    texto: Master ON - Fuel level VERIFIED
+    icono: combustible
+  - id: ash9
+    texto: Master OFF
+    icono: interruptor
+
+- id: exterior_inspection
+  titulo: Exterior inspection before flight
+  categoria: Normal procedures
+  full-list: true
+  pasos:
+  - id: re1
+    texto: Parking brake LOCKED
+    icono: freno
+  - id: re2
+    texto: Master OFF
+    icono: interruptor
+  - id: re3
+    texto: Magneto OFF (down)
+    icono: ignicion
+  - id: re4
+    texto: Oil level VERIFIED (min 1.5 l - max 2.5 l)
+    icono: aceite
+  - id: re5
+    texto: Oil dipstick PROPERLY INSERTED and cap CLOSED
+    icono: aceite
+  - id: re6
+    texto: Propeller pitch cable and control VERIFIED
+    icono: helice
+  - id: re7
+    texto: Propeller (cracks, edges) and spinner VERIFIED
+    icono: helice
+  - id: re8
+    texto: Propeller blades - Free pitch change and feather travel VERIFIED
+    icono: helice
+  - id: re9
+    texto: Engine (oil leaks, belt, carburetor) INSPECTED
+    icono: motor
+  - id: re10
+    texto: Engine air flow hatch and exhaust pipe VERIFIED
+    icono: motor
+  - id: re11
+    texto: Airbrakes EXTENDED AND VERIFIED
+    icono: aerofreno
+  - id: re12
+    texto: Motor glider surface (dents, cracks, fabric) VERIFIED
+    icono: inspeccion
+  - id: re13
+    texto: Right wing (surface, aileron, inspection panels, connections) VERIFIED
+    icono: alas
+  - id: re14
+    texto: Right wing airbrake VERIFIED
+    icono: aerofreno
+  - id: re15
+    texto: Right wing auxiliary wheel VERIFIED
+    icono: tren
+  - id: re16
+    texto: Right fuselage and total energy probe VERIFIED
+    icono: inspeccion
+  - id: re17
+    texto: Main landing gear VERIFIED
+    icono: tren
+  - id: re18
+    texto: Fuel level VERIFIED - Cap PROPERLY CLOSED
+    icono: combustible
+  - id: re19
+    texto: Pitot tube cover REMOVED
+    icono: pitot
+  - id: re20
+    texto: Horizontal stabilizer and elevator VERIFIED
+    icono: profundidad
+  - id: re21
+    texto: Trim tab VERIFIED
+    icono: trim
+  - id: re22
+    texto: Vertical stabilizer and rudder VERIFIED
+    icono: timon
+  - id: re23
+    texto: Tail wheel VERIFIED
+    icono: tren
+  - id: re24
+    texto: Left fuselage VERIFIED
+    icono: inspeccion
+  - id: re25
+    texto: Left wing (surface, aileron, inspection panels, connections) VERIFIED
+    icono: alas
+  - id: re26
+    texto: Left wing airbrake VERIFIED
+    icono: aerofreno
+  - id: re27
+    texto: Left wing auxiliary wheel VERIFIED
+    icono: tren
+
+- id: preflight_cabin_preparation
+  titulo: Preflight cabin preparation
+  categoria: Normal procedures
+  full-list: true
+  pasos:
+  - id: ppc1
+    texto: Ballast according to pilot weight VERIFIED
+    icono: balanza
+  - id: ppc2
+    texto: 'Single-seat flight: Rear seat harness SECURED'
+    icono: cinturon
+  - id: ppc3
+    texto: 'Single-seat flight: Rear seat magneto ON'
+    icono: ignicion
+  - id: ppc4
+    texto: 'Tandem flight: Front seat pedals ADJUSTED'
+    icono: control
+  - id: ppc5
+    texto: 'Tandem flight: Front harness FASTENED AND ADJUSTED'
+    icono: cinturon
+  - id: ppc6
+    texto: 'Tandem flight: Rear harness FASTENED AND ADJUSTED'
+    icono: cinturon
+
+- id: starting_engine
+  titulo: Engine start
+  categoria: Normal procedures
+  full-list: false
+  color: '#FFEB3B'
+  pasos:
+  - id: pm1
+    texto: Cabin CLOSED
+    icono: cabina
+  - id: pm2
+    texto: Brakes SET AND LOCKED!
+    icono: freno
+  - id: pm3
+    texto: Cowl flap OPEN
+    icono: refrigeracion
+  - id: pm4
+    texto: Fuel valve OPEN
+    icono: combustible
+  - id: pm5
+    texto: Fuel level VERIFIED
+    icono: combustible
+  - id: pm6
+    texto: Carburetor heat OFF
+    icono: calefaccion
+  - id: pm7
+    texto: Propeller pitch OFF
+    icono: helice
+  - id: pm8
+    texto: Radio OFF
+    icono: radio
+  - id: pm9
+    texto: Master ON
+    icono: interruptor
+  - id: pm10
+    texto: Choke AS REQUIRED
+    icono: estrangulador
+  - id: pm11
+    texto: Throttle AS REQUIRED
+    icono: gases
+  - id: pm12
+    texto: Magneto ON (Ein)
+    icono: ignicion
+  - id: pm13
+    texto: Propeller area CLEAR!
+    icono: helice
+  - id: pm14
+    texto: Starter ENGAGE
+    icono: boton
+  - id: pm15
+    texto: Oil pressure RISING
+    icono: aceite
+  - id: pm15b
+    texto: Engine started
+    icono: motor
+    log: Engine started
+  - id: pm16
+    texto: Radio ON
+    icono: radio
+  - id: pm17
+    texto: 'Initial warm-up: 1,000 rpm (2 min)'
+    icono: motor
+  - id: pm18
+    texto: 'Warm-up: 1,500 rpm'
+    icono: motor
+
+- id: before_takeoff
+  titulo: Before takeoff
+  categoria: Normal procedures
+  color: '#FFEB3B'
+  pasos:
+  - id: ad1
+    texto: Airbrakes CHECKED AND LOCKED
+    icono: aerofreno
+  - id: ad2
+    texto: Instruments CHECKED
+    icono: instrumentos
+  - id: ad3
+    texto: Altimeter SET
+    icono: altimetro
+    qnh: hPa
+  - id: ad4
+    texto: Engine instruments IN GREEN
+    icono: motor
+  - id: ad5
+    texto: Choke OFF
+    icono: estrangulador
+  - id: ad6
+    texto: Propeller pitch OFF
+    icono: helice
+  - id: ad7
+    texto: Carburetor heat OFF
+    icono: calefaccion
+  - id: ad8
+    texto: Trim ADJUSTED
+    icono: trim
+  - id: ad9
+    texto: Cowl flaps OPEN
+    icono: refrigeracion
+  - id: ad10
+    texto: Harness FASTENED AND ADJUSTED
+    icono: cinturon
+  - id: ad11
+    texto: Controls FREE
+    icono: control
+  - id: ad12
+    texto: Canopy CLOSED AND SECURED
+    icono: cabina
+  - id: ad13
+    texto: Area clear VERIFIED
+    icono: inspeccion
+  - id: ad14
+    texto: Wind (windsock) CHECKED
+    icono: manga
+  - id: ad15
+    texto: Communicate takeoff
+    icono: radio
+
+- id: data_limits
+  titulo: Data and service limits
+  categoria: Technical information
+  color: '#607D8B'
+  pasos:
+  - id: dl1
+    texto: 'Maximum power 5 min: 3,550 rpm (60 HP)'
+    icono: motor
+  - id: dl2
+    texto: 'Maximum continuous power: 2,800 rpm (45 HP)'
+    icono: motor
+  - id: dl3
+    texto: 'Oil: 2.5 l (min. 1.5 l)'
+    icono: aceite
+  - id: dl4
+    texto: 'Fuel: 40 l'
+    icono: combustible
+  - id: dl5
+    texto: 'Oil temp: min 50°C (70°C icing risk) - max 120°C'
+    icono: aceite
+  - id: dl6
+    texto: 'Oil pressure: min 1 kg/cm² (2,500 rpm) - max 4 kg/cm²'
+    icono: aceite
+  - id: dl7
+    texto: 'VNE: 190 km/h'
+    icono: anemometro
+  - id: dl8
+    texto: 'V Maneuver: 156 km/h'
+    icono: anemometro
+  - id: dl9
+    texto: 'V Climb: 90-100 km/h'
+    icono: anemometro
+  - id: dl10
+    texto: 'V Cruise: 130-150 km/h (2,600-2,800 rpm)'
+    icono: anemometro
+  - id: dl11
+    texto: 'V Best glide: 1:26 at 95 km/h'
+    icono: anemometro
+  - id: dl12
+    texto: 'Nominal cruise: 2,800 rpm, 140 km/h, 12 l/h, 3:20 h, 480 km'
+    icono: motor
+  - id: dl13
+    texto: 'Economy cruise: 2,700 rpm, 130 km/h, 10 l/h, 4 h, 525 km'
+    icono: motor
+  - id: dl14
+    texto: 'Empty weight: 400 kg'
+    icono: balanza
+  - id: dl15
+    texto: 'Max takeoff weight: 610 kg'
+    icono: balanza
+  - id: dl16
+    texto: 'Max seat load: 110 kg'
+    icono: balanza
+  - id: dl17
+    texto: 'Max baggage: 10 kg'
+    icono: balanza
+  - id: dl18
+    texto: 'Min front cabin load: 55 kg'
+    icono: balanza
+
+- id: emergency_takeoff_abort
+  titulo: Emergency - Abort takeoff on ground roll
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: eda1
+    texto: Continue STRAIGHT
+    icono: control
+  - id: eda2
+    texto: Throttle CLOSE
+    icono: gases
+  - id: eda3
+    texto: Brake AS NEEDED
+    icono: freno
+
+- id: emergency_takeoff_airborne_runway
+  titulo: Emergency - Airborne with sufficient runway (engine failure)
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: edap1
+    texto: Continue STRAIGHT
+    icono: control
+  - id: edap2
+    texto: Throttle CLOSE
+    icono: gases
+  - id: edap3
+    texto: Airbrakes EXTEND
+    icono: aerofreno
+  - id: edap4
+    texto: Land and brake AS NEEDED
+    icono: freno
+
+- id: emergency_takeoff_below100m
+  titulo: Emergency - Past runway threshold <100m altitude (engine failure)
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: ed100_1
+    texto: DO NOT ATTEMPT TO RETURN TO RUNWAY!
+    icono: alerta
+  - id: ed100_2
+    texto: Throttle CLOSE
+    icono: gases
+  - id: ed100_3
+    texto: Propeller BRAKE AND FEATHER
+    icono: helice
+  - id: ed100_4
+    texto: Speed 90 km/h
+    icono: anemometro
+  - id: ed100_5
+    texto: 'Land: fields north (R30/33) or south of Segovia road (R15)'
+    icono: aterrizaje
+  - id: ed100_6
+    texto: 'If time permits: Ignition OFF - Fuel valve CLOSED - Master OFF'
+    icono: interruptor
+
+- id: emergency_takeoff_above100m
+  titulo: Emergency - Past runway threshold >100m altitude (engine failure)
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: ed100m_1
+    texto: Throttle CLOSE
+    icono: gases
+  - id: ed100m_2
+    texto: Propeller BRAKE AND FEATHER
+    icono: helice
+  - id: ed100m_3
+    texto: Speed 90 km/h
+    icono: anemometro
+  - id: ed100m_4
+    texto: Gentle 180° turn - Land downwind on opposite runway
+    icono: control
+  - id: ed100m_5
+    texto: 'If time permits: Ignition OFF - Fuel valve CLOSED - Master OFF'
+    icono: interruptor
+
+- id: emergency_flight_power_loss
+  titulo: Emergency - Power loss (engine doesn't stop)
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: evpp1
+    texto: Return to aerodrome
+    icono: vuelo
+  - id: evpp2
+    texto: Land on most suitable runway
+    icono: aterrizaje
+
+- id: emergency_flight_failure_below300m
+  titulo: Emergency - Total engine failure <300m altitude
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: evf300_1
+    texto: Throttle CLOSE
+    icono: gases
+  - id: evf300_2
+    texto: Propeller BRAKE AND FEATHER
+    icono: helice
+  - id: evf300_3
+    texto: Speed 90 km/h
+    icono: anemometro
+  - id: evf300_4
+    texto: 'Secure cabin: Ignition OFF - Fuel valve CLOSED - Master OFF'
+    icono: interruptor
+  - id: evf300_5
+    texto: 'If near aerodrome: land on suitable runway'
+    icono: aterrizaje
+  - id: evf300_6
+    texto: 'If not: find alternate field and make emergency landing'
+    icono: aterrizaje
+  - id: evf300_7
+    texto: Communicate intentions
+    icono: radio
+
+- id: emergency_flight_failure_above300m
+  titulo: Emergency - Total engine failure >300m altitude
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: evf300m_1
+    texto: Speed 90 km/h
+    icono: anemometro
+  - id: evf300m_2
+    texto: Attempt ENGINE RESTART
+    icono: motor
+  - id: evf300m_3
+    texto: 'If no start: Throttle CLOSE'
+    icono: gases
+  - id: evf300m_4
+    texto: 'If no start: Propeller BRAKE AND FEATHER'
+    icono: helice
+  - id: evf300m_5
+    texto: 'If no start: Speed 90 km/h'
+    icono: anemometro
+  - id: evf300m_6
+    texto: 'If no start: Secure cabin (Ignition OFF - Fuel CLOSED - Master OFF)'
+    icono: interruptor
+  - id: evf300m_7
+    texto: 'If near aerodrome: land on suitable runway'
+    icono: aterrizaje
+  - id: evf300m_8
+    texto: 'If not: find alternate field and make emergency landing'
+    icono: aterrizaje
+  - id: evf300m_9
+    texto: Communicate intentions
+    icono: radio
+
+- id: emergency_fire
+  titulo: Emergency - Fire
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: ef1
+    texto: Throttle CLOSE
+    icono: gases
+  - id: ef2
+    texto: Fuel valve CLOSED
+    icono: combustible
+  - id: ef3
+    texto: Propeller BRAKE AND FEATHER
+    icono: helice
+  - id: ef4
+    texto: Speed 90 km/h
+    icono: anemometro
+  - id: ef5
+    texto: 'Secure cabin: Ignition OFF - Fuel valve CLOSED - Master OFF'
+    icono: interruptor
+  - id: ef6
+    texto: 'If near aerodrome: land IMMEDIATELY on suitable runway'
+    icono: aterrizaje
+  - id: ef7
+    texto: 'If not: find field and land IMMEDIATELY'
+    icono: aterrizaje
+  - id: ef8
+    texto: Communicate intentions
+    icono: radio
+  - id: ef9
+    texto: Consider SIDESLIP to deflect flames
+    icono: control
+
+- id: emergency_restart_failure
+  titulo: Emergency - Failed engine restart in flight with starter
+  categoria: Emergency procedures
+  color: '#F44336'
+  pasos:
+  - id: eafv1
+    texto: Dive decisively to 150 km/h
+    icono: anemometro
+  - id: eafv2
+    texto: Ignition ON
+    icono: ignicion
+  - id: eafv3
+    texto: Propeller feather control RELEASE SLOWLY
+    icono: helice
+  - id: eafv4
+    texto: 'When propeller starts turning: Feather control RELEASE COMPLETELY'
+    icono: helice
+  - id: eafv5
+    texto: '⚠️ This maneuver consumes 150-200 meters of altitude'
+    icono: alerta

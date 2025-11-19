@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">Taifun Checks</string>
+
+    <!-- HomeScreen -->
+    <string name="home_title">Checklists</string>
+    <string name="editor_button">YAML Editor</string>
+    <string name="settings_button">Settings</string>
+    <string name="empty_list_title">No checklists</string>
+    <string name="empty_list_message">Import a YAML file or create one in the editor</string>
+    <string name="search_placeholder">Search checklist...</string>
+    <string name="reset_all">Reset All</string>
+    <string name="confirm_reset_all_title">Reset all checklists?</string>
+    <string name="confirm_reset_all_message">All progress from all checklists will be lost. This action cannot be undone.</string>
+    <string name="reset_all_success">All progress has been reset</string>
+
+    <!-- StepScreen -->
+    <string name="step_of">Step %1$d of %2$d</string>
+    <string name="page_of">Page %1$d / %2$d</string>
+    <string name="loading">Loading…</string>
+    <string name="anterior">Previous</string>
+    <string name="siguiente">Next</string>
+    <string name="reset">Reset</string>
+    <string name="confirm_reset_title">Reset checklist?</string>
+    <string name="confirm_reset_message">Current progress will be lost</string>
+    <string name="switch_to_fulllist">Full List Mode</string>
+    <string name="switch_to_stepbystep">Step by Step Mode</string>
+    <string name="voice_control">Voice Control</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_enabled">Voice control enabled</string>
+    <string name="voice_disabled">Voice control disabled</string>
+    <string name="permission_needed">Microphone permission required</string>
+
+    <!-- EditorScreen -->
+    <string name="editor_title">YAML Editor</string>
+    <string name="yaml_label">YAML</string>
+    <string name="save">Save</string>
+    <string name="importar">Import</string>
+    <string name="exportar">Export</string>
+    <string name="back">Back</string>
+    <string name="status_loaded">Catalog loaded</string>
+    <string name="status_saved">Saved</string>
+    <string name="status_imported">Imported</string>
+    <string name="status_exported">Exported</string>
+    <string name="status_error">Error: %1$s</string>
+    <string name="error_unknown">unknown</string>
+    <string name="validation_error">YAML validation error</string>
+    <string name="validation_ok">Valid YAML</string>
+
+    <!-- SettingsScreen -->
+    <string name="settings_title">Settings</string>
+    <string name="theme_section">Theme</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="high_contrast">High contrast</string>
+    <string name="high_contrast_desc">Maximum readability for use in difficult conditions</string>
+    <string name="screen_section">Screen</string>
+    <string name="screen_on">Keep screen on</string>
+    <string name="screen_on_desc">Prevents the screen from turning off during use</string>
+    <string name="no_options">No options yet</string>
+    <string name="language_section">Language</string>
+    <string name="language_label">App language</string>
+    <string name="language_auto">Auto (System)</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_english">English</string>
+    <string name="haptics_section">Haptics</string>
+    <string name="haptics_enabled">Haptic feedback</string>
+    <string name="haptics_desc">Vibrations when pressing buttons</string>
+    <string name="help_button">Help</string>
+    <string name="app_info_section">App Information</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="app_description">Aviation checklists</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_previous">Go to previous step</string>
+    <string name="accessibility_next">Go to next step</string>
+    <string name="accessibility_reset">Reset checklist from the beginning</string>
+    <string name="accessibility_back">Go back to previous screen</string>
+    <string name="accessibility_checkbox">Mark step as completed</string>
+    <string name="accessibility_step_icon">Step icon</string>
+    <string name="accessibility_search">Search checklist</string>
+
+    <!-- Dialogs -->
+    <string name="aceptar">OK</string>
+    <string name="cancelar">Cancel</string>
+
+    <!-- Errors -->
+    <string name="error_yaml_parse">Error parsing YAML</string>
+    <string name="error_file_not_found">File not found</string>
+    <string name="error_io">Read/write error</string>
+
+    <!-- Help -->
+    <string name="help_title">Help</string>
+    <string name="help_content">Loading help…</string>
+
+    <!-- Color Picker -->
+    <string name="color_picker_title">Select Color</string>
+    <string name="color_label">Color</string>
+    <string name="color_custom">Custom color</string>
+    <string name="color_none">No color</string>
+    <string name="color_red">Red</string>
+    <string name="color_green">Green</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_pink">Pink</string>
+    <string name="color_cyan">Cyan</string>
+    <string name="color_hex_label">Hex Code</string>
+    <string name="color_hex_hint">#RRGGBB</string>
+    <string name="color_invalid">Invalid color code</string>
+
+    <!-- Checklist Manager -->
+    <string name="manager_title">Checklist Management</string>
+    <string name="manager_import">Import Checklist</string>
+    <string name="manager_imported">Checklist imported</string>
+    <string name="manager_export">Export</string>
+    <string name="manager_share">Share</string>
+    <string name="manager_delete">Delete</string>
+    <string name="manager_edit">Edit</string>
+    <string name="manager_select">Use</string>
+    <string name="manager_empty">No checklists available</string>
+    <string name="manager_confirm_delete_title">Delete checklist?</string>
+    <string name="manager_confirm_delete_message">This action cannot be undone</string>
+    <string name="manager_deleted">Checklist deleted</string>
+    <string name="manager_selected">Checklist selected</string>
+    <string name="manager_current_label">Current</string>
+    <string name="create_empty_checklist">Create Empty Checklist</string>
+    <string name="filename_label">Filename</string>
+    <string name="checklist_created">Checklist created</string>
+    <string name="create">Create</string>
+    <string name="create_new">Create New</string>
+
+    <!-- First Launch -->
+    <string name="first_launch_title">Welcome to FlightChecks</string>
+    <string name="first_launch_subtitle">Aviation checklists</string>
+    <string name="first_launch_language_label">Select your language</string>
+    <string name="first_launch_checklist_label">Select your checklist</string>
+    <string name="first_launch_continue">Continue</string>
+    <string name="first_launch_skip">Skip</string>
+
+    <!-- Voice Commands -->
+    <string name="voice_command_next_es">siguiente</string>
+    <string name="voice_command_previous_es">anterior</string>
+    <string name="voice_command_next_en">next</string>
+    <string name="voice_command_previous_en">previous</string>
+
+    <!-- Edit Checklist Screen -->
+    <string name="edit_checklist_title">Edit Checklist</string>
+    <string name="add_step">Add Step</string>
+    <string name="checklist_information">Checklist Information</string>
+    <string name="title_label">Title</string>
+    <string name="category_label">Category</string>
+    <string name="default_mode">Default Mode</string>
+    <string name="full_list_mode">Full List</string>
+    <string name="step_by_step_mode">Step by Step</string>
+    <string name="steps_count">Steps (%1$d)</string>
+    <string name="icon_colon">Icon: %1$s</string>
+    <string name="edit_title">Edit Title</string>
+    <string name="edit_category">Edit Category</string>
+    <string name="delete_step_title">Delete Step?</string>
+    <string name="delete_step_message">This action cannot be undone.</string>
+    <string name="delete">Delete</string>
+    <string name="edit_step">Edit Step</string>
+    <string name="step_text">Step Text</string>
+    <string name="icon_optional">Icon (optional)</string>
+    <string name="select_icon">Select an icon</string>
+    <string name="no_icon">No icon</string>
+
+    <!-- Settings Screen -->
+    <string name="version">Version</string>
+
+    <!-- Common -->
+    <string name="edit">Edit</string>
+    <string name="category_name">Category Name</string>
+    <string name="error">Error</string>
+
+    <!-- Editor Screen -->
+    <string name="import_warnings">Import Warnings</string>
+    <string name="import_warnings_message">Some items were skipped during import:</string>
+
+    <!-- Optional Step Features -->
+    <string name="optional_features">Optional Features</string>
+    <string name="altitude_label">Altitude</string>
+    <string name="altitude_hint">m or ft</string>
+    <string name="qnh_label">QNH</string>
+    <string name="qnh_hint">hPa or inHg</string>
+    <string name="link_label">Link (URL)</string>
+    <string name="app_label">App (Package Name)</string>
+    <string name="local_time_label">Show Local Time</string>
+    <string name="utc_time_label">Show UTC Time</string>
+    <string name="log_label">Log</string>
+    <string name="log_hint">Ex: Takeoff runway 32L</string>
+
+    <!-- Log Viewer Screen -->
+    <string name="log_viewer_title">Flight Log</string>
+    <string name="total_entries">Total entries: %1$d</string>
+    <string name="no_log_entries">No log entries</string>
+    <string name="no_log_subtitle">Use the \'Log\' button in checklists to add entries</string>
+    <string name="delete_entry">Delete entry</string>
+    <string name="delete_entry_title">Delete entry</string>
+    <string name="delete_entry_message">Are you sure you want to delete this log entry?</string>
+    <string name="delete_all_title">Clear entire log</string>
+    <string name="delete_all_message">Are you sure you want to delete ALL log entries? This action cannot be undone.</string>
+    <string name="delete_all_confirm">Delete all</string>
+    <string name="entry_deleted">Entry deleted</string>
+    <string name="entry_delete_error">Error deleting entry</string>
+    <string name="log_cleared">Log cleared completely</string>
+    <string name="log_clear_error">Error clearing log</string>
+    <string name="share_log">Share log</string>
+    <string name="no_log_to_share">No log to share</string>
+    <string name="import_log">Import CSV</string>
+    <string name="import_log_success">CSV imported successfully</string>
+    <string name="import_log_error">Error importing CSV</string>
+    <string name="import_log_confirm_title">Import CSV?</string>
+    <string name="import_log_confirm_message">This will OVERWRITE the current log. Continue?</string>
+    <string name="export_log">Save CSV</string>
+    <string name="export_log_success">CSV saved successfully</string>
+    <string name="export_log_error">Error saving CSV</string>
+    <string name="log_auto_saved">Log automatically saved to Download/FlightChecks/</string>
+    <string name="edit_entry">Edit entry</string>
+    <string name="edit_entry_title">Edit Entry</string>
+    <string name="edit_entry_save">Save</string>
+    <string name="edit_entry_success">Entry edited</string>
+    <string name="edit_entry_error">Error editing entry</string>
+    <string name="entry_text_label">Text</string>
+    <string name="entry_latitude_label">Latitude</string>
+    <string name="entry_longitude_label">Longitude</string>
+    <string name="entry_altitude_label">Altitude (m)</string>
+    <string name="entry_icao_label">ICAO</string>
+</resources>

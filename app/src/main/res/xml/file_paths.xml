@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Permite compartir archivos del directorio files interno -->
+    <files-path name="checklist_files" path="." />
+    <!-- Permite compartir archivos del directorio external files (incluyendo Documents) -->
+    <external-files-path name="external_files" path="." />
+    <!-- Permite compartir archivos del directorio cache (para compartir) -->
+    <cache-path name="cache_files" path="." />
+    <!-- Permite compartir archivos del directorio external media (Android/media) -->
+    <external-media-path name="external_media" path="." />
+</paths>
