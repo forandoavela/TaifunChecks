@@ -1,6 +1,7 @@
 package com.taifun.checks.data
 
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,14 +41,23 @@ class LogRepository(private val context: Context) {
      * Obtiene el archivo CSV de log en Android/media
      * El archivo se guarda aquí para que sea accesible por el usuario
      * No requiere permisos especiales y es visible vía USB
+     * Los archivos persisten después de desinstalar la app
      */
     private fun getLogFile(): File {
-        // Usar Android/media (accesible por el usuario, disponible desde Android 11)
-        val mediaDir = context.getExternalFilesDirs(null).firstOrNull()?.let { mediaDir ->
-            File(mediaDir, "logs").apply { mkdirs() }
+        // Usar Android/media (accesible por el usuario, disponible desde Android 10/API 29)
+        // Los archivos persisten después de desinstalar la app
+        val mediaDir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context.externalMediaDirs.firstOrNull()?.let { mediaDir ->
+                File(mediaDir, "logs").apply { mkdirs() }
+            }
+        } else {
+            // Fallback para Android 9 y anteriores: usar external files
+            context.getExternalFilesDirs(null).firstOrNull()?.let { externalDir ->
+                File(externalDir, "logs").apply { mkdirs() }
+            }
         }
 
-        // Fallback a directorio externo si media no está disponible
+        // Fallback a directorio interno si external media no está disponible
         val appDir = if (mediaDir != null && mediaDir.exists()) {
             mediaDir
         } else {
