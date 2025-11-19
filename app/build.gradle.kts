@@ -13,17 +13,18 @@ android {
         minSdk = 24
         targetSdk = 35
 
-        // Versión manual con incremento automático basado en commits
-        // x.y.z donde:
-        //   x = major (cambios importantes) - cambiar manualmente
-        //   y = minor (nuevas funcionalidades) - cambiar manualmente
-        //   z = patch (incrementa automáticamente con cada commit)
+        // Sistema de versiones: w.x.yy.zz donde:
+        //   w = versión principal (cambios muy importantes) - cambiar manualmente
+        //   x = grandes funcionalidades - cambiar manualmente
+        //   yy = grandes grupos de mejoras y correcciones - cambiar manualmente
+        //   zz = cambios menores de corrección de errores (auto-incrementado con commits)
 
-        val majorVersion = 1
-        val minorVersion = 5 // v1.5: Fixed Google Play translations, native debug symbols, language splitting
+        val majorVersion = 1      // w - versión principal
+        val minorVersion = 0      // x - grandes funcionalidades
+        val patchVersion = 0      // yy - grupos de mejoras (00-99)
 
-        // Intentar obtener el número de commits, si falla usar valor base
-        val patchVersion = try {
+        // Intentar obtener el número de commits para zz (auto-incrementado)
+        val buildVersion = try {
             val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
             val output = process.inputStream.bufferedReader().readText().trim()
             process.waitFor()
@@ -31,25 +32,23 @@ android {
             val count = output.toIntOrNull() ?: 0
 
             // Si devuelve 1, probablemente es un shallow clone en CI/CD
-            // En ese caso, usar el número del último commit conocido + 1
+            // En ese caso, usar el número del último commit conocido
             if (count <= 1) {
                 println("⚠ Shallow clone detected (count=$count), using base version")
-                8  // Base para v1.5 en CI/CD - updated for version 10508
+                0  // Base para v1.0.0.0 en CI/CD
             } else {
                 println("✓ Git commit count: $count")
-                // Subtract because we're at commit 109, but want version 10508 (patch 8)
-                count - 101
+                count
             }
         } catch (e: Exception) {
             println("⚠ Git not available: ${e.message}")
-            8  // Fallback manual para v1.5
+            0  // Fallback manual para v1.0.0.0
         }
 
-        // versionCode que siempre incrementa con major.minor.patch
-        // Fórmula: major*10000 + minor*100 + patch
-        // v1.3.70 → 10370, v1.4.0 → 10400, garantiza incremento
-        versionCode = majorVersion * 10000 + minorVersion * 100 + patchVersion
-        versionName = "$majorVersion.$minorVersion.$patchVersion"
+        // versionCode: wxyyzz (concatenación directa)
+        // Ejemplo: v1.0.00.00 → 100000, v1.2.15.03 → 121503
+        versionCode = majorVersion * 100000 + minorVersion * 10000 + patchVersion * 100 + buildVersion
+        versionName = "$majorVersion.$minorVersion.${patchVersion.toString().padStart(2, '0')}.${buildVersion.toString().padStart(2, '0')}"
 
         println("═══════════════════════════════════════════════")
         println("  Building version: $versionName")

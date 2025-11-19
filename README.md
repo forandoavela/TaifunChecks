@@ -1,6 +1,6 @@
 # Taifun Checks - Aviation Checklist App
 
-![Version](https://img.shields.io/badge/version-1.5.8-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.00.00-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Language](https://img.shields.io/badge/language-Kotlin-purple.svg)
 
@@ -669,11 +669,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 1.5.8
-**Last Updated**: 2025-11-12
+**Version**: 1.0.00.00
+**Last Updated**: 2025-11-19
 **Maintainer**: Jorge Mármol
 
 ## Changelog
+
+### v1.0.00.00 (2025-11-19)
+- **New Versioning System**: Changed to w.x.yy.zz format
+  - **w**: Major version (very important breaking changes)
+  - **x**: Large new features
+  - **yy**: Large groups of improvements and fixes
+  - **zz**: Minor bug fixes (auto-incremented with each commit)
+- **Version Code Update**: New formula `w*100000 + x*10000 + yy*100 + zz`
+- **First Release**: Starting fresh with v1.0.00.00
 
 ### v1.5.8 (2025-11-10)
 - **GPS Tracking & CSV Logging**: Track and log GPS coordinates, altitude, and custom notes

@@ -1,8 +1,8 @@
 # CLAUDE.md - AI Assistant Guide for FlightChecks
 
-**Last Updated**: 2025-11-17
+**Last Updated**: 2025-11-19
 **Project**: Taifun Checks - Aviation Checklist App
-**Version**: 1.5.8
+**Version**: 1.0.00.00 (New versioning system: w.x.yy.zz)
 **Type**: Android Native (Kotlin + Jetpack Compose)
 
 ---
@@ -214,26 +214,29 @@ FlightChecks/
 
 ### Version Management
 
-**Semantic Versioning**: `major.minor.patch`
+**Version Format**: `w.x.yy.zz`
 
-- **Major**: Breaking changes (manual increment in `build.gradle.kts`)
-- **Minor**: New features (manual increment)
-- **Patch**: Bug fixes (auto-increment based on git commit count)
+- **w**: Major version (very important breaking changes) - manual increment in `build.gradle.kts`
+- **x**: Large new features (manual increment)
+- **yy**: Large groups of improvements and fixes (manual increment, 00-99)
+- **zz**: Minor bug fixes (auto-increment based on git commit count)
 
-**Version Code Formula**: `major*10000 + minor*100 + patch`
+**Version Code Formula**: `w*100000 + x*10000 + yy*100 + zz`
 
-Example: v1.5.8 → version code 10508
+Example: v1.0.00.05 → version code 100005, v1.2.15.03 → version code 121503
 
-**Location**: `/home/user/FlightChecks/app/build.gradle.kts:22-46`
+**Location**: `/home/user/TaifunChecks/app/build.gradle.kts:22-51`
 
 ```kotlin
-val majorVersion = 1
-val minorVersion = 5
-val patchVersion = try {
+val majorVersion = 1      // w - versión principal
+val minorVersion = 0      // x - grandes funcionalidades
+val patchVersion = 0      // yy - grupos de mejoras (00-99)
+val buildVersion = try {
     val count = Runtime.getRuntime().exec("git rev-list --count HEAD")
         .inputStream.bufferedReader().readText().trim().toIntOrNull() ?: 0
-    if (count <= 1) 8 else count - 101  // Handle shallow clones
-} catch (e: Exception) { 8 }
+    if (count <= 1) 0 else count  // Handle shallow clones
+} catch (e: Exception) { 0 }
+versionCode = majorVersion * 100000 + minorVersion * 10000 + patchVersion * 100 + buildVersion
 ```
 
 ### Git Workflow
@@ -294,7 +297,7 @@ export KEY_PASSWORD=your_key_password
 
 **Release Workflow**: `.github/workflows/release.yml`
 
-Triggered by git tag push (e.g., `git tag v1.5.8 && git push origin v1.5.8`)
+Triggered by git tag push (e.g., `git tag v1.0.00.05 && git push origin v1.0.00.05`)
 
 ---
 
@@ -783,11 +786,21 @@ If you're new to this codebase:
 **Solution**: Verify GitHub Actions permissions; check artifact path correctness
 
 **Problem**: Release not created from tag
-**Solution**: Ensure tag format is `v*` (e.g., v1.5.8); check workflow trigger configuration
+**Solution**: Ensure tag format is `v*` (e.g., v1.0.00.05); check workflow trigger configuration
 
 ---
 
 ## Migration Notes
+
+### From v1.5.x to v1.0.00.zz (New Versioning System)
+
+**Major Changes**:
+- Changed version format from `major.minor.patch` to `w.x.yy.zz`
+- Version code formula changed from `major*10000 + minor*100 + patch` to `w*100000 + x*10000 + yy*100 + zz`
+- First version with new system: v1.0.00.00
+- `zz` component auto-increments with each commit
+
+**Breaking Changes**: None (backward compatible, only versioning scheme changed)
 
 ### From v1.4 to v1.5
 
@@ -854,6 +867,7 @@ When explaining code to developers:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-11-19 | 1.1 | Updated versioning system to w.x.yy.zz format |
 | 2025-11-17 | 1.0 | Initial CLAUDE.md creation |
 
 ---
