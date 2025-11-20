@@ -21,7 +21,7 @@ android {
 
         val majorVersion = 1      // w - versión principal
         val minorVersion = 0      // x - grandes funcionalidades
-        val patchVersion = 0      // yy - grupos de mejoras (00-99)
+        val patchVersion = 1      // yy - grupos de mejoras (00-99)
 
         // Intentar obtener el número de commits para zz (auto-incrementado)
         val buildVersion = try {
