@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.data.SettingsRepository
@@ -66,25 +65,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                 .fillMaxSize()
                 .padding(pad)
                 .verticalScroll(scrollState)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Sección de Tema
             Text(
                 text = stringResource(R.string.theme_section),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Dark Theme
                     Row(
@@ -94,8 +91,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     ) {
                         Text(
                             text = stringResource(R.string.dark_theme),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
+                            style = MaterialTheme.typography.bodyLarge
                         )
                         Switch(
                             checked = darkTheme,
@@ -115,8 +111,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                             Text(
                                 text = stringResource(R.string.high_contrast),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
                                 text = stringResource(R.string.high_contrast_desc),
@@ -140,17 +135,15 @@ fun SettingsScreen(onBack: () -> Unit) {
             // Sección de Pantalla
             Text(
                 text = stringResource(R.string.screen_section),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     // Screen Always On
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -160,8 +153,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                             Text(
                                 text = stringResource(R.string.screen_on),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
                                 text = stringResource(R.string.screen_on_desc),
@@ -185,24 +177,21 @@ fun SettingsScreen(onBack: () -> Unit) {
             // Sección de Idioma
             Text(
                 text = stringResource(R.string.language_section),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.language_label),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyLarge
                     )
 
                     // Auto language option
@@ -272,8 +261,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             // Sección de Háptica
             Text(
                 text = stringResource(R.string.haptics_section),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
@@ -293,8 +281,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         ) {
                             Text(
                                 text = stringResource(R.string.haptics_enabled),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
                                 text = stringResource(R.string.haptics_desc),
@@ -320,17 +307,15 @@ fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                )
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = "${stringResource(R.string.version)} $versionName",

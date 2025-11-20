@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.data.ChecklistRepository
@@ -172,23 +171,21 @@ fun EditChecklistScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad)
-                    .padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Sección de información del checklist
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
+                        Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = stringResource(R.string.checklist_information),
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.SemiBold,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             // Título
                             OutlinedCard(
@@ -211,15 +208,14 @@ fun EditChecklistScreen(
                                         )
                                         Text(
                                             text = titulo.ifBlank { "-" },
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Medium
+                                            style = MaterialTheme.typography.bodyLarge
                                         )
                                     }
                                     Icon(Icons.Default.Edit, contentDescription = null)
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             // Categoría
                             OutlinedCard(
@@ -242,15 +238,14 @@ fun EditChecklistScreen(
                                         )
                                         Text(
                                             text = categoria.ifBlank { "-" },
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Medium
+                                            style = MaterialTheme.typography.bodyLarge
                                         )
                                     }
                                     Icon(Icons.Default.Edit, contentDescription = null)
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             // Color
                             OutlinedCard(
@@ -277,8 +272,7 @@ fun EditChecklistScreen(
                                             } else {
                                                 color ?: ""
                                             },
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Medium
+                                            style = MaterialTheme.typography.bodyLarge
                                         )
                                     }
                                     Row(
@@ -305,7 +299,7 @@ fun EditChecklistScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(8.dp))
 
                             // Full-list toggle
                             Row(
@@ -325,8 +319,7 @@ fun EditChecklistScreen(
                                         } else {
                                             stringResource(R.string.step_by_step_mode)
                                         },
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Medium
+                                        style = MaterialTheme.typography.bodyLarge
                                     )
                                 }
                                 Switch(
@@ -345,8 +338,7 @@ fun EditChecklistScreen(
                 item {
                     Text(
                         text = stringResource(R.string.steps_count, pasos.size),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -354,13 +346,12 @@ fun EditChecklistScreen(
                 // Lista de pasos
                 itemsIndexed(pasos) { index, paso ->
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             // Botones de reordenamiento
@@ -407,12 +398,11 @@ fun EditChecklistScreen(
 
                             // Contenido del paso
                             Column(
-                                modifier = Modifier.weight(1f).padding(horizontal = 12.dp)
+                                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
                             ) {
                                 Text(
                                     text = "${index + 1}. ${paso.texto}",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Medium
+                                    style = MaterialTheme.typography.bodyLarge
                                 )
                                 if (paso.icono != null) {
                                     Text(
@@ -441,7 +431,7 @@ fun EditChecklistScreen(
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
@@ -656,7 +646,7 @@ private fun EditStepDialog(
                     .fillMaxWidth()
                     .heightIn(max = 500.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
                     value = texto,
@@ -675,7 +665,6 @@ private fun EditStepDialog(
                 Text(
                     text = stringResource(R.string.optional_features),
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
                 )
 

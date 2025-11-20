@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.taifun.checks.R
@@ -237,8 +236,8 @@ fun ChecklistManagerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad),
-                contentPadding = PaddingValues(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(checklistFiles, key = { it }) { filename ->
                     ChecklistFileCard(
@@ -437,17 +436,13 @@ private fun ChecklistFileCard(
             CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             )
-        },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isActive) 1.dp else 2.dp,
-            pressedElevation = 4.dp
-        )
+        }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Título del archivo con badge si es activo
             Row(
@@ -457,8 +452,7 @@ private fun ChecklistFileCard(
             ) {
                 Text(
                     text = filename,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Medium,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
 
@@ -471,8 +465,7 @@ private fun ChecklistFileCard(
                             text = stringResource(R.string.manager_current_label),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            fontWeight = FontWeight.SemiBold
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
@@ -531,7 +524,7 @@ private fun ChecklistFileCard(
                     Icon(
                         Icons.Filled.Delete,
                         contentDescription = stringResource(R.string.manager_delete),
-                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
