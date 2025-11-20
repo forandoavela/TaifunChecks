@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
@@ -26,6 +27,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Habilitar edge-to-edge para compatibilidad con Android 15+
+        // Scaffold de Material3 maneja automáticamente los system bars insets
+        enableEdgeToEdge()
 
         settingsRepo = SettingsRepository(this)
 

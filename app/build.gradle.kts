@@ -17,32 +17,42 @@ android {
         //   w = versión principal (cambios muy importantes) - cambiar manualmente
         //   x = grandes funcionalidades - cambiar manualmente
         //   yy = grandes grupos de mejoras y correcciones - cambiar manualmente
-        //   zz = cambios menores de corrección de errores (auto-incrementado con commits)
+        //   zz = cambios menores de corrección de errores (auto-incrementado con commits desde último tag)
+        //
+        // IMPORTANTE: Cuando cambies w, x, o yy, crea un git tag (ej: v1.0.02) para reiniciar zz a 0
 
         val majorVersion = 1      // w - versión principal
         val minorVersion = 0      // x - grandes funcionalidades
         val patchVersion = 1      // yy - grupos de mejoras (00-99)
 
-        // Intentar obtener el número de commits para zz (auto-incrementado)
+        // Intentar obtener el número de commits desde el último tag para zz (auto-incrementado)
         val buildVersion = try {
-            val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
-            val output = process.inputStream.bufferedReader().readText().trim()
-            process.waitFor()
+            // Primero intentar obtener el último tag
+            val tagProcess = Runtime.getRuntime().exec("git describe --tags --abbrev=0")
+            val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
+            tagProcess.waitFor()
 
-            val count = output.toIntOrNull() ?: 0
-
-            // Si devuelve 1, probablemente es un shallow clone en CI/CD
-            // En ese caso, usar el número del último commit conocido
-            if (count <= 1) {
-                println("⚠ Shallow clone detected (count=$count), using base version")
-                0  // Base para v1.0.0.0 en CI/CD
+            val count = if (lastTag.isNotEmpty() && tagProcess.exitValue() == 0) {
+                // Contar commits desde el último tag
+                val countProcess = Runtime.getRuntime().exec("git rev-list --count ${lastTag}..HEAD")
+                val output = countProcess.inputStream.bufferedReader().readText().trim()
+                countProcess.waitFor()
+                val commitsSinceTag = output.toIntOrNull() ?: 0
+                println("✓ Commits since tag $lastTag: $commitsSinceTag")
+                commitsSinceTag
             } else {
-                println("✓ Git commit count: $count")
-                count
+                // Si no hay tags, contar todos los commits
+                val countProcess = Runtime.getRuntime().exec("git rev-list --count HEAD")
+                val output = countProcess.inputStream.bufferedReader().readText().trim()
+                countProcess.waitFor()
+                val totalCommits = output.toIntOrNull() ?: 0
+                println("⚠ No tags found, using total commit count: $totalCommits")
+                totalCommits
             }
+            count
         } catch (e: Exception) {
-            println("⚠ Git not available: ${e.message}")
-            0  // Fallback manual para v1.0.0.0
+            println("⚠ Git not available: ${e.message}, using fallback version 0")
+            0  // Fallback si git no está disponible
         }
 
         // versionCode: wxyyzz (concatenación directa)
