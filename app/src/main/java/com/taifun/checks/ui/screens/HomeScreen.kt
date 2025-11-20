@@ -75,7 +75,7 @@ fun HomeScreen(
                 it.categoria?.contains(searchQuery, ignoreCase = true) == true
     }
 
-    val groupedByCategory = filteredLists.groupBy { it.categoria ?: "Sin categoría" }
+    val groupedByCategory = filteredLists.groupBy { it.categoria ?: ctx.getString(R.string.uncategorized) }
 
     Scaffold(
         topBar = {
@@ -195,7 +195,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.Edit,
-                                        contentDescription = "Editar categoría",
+                                        contentDescription = stringResource(R.string.edit_category_description),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -422,7 +422,7 @@ private fun ChecklistButton(
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            text = "${checklist.pasos.size} pasos",
+                            text = stringResource(R.string.steps_count, checklist.pasos.size),
                             style = MaterialTheme.typography.labelSmall,
                             color = accentColor,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -435,7 +435,7 @@ private fun ChecklistButton(
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text(
-                                text = "Lista completa",
+                                text = stringResource(R.string.full_list_mode),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -455,7 +455,7 @@ private fun ChecklistButton(
             ) {
                 Icon(
                     Icons.Default.Edit,
-                    contentDescription = "Editar",
+                    contentDescription = stringResource(R.string.edit),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }

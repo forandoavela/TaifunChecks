@@ -153,7 +153,7 @@
     <string name="default_mode">Modo por Defecto</string>
     <string name="full_list_mode">Lista Completa</string>
     <string name="step_by_step_mode">Paso a Paso</string>
-    <string name="steps_count">Pasos (%1$d)</string>
+    <string name="steps_count">%1$d pasos</string>
     <string name="icon_colon">Icono: %1$s</string>
     <string name="edit_title">Editar Título</string>
     <string name="edit_category">Editar Categoría</string>
@@ -173,6 +173,8 @@
     <string name="edit">Editar</string>
     <string name="category_name">Nombre de Categoría</string>
     <string name="error">Error</string>
+    <string name="uncategorized">Sin categoría</string>
+    <string name="edit_category_description">Editar categoría</string>
 
     <!-- Editor Screen -->
     <string name="import_warnings">Advertencias de Importación</string>
