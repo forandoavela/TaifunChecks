@@ -278,7 +278,7 @@ fun LogViewerScreen(
                         haptic.performHapticFeedback()
                         showClearAllDialog = true
                     }) {
-                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.delete_all_title), tint = MaterialTheme.colorScheme.error)
+                        Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.delete_all_title), tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f))
                     }
                 }
             )
@@ -293,16 +293,17 @@ fun LogViewerScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(20.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Text(
                     text = stringResource(R.string.total_entries, entries.size),
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    modifier = Modifier.padding(20.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
 
@@ -325,7 +326,8 @@ fun LogViewerScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.no_log_entries),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = stringResource(R.string.no_log_subtitle),
@@ -337,8 +339,8 @@ fun LogViewerScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     itemsIndexed(entries) { index, entry ->
                         LogEntryCard(
@@ -372,8 +374,8 @@ private fun LogEntryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -384,8 +386,8 @@ private fun LogEntryCard(
                 Text(
                     text = entry.logText,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
                 )
 
@@ -404,7 +406,7 @@ private fun LogEntryCard(
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = stringResource(R.string.delete_entry),
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -414,6 +416,7 @@ private fun LogEntryCard(
             Text(
                 text = "🕐 ${formatUtcTime(entry.utcTime)}",
                 style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
                 fontSize = 13.sp
             )
 
@@ -466,7 +469,7 @@ private fun EditEntryDialog(
         title = { Text(stringResource(R.string.edit_entry_title)) },
         text = {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
                     value = text,

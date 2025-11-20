@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.data.ChecklistRepository
@@ -155,7 +156,7 @@ fun EditorScreen(onBack: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(pad)
-                .padding(16.dp),
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Status bar
@@ -165,12 +166,14 @@ fun EditorScreen(onBack: () -> Unit) {
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                 } else {
                     CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                }
+                },
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = status,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
                     )
                     if (validationError != null) {
                         Text(
@@ -200,7 +203,7 @@ fun EditorScreen(onBack: () -> Unit) {
             // Botones de acción
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Guardar
                 Button(
@@ -230,7 +233,11 @@ fun EditorScreen(onBack: () -> Unit) {
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = validationError == null
+                    enabled = validationError == null,
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 6.dp
+                    )
                 ) {
                     Text(stringResource(R.string.save))
                 }
@@ -274,7 +281,7 @@ fun EditorScreen(onBack: () -> Unit) {
             text = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         stringResource(R.string.import_warnings_message),
