@@ -20,12 +20,21 @@ class ChecklistRepository(private val context: Context) {
     /**
      * Obtiene el directorio para almacenar archivos YAML
      * Usa Android/media para que sea accesible por el usuario
+     * Los archivos persisten después de desinstalar la app
      * Fallback a filesDir si no está disponible
      */
     private fun getStorageDir(): File {
-        // Usar Android/media (accesible por el usuario, disponible desde Android 11)
-        val mediaDir = context.getExternalFilesDirs(null).firstOrNull()?.let { mediaDir ->
-            File(mediaDir, "checklists").apply { mkdirs() }
+        // Usar Android/media (accesible por el usuario, disponible desde Android 10/API 29)
+        // Los archivos persisten después de desinstalar la app
+        val mediaDir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            context.externalMediaDirs.firstOrNull()?.let { mediaDir ->
+                File(mediaDir, "checklists").apply { mkdirs() }
+            }
+        } else {
+            // Fallback para Android 9 y anteriores: usar external files
+            context.getExternalFilesDirs(null).firstOrNull()?.let { externalDir ->
+                File(externalDir, "checklists").apply { mkdirs() }
+            }
         }
 
         // Fallback a directorio interno si external media no está disponible
