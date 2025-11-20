@@ -30,19 +30,11 @@ android {
             process.waitFor()
 
             val count = output.toIntOrNull() ?: 0
-
-            // Si devuelve 1, probablemente es un shallow clone en CI/CD
-            // En ese caso, usar el número del último commit conocido
-            if (count <= 1) {
-                println("⚠ Shallow clone detected (count=$count), using base version")
-                0  // Base para v1.0.0.0 en CI/CD
-            } else {
-                println("✓ Git commit count: $count")
-                count
-            }
+            println("✓ Git commit count: $count")
+            count
         } catch (e: Exception) {
-            println("⚠ Git not available: ${e.message}")
-            0  // Fallback manual para v1.0.0.0
+            println("⚠ Git not available: ${e.message}, using fallback version 0")
+            0  // Fallback si git no está disponible
         }
 
         // versionCode: wxyyzz (concatenación directa)
