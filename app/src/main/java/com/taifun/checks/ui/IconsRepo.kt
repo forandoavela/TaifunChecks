@@ -1,5 +1,8 @@
 package com.taifun.checks.ui
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
@@ -12,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Iconos de aviación para checklists Taifun.
+ * Usa Material Icons Extended para conceptos genéricos y iconos custom para aviación específica.
  * Incluye helper iconFor(nombre) para mapear desde YAML.
  */
 object IconsRepo {
@@ -704,57 +708,66 @@ object IconsRepo {
     }.build()
 
     // ---- Helper para YAML ----
+    /**
+     * Mapea nombres de iconos a ImageVectors.
+     * Usa Material Icons Extended para conceptos genéricos y iconos custom para aviación específica.
+     * Esto mejora la representatividad y consistencia visual.
+     */
     fun iconFor(nombre: String?): ImageVector = when (nombre?.lowercase()) {
-        "check" -> Check
-        "llave" -> Llave
-        "cabina" -> Cabina
+        // Iconos Material3 - Conceptos genéricos más representativos
+        "check" -> Icons.Filled.CheckCircle
+        "llave" -> Icons.Filled.Key
+        "cabina" -> Icons.Filled.AirlineSeatReclineNormal
+        "luz" -> Icons.Filled.Lightbulb
+        "inspeccion" -> Icons.Filled.Search
+        "documento" -> Icons.Filled.Description
+        "carga" -> Icons.Filled.Inventory
+        "balanza" -> Icons.Filled.Scale
+        "cinturon" -> Icons.Filled.Security
+        "bateria" -> Icons.Filled.BatteryFull
+        "interruptor" -> Icons.Filled.ToggleOn
+        "radio" -> Icons.Filled.Radio
+        "freno" -> Icons.Filled.Block
+        "boton" -> Icons.Filled.RadioButtonChecked
+        "transponder" -> Icons.Filled.Sensors
+        "brujula" -> Icons.Filled.Explore
+        "viento" -> Icons.Filled.Air
+        "paracaidas" -> Paracaidas  // Custom icon
+        "salida" -> Icons.Filled.ExitToApp
+        "seguro" -> Icons.Filled.Shield
+        "puerto" -> Icons.Filled.Usb
+        "calefaccion" -> Icons.Filled.Thermostat
+
+        // Iconos custom - Específicos de aviación que no tienen equivalente en Material
         "flaps" -> Flaps
         "aerofreno" -> Aerofreno
         "aleron" -> Aleron
-        "luz" -> Luz
         "pitot" -> Pitot
         "combustible" -> Combustible
         "aceite" -> Aceite
         "motor" -> Motor
         "helice" -> Helice
-        "inspeccion" -> Inspeccion
         "tren" -> Tren
         "antena" -> Antena
-        "puerto" -> Puerto
         "timon" -> Timon
         "profundidad" -> Profundidad
         "control" -> Control
         "alas" -> Alas
-        "vuelo" -> Vuelo
-        "documento" -> Documento
-        "carga" -> Carga
-        "balanza" -> Balanza
-        "cinturon" -> Cinturon
-        "bateria" -> Bateria
-        "interruptor" -> Interruptor
-        "radio" -> Radio
-        "freno" -> Freno
+        "vuelo" -> Icons.Filled.Flight
         "estrangulador" -> Estrangulador
-        "gases" -> Gases
-        "instrumentos" -> Instrumentos
-        "boton" -> Boton
-        "generador" -> Generador
+        "gases" -> Icons.Filled.Speed
+        "instrumentos" -> Icons.Filled.Dashboard
+        "generador" -> Icons.Filled.PowerSettings
         "bomba" -> Bomba
-        "ignicion" -> Ignicion
-        "refrigeracion" -> Refrigeracion
+        "ignicion" -> Icons.Filled.Bolt
+        "refrigeracion" -> Icons.Filled.AcUnit
         "trim" -> Trim
-        "transponder" -> Transponder
-        "brujula" -> Brujula
-        "viento" -> Viento
         "anemometro" -> Anemometro
-        "paracaidas" -> Paracaidas
-        "palanca" -> Palanca
-        "calefaccion" -> Calefaccion
-        "salida" -> Salida
-        "seguro" -> Seguro
+        "palanca" -> Icons.Filled.Tune
         "altimetro" -> Altimetro
         "taifun", "logo" -> TaifunLogo
-        else -> Check // default mejor que Documento para aviación
+        "microfono" -> Microfono
+        else -> Icons.Filled.CheckCircle // default con icono Material más claro
     }
 
     // ---- Opciones de iconos para selector ----
@@ -766,7 +779,8 @@ object IconsRepo {
     )
 
     /**
-     * Lista completa de iconos disponibles organizados por categoría
+     * Lista completa de iconos disponibles organizados por categoría.
+     * Usa Material Icons Extended para mejor representatividad.
      */
     val availableIcons = listOf(
         // Controles de Vuelo
@@ -775,7 +789,7 @@ object IconsRepo {
         IconOption("profundidad", "Profundidad", Profundidad, "Controles"),
         IconOption("aleron", "Alerón", Aleron, "Controles"),
         IconOption("trim", "Trim", Trim, "Controles"),
-        IconOption("palanca", "Palanca", Palanca, "Controles"),
+        IconOption("palanca", "Palanca", Icons.Filled.Tune, "Controles"),
 
         // Superficies
         IconOption("flaps", "Flaps", Flaps, "Superficies"),
@@ -785,10 +799,10 @@ object IconsRepo {
         // Motor y Propulsión
         IconOption("motor", "Motor", Motor, "Motor"),
         IconOption("helice", "Hélice", Helice, "Motor"),
-        IconOption("gases", "Gases", Gases, "Motor"),
+        IconOption("gases", "Gases", Icons.Filled.Speed, "Motor"),
         IconOption("estrangulador", "Estrangulador", Estrangulador, "Motor"),
-        IconOption("ignicion", "Ignición", Ignicion, "Motor"),
-        IconOption("refrigeracion", "Refrigeración", Refrigeracion, "Motor"),
+        IconOption("ignicion", "Ignición", Icons.Filled.Bolt, "Motor"),
+        IconOption("refrigeracion", "Refrigeración", Icons.Filled.AcUnit, "Motor"),
 
         // Combustible y Fluidos
         IconOption("combustible", "Combustible", Combustible, "Fluidos"),
@@ -797,49 +811,49 @@ object IconsRepo {
 
         // Tren de Aterrizaje
         IconOption("tren", "Tren", Tren, "Tren"),
-        IconOption("freno", "Freno", Freno, "Tren"),
+        IconOption("freno", "Freno", Icons.Filled.Block, "Tren"),
 
         // Eléctrico
-        IconOption("bateria", "Batería", Bateria, "Eléctrico"),
-        IconOption("generador", "Generador", Generador, "Eléctrico"),
-        IconOption("interruptor", "Interruptor", Interruptor, "Eléctrico"),
-        IconOption("luz", "Luz", Luz, "Eléctrico"),
-        IconOption("boton", "Botón", Boton, "Eléctrico"),
+        IconOption("bateria", "Batería", Icons.Filled.BatteryFull, "Eléctrico"),
+        IconOption("generador", "Generador", Icons.Filled.PowerSettings, "Eléctrico"),
+        IconOption("interruptor", "Interruptor", Icons.Filled.ToggleOn, "Eléctrico"),
+        IconOption("luz", "Luz", Icons.Filled.Lightbulb, "Eléctrico"),
+        IconOption("boton", "Botón", Icons.Filled.RadioButtonChecked, "Eléctrico"),
 
         // Aviónica
-        IconOption("radio", "Radio", Radio, "Aviónica"),
-        IconOption("transponder", "Transponder", Transponder, "Aviónica"),
+        IconOption("radio", "Radio", Icons.Filled.Radio, "Aviónica"),
+        IconOption("transponder", "Transponder", Icons.Filled.Sensors, "Aviónica"),
         IconOption("antena", "Antena", Antena, "Aviónica"),
 
         // Instrumentos
-        IconOption("instrumentos", "Instrumentos", Instrumentos, "Instrumentos"),
+        IconOption("instrumentos", "Instrumentos", Icons.Filled.Dashboard, "Instrumentos"),
         IconOption("altimetro", "Altímetro", Altimetro, "Instrumentos"),
-        IconOption("brujula", "Brújula", Brujula, "Instrumentos"),
+        IconOption("brujula", "Brújula", Icons.Filled.Explore, "Instrumentos"),
         IconOption("anemometro", "Anemómetro", Anemometro, "Instrumentos"),
 
         // Inspección
-        IconOption("inspeccion", "Inspección", Inspeccion, "Inspección"),
-        IconOption("check", "Check", Check, "Inspección"),
-        IconOption("llave", "Llave", Llave, "Inspección"),
+        IconOption("inspeccion", "Inspección", Icons.Filled.Search, "Inspección"),
+        IconOption("check", "Check", Icons.Filled.CheckCircle, "Inspección"),
+        IconOption("llave", "Llave", Icons.Filled.Key, "Inspección"),
         IconOption("pitot", "Pitot", Pitot, "Inspección"),
 
         // Cabina
-        IconOption("cabina", "Cabina", Cabina, "Cabina"),
-        IconOption("cinturon", "Cinturón", Cinturon, "Cabina"),
-        IconOption("puerto", "Puerto", Puerto, "Cabina"),
-        IconOption("calefaccion", "Calefacción", Calefaccion, "Cabina"),
+        IconOption("cabina", "Cabina", Icons.Filled.AirlineSeatReclineNormal, "Cabina"),
+        IconOption("cinturon", "Cinturón", Icons.Filled.Security, "Cabina"),
+        IconOption("puerto", "Puerto", Icons.Filled.Usb, "Cabina"),
+        IconOption("calefaccion", "Calefacción", Icons.Filled.Thermostat, "Cabina"),
 
         // Seguridad
-        IconOption("seguro", "Seguro", Seguro, "Seguridad"),
-        IconOption("salida", "Salida", Salida, "Seguridad"),
+        IconOption("seguro", "Seguro", Icons.Filled.Shield, "Seguridad"),
+        IconOption("salida", "Salida", Icons.Filled.ExitToApp, "Seguridad"),
         IconOption("paracaidas", "Paracaídas", Paracaidas, "Seguridad"),
 
         // Otros
-        IconOption("vuelo", "Vuelo", Vuelo, "General"),
-        IconOption("documento", "Documento", Documento, "General"),
-        IconOption("carga", "Carga", Carga, "General"),
-        IconOption("balanza", "Balanza", Balanza, "General"),
-        IconOption("viento", "Viento", Viento, "General")
+        IconOption("vuelo", "Vuelo", Icons.Filled.Flight, "General"),
+        IconOption("documento", "Documento", Icons.Filled.Description, "General"),
+        IconOption("carga", "Carga", Icons.Filled.Inventory, "General"),
+        IconOption("balanza", "Balanza", Icons.Filled.Scale, "General"),
+        IconOption("viento", "Viento", Icons.Filled.Air, "General")
     )
 
     /**

@@ -355,72 +355,107 @@ private fun ChecklistButton(
     onEdit: () -> Unit,
     haptic: com.taifun.checks.ui.HapticFeedbackHelper
 ) {
+    val accentColor = if (!checklist.color.isNullOrBlank()) {
+        hexToColor(checklist.color!!)
+    } else {
+        MaterialTheme.colorScheme.primary
+    }
+
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = accentColor.copy(alpha = 0.3f),
+                shape = MaterialTheme.shapes.medium
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 64.dp),
+                .heightIn(min = 72.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Indicador de color (si existe)
+            // Badge de color sutil (si existe)
             if (!checklist.color.isNullOrBlank()) {
                 Box(
                     modifier = Modifier
-                        .width(6.dp)
-                        .fillMaxHeight()
-                        .background(hexToColor(checklist.color!!))
+                        .width(4.dp)
+                        .height(48.dp)
+                        .background(
+                            accentColor.copy(alpha = 0.8f),
+                            shape = MaterialTheme.shapes.small
+                        )
                 )
             }
 
-            // Botón principal (abrir checklist)
-            Button(
-                onClick = {
-                    haptic.performHapticFeedback()
-                    onClick()
-                },
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // Contenido principal (clickeable)
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
-                contentPadding = PaddingValues(16.dp),
-                colors = if (!checklist.color.isNullOrBlank()) {
-                    ButtonDefaults.buttonColors(
-                        containerColor = hexToColor(checklist.color!!)
-                    )
-                } else {
-                    ButtonDefaults.buttonColors()
-                }
+                    .clickable {
+                        haptic.performHapticFeedback()
+                        onClick()
+                    }
+                    .padding(vertical = 12.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.Start
+                Text(
+                    text = checklist.titulo,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = checklist.titulo,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = "${checklist.pasos.size} pasos" +
-                                if (checklist.fullList == true) " • Lista completa" else "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                    )
+                    // Badge pequeño con número de pasos
+                    Surface(
+                        color = accentColor.copy(alpha = 0.15f),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = "${checklist.pasos.size} pasos",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = accentColor,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                    // Indicador de tipo de lista
+                    if (checklist.fullList == true) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text(
+                                text = "Lista completa",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
                 }
             }
 
-            // Botón editar
+            // Botón editar con menos prominencia
             IconButton(
                 onClick = {
                     haptic.performHapticFeedback()
                     onEdit()
                 },
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(end = 4.dp)
             ) {
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = "Editar",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
             }
         }
