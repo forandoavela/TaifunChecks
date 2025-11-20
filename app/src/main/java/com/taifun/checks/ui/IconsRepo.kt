@@ -757,7 +757,7 @@ object IconsRepo {
         "estrangulador" -> Estrangulador
         "gases" -> Icons.Filled.Speed
         "instrumentos" -> Icons.Filled.Dashboard
-        "generador" -> Icons.Filled.PowerSettings
+        "generador" -> Icons.Filled.Power
         "bomba" -> Bomba
         "ignicion" -> Icons.Filled.Bolt
         "refrigeracion" -> Icons.Filled.AcUnit
@@ -815,7 +815,7 @@ object IconsRepo {
 
         // Eléctrico
         IconOption("bateria", "Batería", Icons.Filled.BatteryFull, "Eléctrico"),
-        IconOption("generador", "Generador", Icons.Filled.PowerSettings, "Eléctrico"),
+        IconOption("generador", "Generador", Icons.Filled.Power, "Eléctrico"),
         IconOption("interruptor", "Interruptor", Icons.Filled.ToggleOn, "Eléctrico"),
         IconOption("luz", "Luz", Icons.Filled.Lightbulb, "Eléctrico"),
         IconOption("boton", "Botón", Icons.Filled.RadioButtonChecked, "Eléctrico"),
