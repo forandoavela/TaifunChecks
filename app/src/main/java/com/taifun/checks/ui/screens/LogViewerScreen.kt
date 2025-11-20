@@ -435,7 +435,6 @@ private fun LogEntryCard(
                     text = "🛬 ICAO: ${entry.icaoCode}",
                     style = MaterialTheme.typography.bodySmall,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary
                 )
             }
