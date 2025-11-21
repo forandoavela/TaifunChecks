@@ -3,6 +3,7 @@ package com.taifun.checks.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -160,12 +161,20 @@ fun EditorScreen(onBack: () -> Unit) {
         ) {
             // Status bar
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = if (validationError != null) {
-                    CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                } else {
-                    CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = if (validationError != null) {
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
+                        } else {
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                        },
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(

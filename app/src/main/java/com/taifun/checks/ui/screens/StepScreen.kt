@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -648,99 +649,102 @@ private fun StepByStepMode(
                             )
                         }
 
-                        // Texto
+                        // Texto con mejor jerarquía
                         Text(
                             text = paso?.texto ?: stringResource(R.string.loading),
-                            fontSize = 28.sp,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.headlineMedium,
-                            lineHeight = 34.sp
+                            style = MaterialTheme.typography.headlineLarge,
+                            lineHeight = 38.sp,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
                     // Lado derecho: datos opcionales y botón log en columna vertical
-                    Column(
+                    Surface(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                        tonalElevation = 2.dp
                     ) {
-                        // Datos opcionales
-                        optionalData.forEach { data ->
-                            Text(
-                                text = data,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
-
-                        // Botón de Log (en modo apaisado)
-                        if (!paso?.log.isNullOrBlank()) {
-                            if (optionalData.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(4.dp))
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp, vertical = 16.dp),
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            // Datos opcionales
+                            optionalData.forEach { data ->
+                                Text(
+                                    text = data,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
                             }
 
-                            Button(
-                                onClick = {
-                                    // Verificar permisos primero
-                                    if (!hasLocationPermission()) {
-                                        locationPermissionLauncher.launch(
-                                            arrayOf(
-                                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                                Manifest.permission.ACCESS_COARSE_LOCATION
-                                            )
-                                        )
-                                        return@Button
-                                    }
+                            // Botón de Log (en modo apaisado)
+                            if (!paso?.log.isNullOrBlank()) {
+                                if (optionalData.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
 
-                                    // Verificar que tenemos datos GPS válidos
-                                    if (latitude != null && longitude != null && altitude != null) {
-                                        coroutineScope.launch {
-                                            val lang = if (language == "en") "en" else "es"
-                                            val success = logRepo.addLogEntry(
-                                                latitude = latitude,
-                                                longitude = longitude,
-                                                altitudeMeters = altitude,
-                                                speedKmh = speedKmh,
-                                                logText = paso.log ?: "",
-                                                language = lang
+                                Button(
+                                    onClick = {
+                                        // Verificar permisos primero
+                                        if (!hasLocationPermission()) {
+                                            locationPermissionLauncher.launch(
+                                                arrayOf(
+                                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                                )
                                             )
-
-                                            if (success) {
-                                                Toast.makeText(
-                                                    ctx,
-                                                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            } else {
-                                                Toast.makeText(
-                                                    ctx,
-                                                    if (lang == "en") "Error saving log" else "Error al guardar",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
+                                            return@Button
                                         }
-                                    } else {
-                                        Toast.makeText(
-                                            ctx,
-                                            if (language == "en") "GPS data not available" else "Datos GPS no disponibles",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                },
-                                modifier = Modifier.wrapContentWidth()
-                            ) {
-                                Text(
-                                    text = "${if (language == "en") "Log" else "Registrar"}: ${paso.log}",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+
+                                        // Verificar que tenemos datos GPS válidos
+                                        if (latitude != null && longitude != null && altitude != null) {
+                                            coroutineScope.launch {
+                                                val lang = if (language == "en") "en" else "es"
+                                                val success = logRepo.addLogEntry(
+                                                    latitude = latitude,
+                                                    longitude = longitude,
+                                                    altitudeMeters = altitude,
+                                                    speedKmh = speedKmh,
+                                                    logText = paso.log ?: "",
+                                                    language = lang
+                                                )
+
+                                                if (success) {
+                                                    Toast.makeText(
+                                                        ctx,
+                                                        if (lang == "en") "Log entry saved" else "Entrada guardada",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else {
+                                                    Toast.makeText(
+                                                        ctx,
+                                                        if (lang == "en") "Error saving log" else "Error al guardar",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(
+                                                ctx,
+                                                if (language == "en") "GPS data not available" else "Datos GPS no disponibles",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
+                                    modifier = Modifier.wrapContentWidth()
+                                ) {
+                                    Text(
+                                        text = "${if (language == "en") "Log" else "Registrar"}: ${paso.log}",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                             }
                         }
                     }
@@ -766,38 +770,41 @@ private fun StepByStepMode(
                         )
                     }
 
-                    // Texto responsive
+                    // Texto responsive con mejor jerarquía
                     Text(
                         text = paso?.texto ?: stringResource(R.string.loading),
-                        fontSize = if (isPortrait) 22.sp else 28.sp,
+                        fontSize = if (isPortrait) 26.sp else 32.sp,
+                        fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineMedium,
-                        lineHeight = if (isPortrait) 28.sp else 34.sp
+                        style = MaterialTheme.typography.headlineLarge,
+                        lineHeight = if (isPortrait) 32.sp else 38.sp,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Mostrar datos opcionales debajo
+                    // Mostrar datos opcionales debajo con mejor estilo
                     if (optionalData.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                        Column(
+                        Surface(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                            tonalElevation = 2.dp
                         ) {
-                            optionalData.forEach { data ->
-                                Text(
-                                    text = data,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                                )
+                            Column(
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                optionalData.forEach { data ->
+                                    Text(
+                                        text = data,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
                             }
                         }
                     }
@@ -878,38 +885,50 @@ private fun StepByStepMode(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(buttonHeight),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Surface(
+                Button(
+                    onClick = onPrevious,
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
-                        .clickable(onClick = onPrevious),
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.medium
+                        .fillMaxHeight(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 6.dp
+                    )
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = stringResource(R.string.anterior),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.anterior),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
 
-                Surface(
+                Button(
+                    onClick = onNext,
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
-                        .clickable(onClick = onNext),
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = MaterialTheme.shapes.medium
+                        .fillMaxHeight(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 2.dp,
+                        pressedElevation = 6.dp
+                    )
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = stringResource(R.string.siguiente),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.siguiente),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
@@ -1137,16 +1156,23 @@ private fun FullListMode(
                         ),
                     colors = if (isChecked) {
                         CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                         )
                     } else {
-                        CardDefaults.cardColors()
-                    }
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    },
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = if (isChecked) 1.dp else 2.dp,
+                        pressedElevation = 4.dp
+                    ),
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp)
+                            .padding(16.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -1156,34 +1182,38 @@ private fun FullListMode(
                             Row(
                                 modifier = Modifier.weight(1f),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 if (p.icono != null) {
                                     val iconTint = if (!checklist?.color.isNullOrBlank()) {
-                                        hexToColor(checklist?.color!!)
+                                        hexToColor(checklist?.color!!).copy(alpha = 0.7f)
                                     } else {
-                                        MaterialTheme.colorScheme.primary
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                                     }
                                     Icon(
                                         imageVector = IconsRepo.iconFor(p.icono),
                                         contentDescription = null,
-                                        modifier = Modifier.size(28.dp),
+                                        modifier = Modifier.size(32.dp),
                                         tint = iconTint
                                     )
                                 }
 
-                                Column {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
                                     Text(
                                         text = p.texto,
-                                        fontSize = 16.sp,
-                                        style = MaterialTheme.typography.bodyLarge
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     if (optionalInfo.isNotEmpty()) {
                                         Text(
                                             text = optionalInfo.joinToString(" • "),
-                                            fontSize = 12.sp,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                            fontSize = 13.sp,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
                                 }

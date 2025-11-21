@@ -7,6 +7,7 @@ import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -236,7 +237,7 @@ fun ChecklistManagerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(checklistFiles, key = { it }) { filename ->
@@ -427,14 +428,20 @@ private fun ChecklistFileCard(
     haptic: com.taifun.checks.ui.HapticFeedbackHelper
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = if (isActive) {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        } else {
-            CardDefaults.cardColors()
-        }
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = if (isActive) {
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                },
+                shape = MaterialTheme.shapes.medium
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Column(
             modifier = Modifier
@@ -442,7 +449,7 @@ private fun ChecklistFileCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Título del archivo
+            // Título del archivo con badge si es activo
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -453,6 +460,20 @@ private fun ChecklistFileCard(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.weight(1f)
                 )
+
+                if (isActive) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = stringResource(R.string.manager_current_label),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
             }
 
             // Botones de acción
@@ -461,29 +482,21 @@ private fun ChecklistFileCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Botón de selección o indicador de actual
-                if (isActive) {
-                    // Botón verde para checklist actual (sin acción)
-                    Button(
-                        onClick = { },
-                        enabled = false,
-                        colors = ButtonDefaults.buttonColors(
-                            disabledContainerColor = MaterialTheme.colorScheme.primary,
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        modifier = Modifier.height(36.dp)
-                    ) {
-                        Text(stringResource(R.string.manager_current_label))
-                    }
-                } else {
-                    // Botón compacto para seleccionar
+                // Botón de selección (solo si no es actual)
+                if (!isActive) {
                     Button(
                         onClick = {
                             haptic.performHapticFeedback()
                             onSelect()
                         },
-                        modifier = Modifier.height(36.dp)
+                        modifier = Modifier.height(40.dp)
                     ) {
+                        Icon(
+                            Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(stringResource(R.string.manager_select))
                     }
                 }
@@ -513,7 +526,11 @@ private fun ChecklistFileCard(
                     haptic.performHapticFeedback()
                     onDelete()
                 }) {
-                    Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.manager_delete))
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = stringResource(R.string.manager_delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
