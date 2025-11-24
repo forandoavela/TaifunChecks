@@ -124,8 +124,10 @@ class LogRepository(private val context: Context) {
             // Obtener timestamp UTC
             val utcTime = dateFormat.format(Date())
 
-            // Detectar aeródromo solo si velocidad < 40 km/h
-            val icaoCode = if (speedKmh != null && speedKmh < 40f) {
+            // Detectar aeródromo si:
+            // 1. No hay dato de velocidad (null) - probablemente parado
+            // 2. La velocidad es < 40 km/h
+            val icaoCode = if (speedKmh == null || speedKmh < 40f) {
                 aerodromeRepository.findNearestAerodrome(latitude, longitude, maxDistanceKm = 2.0)
             } else {
                 null
