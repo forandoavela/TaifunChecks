@@ -104,7 +104,7 @@ class LogRepository(private val context: Context) {
      * @param latitude Latitud GPS
      * @param longitude Longitud GPS
      * @param altitudeMeters Altitud GPS en metros
-     * @param speedKmh Velocidad GPS en km/h
+     * @param speedKmh Velocidad GPS en km/h (ya no se usa para detección ICAO, se mantiene por compatibilidad)
      * @param logText Texto del log configurado en el paso
      * @param language Idioma para headers ("es" o "en")
      * @return true si se guardó correctamente
@@ -124,14 +124,17 @@ class LogRepository(private val context: Context) {
             // Obtener timestamp UTC
             val utcTime = dateFormat.format(Date())
 
-            // Detectar aeródromo si:
-            // 1. No hay dato de velocidad (null) - probablemente parado
-            // 2. La velocidad es < 40 km/h
-            val icaoCode = if (speedKmh == null || speedKmh < 40f) {
-                aerodromeRepository.findNearestAerodrome(latitude, longitude, maxDistanceKm = 2.0)
-            } else {
-                null
-            }
+            // Detectar aeródromo usando criterios de posición horizontal y altitud
+            // La nueva lógica verifica:
+            // 1. Distancia horizontal < 2 km
+            // 2. Diferencia de altitud < 50 m (más fiable que velocidad GPS)
+            val icaoCode = aerodromeRepository.findNearestAerodrome(
+                latitude = latitude,
+                longitude = longitude,
+                altitudeMeters = altitudeMeters,
+                maxDistanceKm = 2.0,
+                maxAltitudeDifferenceM = 50.0
+            )
 
             // Crear entrada
             val entry = LogEntry(
