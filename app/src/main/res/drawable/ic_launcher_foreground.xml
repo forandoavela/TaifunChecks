@@ -1,8 +1,14 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:viewportWidth="512"
     android:viewportHeight="512"
-    android:width="512dp"
-    android:height="512dp">
+    android:width="108dp"
+    android:height="108dp">
+    <!-- Scale to 66% and center to ensure safe margins for adaptive icons -->
+    <group
+        android:scaleX="0.66"
+        android:scaleY="0.66"
+        android:pivotX="256"
+        android:pivotY="256">
     <path
         android:pathData="M144.5 29L356 29.5L144.5 30L144.5 29Z"
         android:fillColor="#94DCF9"
@@ -1254,4 +1260,5 @@
         android:fillColor="#E6ECE8"
         android:strokeColor="#E6ECE8"
         android:strokeWidth="1" />
+    </group>
 </vector>
