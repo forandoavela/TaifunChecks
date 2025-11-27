@@ -237,7 +237,7 @@ fun LogViewerScreen(
 
     // Dialog de log personalizado
     if (showCustomLogDialog) {
-        val language by settingsRepo.selectedLanguageFlow.collectAsState(initial = "auto")
+        val language by settingsRepo.languageFlow.collectAsState(initial = "auto")
         val latitude by sensorRepo.latitude.collectAsState()
         val longitude by sensorRepo.longitude.collectAsState()
         val altitude by sensorRepo.altitude.collectAsState()
