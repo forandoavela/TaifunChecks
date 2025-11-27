@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
 
+# Cancelar releases anteriores del mismo tag (poco probable, pero por seguridad)
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false  # No cancelar releases, pueden ser importantes
+
 jobs:
   release:
     name: Create Release

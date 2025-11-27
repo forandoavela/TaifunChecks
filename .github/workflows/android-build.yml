@@ -12,6 +12,11 @@ on:
       - main
   workflow_dispatch:
 
+# Cancelar workflows anteriores del mismo branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build APK
