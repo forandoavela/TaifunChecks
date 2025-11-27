@@ -62,6 +62,7 @@ A professional aviation checklist application designed specifically for Taifun 1
 
 ### Flight Logging Features (NEW in v1.5.7-1.5.8)
 - **GPS Tracking & Logging**: Automatically log GPS coordinates, altitude, and custom notes during procedures
+- **Custom Log Entries**: Create manual log entries anytime from the Log Viewer with current GPS data
 - **CSV Export/Import**: Export flight logs to CSV format for analysis or record-keeping
 - **Log Viewer**: Dedicated screen to view, edit, and manage flight log entries
 - **Automatic Engine Logging**: For gliders - automatically log engine start/stop events
@@ -351,6 +352,18 @@ Record your flight activities with GPS-tracked log entries.
      - Timestamp
      - Nearest aerodrome ICAO code (if available)
 
+2. **Creating Custom Log Entries**
+   - Tap the floating action button (✏️) in the Log Viewer screen
+   - Enter custom text for your log entry
+   - Current GPS data, altitude, and UTC time are automatically recorded
+   - ICAO code is included if near an aerodrome (within 2km and speed < 40 km/h)
+   - Useful for logging events not tied to specific checklist steps
+   - Examples: flight start, fuel stops, incidents, observations, etc.
+
+3. **Automatic Engine Logging (Gliders)**
+   - For glider operations, engine start/stop events are logged automatically
+   - No manual intervention required
+   - Tracks engine usage for maintenance and record-keeping
    **ICAO Code Detection:**
    - Automatically detects when you're at an aerodrome using:
      - Horizontal distance < 2 km from aerodrome coordinates
@@ -359,29 +372,24 @@ Record your flight activities with GPS-tracked log entries.
    - More reliable than speed-based detection (works in hangars, parking areas)
    - Won't detect aerodromes when flying over them
 
-2. **Automatic Engine Logging (Gliders)**
-   - For glider operations, engine start/stop events are logged automatically
-   - No manual intervention required
-   - Tracks engine usage for maintenance and record-keeping
-
-3. **Accessing the Log Viewer**
+4. **Accessing the Log Viewer**
    - Open from home screen menu
    - View all log entries in chronological order
    - See total entry count
    - Each entry shows: timestamp, text, coordinates, altitude, ICAO code
 
-4. **Managing Log Entries**
+5. **Managing Log Entries**
    - **Edit**: Tap pencil icon to modify entry details
    - **Delete**: Tap trash icon to remove individual entries
    - **Clear All**: Use menu option to clear entire log (with confirmation)
 
-5. **Exporting Logs**
+6. **Exporting Logs**
    - **Auto-save**: Logs automatically saved to `Download/FlightChecks/` folder as CSV
    - **Manual Export**: Tap "Save CSV" to export with custom location
    - **Share**: Tap share icon to send log via email, messaging, etc.
    - CSV format compatible with Excel, Google Sheets, and flight logging software
 
-6. **Importing Logs**
+7. **Importing Logs**
    - Tap "Import CSV" to load existing log files
    - Note: Import will overwrite current log (confirmation required)
    - Useful for merging logs or restoring backups

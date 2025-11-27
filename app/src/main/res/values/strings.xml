@@ -229,4 +229,15 @@
     <string name="entry_longitude_label">Longitud</string>
     <string name="entry_altitude_label">Altitud (m)</string>
     <string name="entry_icao_label">ICAO</string>
+
+    <!-- Custom Log -->
+    <string name="create_custom_log">Crear Log</string>
+    <string name="custom_log_title">Crear Log Personalizado</string>
+    <string name="custom_log_message">Introduce el texto para el log. Se registrará la ubicación actual, altitud y hora UTC.</string>
+    <string name="custom_log_text_label">Texto del Log</string>
+    <string name="custom_log_text_hint">Ej: Inicio de vuelo, despegue, aterrizaje...</string>
+    <string name="custom_log_success">Log guardado correctamente</string>
+    <string name="custom_log_error">Error al guardar log</string>
+    <string name="custom_log_no_gps">GPS no disponible. Asegúrate de tener permisos de ubicación activados.</string>
+    <string name="custom_log_empty_text">El texto del log no puede estar vacío</string>
 </resources>

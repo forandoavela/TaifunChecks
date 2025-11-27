@@ -519,6 +519,14 @@ Edita cualquier paso → Desplázate a "Funciones Opcionales"
    • Timestamp
    • Nearest aerodrome ICAO code (if available)
 
+**Creating Custom Log Entries:**
+• Tap the ✏️ floating button in the Log Viewer screen
+• Enter custom text for your log entry
+• Current GPS data, altitude, and UTC time are automatically recorded
+• ICAO code included if near an aerodrome (within 2km and speed < 40 km/h)
+• Useful for logging events not tied to specific checklist steps
+• Examples: flight start, fuel stops, incidents, observations
+
 **ICAO Code Detection:**
 • Automatically detects when at an aerodrome using:
   - Horizontal distance < 2 km from aerodrome
@@ -588,6 +596,14 @@ Columns: Timestamp, Text, Latitude, Longitude, Altitude (m), ICAO Code
    • Altitud actual
    • Marca de tiempo
    • Código ICAO del aeródromo más cercano (si disponible)
+
+**Crear Entradas de Log Personalizadas:**
+• Toca el botón flotante ✏️ en la pantalla del Visor de Log
+• Introduce el texto personalizado para tu entrada de log
+• Los datos GPS actuales, altitud y hora UTC se registran automáticamente
+• Código ICAO incluido si estás cerca de un aeródromo (2km y velocidad < 40 km/h)
+• Útil para registrar eventos no vinculados a pasos específicos de checklist
+• Ejemplos: inicio de vuelo, paradas de combustible, incidentes, observaciones
 
 **Detección de Código ICAO:**
 • Detecta automáticamente cuando estás en un aeródromo usando:
