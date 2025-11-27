@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.taifun.checks.R
 import com.taifun.checks.data.LogEntry
 import com.taifun.checks.data.LogRepository
+import com.taifun.checks.data.SensorDataRepository
+import com.taifun.checks.data.SettingsRepository
 import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -42,6 +45,8 @@ fun LogViewerScreen(
     val ctx = LocalContext.current
     val haptic = rememberHapticFeedback()
     val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext) }
+    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
+    val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
     val scope = rememberCoroutineScope()
 
     var entries by remember { mutableStateOf<List<LogEntry>>(emptyList()) }
@@ -51,6 +56,7 @@ fun LogViewerScreen(
     var entryToEdit by remember { mutableStateOf<Pair<Int, LogEntry>?>(null) }
     var showImportConfirm by remember { mutableStateOf(false) }
     var pendingImportUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var showCustomLogDialog by remember { mutableStateOf(false) }
 
     // Launcher para importar CSV
     val importLauncher = rememberLauncherForActivityResult(
@@ -87,9 +93,17 @@ fun LogViewerScreen(
         }
     }
 
-    // Cargar entradas al inicio
+    // Cargar entradas al inicio y empezar seguimiento GPS
     LaunchedEffect(Unit) {
         reloadEntries()
+        sensorRepo.startLocationTracking()
+    }
+
+    // Limpiar al salir
+    DisposableEffect(Unit) {
+        onDispose {
+            sensorRepo.stopLocationTracking()
+        }
     }
 
     // Dialog de confirmación para eliminar entrada
@@ -221,7 +235,69 @@ fun LogViewerScreen(
         )
     }
 
+    // Dialog de log personalizado
+    if (showCustomLogDialog) {
+        val language by settingsRepo.selectedLanguageFlow.collectAsState(initial = "auto")
+        val latitude by sensorRepo.latitude.collectAsState()
+        val longitude by sensorRepo.longitude.collectAsState()
+        val altitude by sensorRepo.altitude.collectAsState()
+        val speedKmh by sensorRepo.speedKmh.collectAsState()
+
+        CustomLogDialog(
+            onDismiss = { showCustomLogDialog = false },
+            onSave = { logText ->
+                scope.launch {
+                    if (logText.isBlank()) {
+                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_empty_text), Toast.LENGTH_SHORT).show()
+                        return@launch
+                    }
+
+                    val lat = latitude
+                    val lon = longitude
+                    val alt = altitude
+
+                    if (lat == null || lon == null || alt == null) {
+                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_no_gps), Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+
+                    val success = logRepo.addLogEntry(
+                        latitude = lat,
+                        longitude = lon,
+                        altitudeMeters = alt,
+                        speedKmh = speedKmh,
+                        logText = logText,
+                        language = if (language == "en") "en" else "es"
+                    )
+
+                    if (success) {
+                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_success), Toast.LENGTH_SHORT).show()
+                        reloadEntries()
+                        showCustomLogDialog = false
+                    } else {
+                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_error), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            haptic = haptic
+        )
+    }
+
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    haptic.performHapticFeedback()
+                    showCustomLogDialog = true
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Create,
+                    contentDescription = stringResource(R.string.create_custom_log)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.log_viewer_title)) },
@@ -535,6 +611,60 @@ private fun EditEntryDialog(
                 }
             }) {
                 Text(stringResource(R.string.edit_entry_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                haptic.performLightFeedback()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.cancelar))
+            }
+        }
+    )
+}
+
+@Composable
+private fun CustomLogDialog(
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit,
+    haptic: com.taifun.checks.ui.HapticFeedbackHelper
+) {
+    var logText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.custom_log_title)) },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.custom_log_message),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+
+                OutlinedTextField(
+                    value = logText,
+                    onValueChange = { logText = it },
+                    label = { Text(stringResource(R.string.custom_log_text_label)) },
+                    placeholder = { Text(stringResource(R.string.custom_log_text_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    haptic.performStrongFeedback()
+                    onSave(logText.trim())
+                },
+                enabled = logText.isNotBlank()
+            ) {
+                Text(stringResource(R.string.aceptar))
             }
         },
         dismissButton = {
