@@ -6,7 +6,7 @@ import java.io.InputStreamReader
 import kotlin.math.*
 
 /**
- * Representa un aeródromo con su identificador y coordenadas
+ * Representa un aeródromo con su identificador, coordenadas y elevación
  * El identificador puede ser un código ICAO oficial (ej: LEMD)
  * o un identificador basado en nombre (ej: ES_FUENTEMILANOS)
  */
@@ -14,6 +14,7 @@ data class Aerodrome(
     val identifier: String,
     val latitude: Double,
     val longitude: Double,
+    val elevationMeters: Double?,
     val source: String = "Unknown"
 )
 
@@ -41,13 +42,14 @@ class AerodromeRepository(private val context: Context) {
                 lines.drop(1) // Skip header
                     .mapNotNull { line ->
                         val parts = line.split(",")
-                        if (parts.size >= 3) {
+                        if (parts.size >= 4) {
                             try {
                                 Aerodrome(
                                     identifier = parts[0].trim(),
                                     latitude = parts[1].trim().toDouble(),
                                     longitude = parts[2].trim().toDouble(),
-                                    source = if (parts.size >= 4) parts[3].trim() else "Unknown"
+                                    elevationMeters = parts[3].trim().toDoubleOrNull(),
+                                    source = if (parts.size >= 5) parts[4].trim() else "Unknown"
                                 )
                             } catch (e: NumberFormatException) {
                                 null // Skip invalid entries
@@ -68,17 +70,22 @@ class AerodromeRepository(private val context: Context) {
 
     /**
      * Encuentra el aeródromo más cercano a la posición dada
-     * Solo retorna si está dentro del radio máximo (2 km por defecto)
+     * Solo retorna si está dentro del radio máximo (2 km por defecto) Y
+     * la diferencia de altitud es menor al umbral especificado (50m por defecto)
      *
      * @param latitude Latitud actual
      * @param longitude Longitud actual
+     * @param altitudeMeters Altitud GPS actual en metros
      * @param maxDistanceKm Distancia máxima en km (default: 2 km)
+     * @param maxAltitudeDifferenceM Diferencia máxima de altitud en metros (default: 50m)
      * @return Identificador del aeródromo más cercano (código ICAO o nombre) o null si no hay ninguno cercano
      */
     fun findNearestAerodrome(
         latitude: Double,
         longitude: Double,
-        maxDistanceKm: Double = 2.0
+        altitudeMeters: Double?,
+        maxDistanceKm: Double = 2.0,
+        maxAltitudeDifferenceM: Double = 50.0
     ): String? {
         loadAerodromes()
 
@@ -99,12 +106,27 @@ class AerodromeRepository(private val context: Context) {
             }
         }
 
-        // Solo retornar si está dentro del radio máximo
-        return if (minDistance <= maxDistanceKm) {
-            nearestAerodrome?.identifier
-        } else {
-            null
+        // Solo retornar si:
+        // 1. Está dentro del radio máximo horizontal (2 km)
+        // 2. Si tenemos altitud GPS y elevación del aeródromo, la diferencia debe ser < 50m
+        if (minDistance <= maxDistanceKm) {
+            val aerodrome = nearestAerodrome ?: return null
+
+            // Si tenemos ambas altitudes, verificar diferencia vertical
+            if (altitudeMeters != null && aerodrome.elevationMeters != null) {
+                val altitudeDifference = kotlin.math.abs(altitudeMeters - aerodrome.elevationMeters)
+                return if (altitudeDifference <= maxAltitudeDifferenceM) {
+                    aerodrome.identifier
+                } else {
+                    null
+                }
+            } else {
+                // Si no tenemos altitud, usar solo criterio horizontal (comportamiento legacy)
+                return aerodrome.identifier
+            }
         }
+
+        return null
     }
 
     /**
