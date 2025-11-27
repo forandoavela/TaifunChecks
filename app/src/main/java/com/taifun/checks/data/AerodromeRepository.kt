@@ -3,6 +3,7 @@ package com.taifun.checks.data
 import android.content.Context
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.util.zip.GZIPInputStream
 import kotlin.math.*
 
 /**
@@ -28,14 +29,15 @@ class AerodromeRepository(private val context: Context) {
     private var isLoaded = false
 
     /**
-     * Carga la base de datos de aeródromos desde assets
+     * Carga la base de datos de aeródromos desde assets (formato gzip)
      * Solo se carga una vez en memoria
      */
     private fun loadAerodromes() {
         if (isLoaded) return
 
         try {
-            val inputStream = context.assets.open("aerodromes.csv")
+            // Usar GZIPInputStream para leer archivo comprimido (reduce tamaño APK en ~70%)
+            val inputStream = GZIPInputStream(context.assets.open("aerodromes.csv.gz"))
             val reader = BufferedReader(InputStreamReader(inputStream))
 
             aerodromes = reader.useLines { lines ->
