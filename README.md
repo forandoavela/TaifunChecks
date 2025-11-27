@@ -364,6 +364,13 @@ Record your flight activities with GPS-tracked log entries.
    - For glider operations, engine start/stop events are logged automatically
    - No manual intervention required
    - Tracks engine usage for maintenance and record-keeping
+   **ICAO Code Detection:**
+   - Automatically detects when you're at an aerodrome using:
+     - Horizontal distance < 2 km from aerodrome coordinates
+     - Altitude difference < 50 m from aerodrome elevation
+   - Database includes 85,333+ aerodromes worldwide with elevation data
+   - More reliable than speed-based detection (works in hangars, parking areas)
+   - Won't detect aerodromes when flying over them
 
 4. **Accessing the Log Viewer**
    - Open from home screen menu
@@ -683,6 +690,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Maintainer**: Jorge Mármol
 
 ## Changelog
+
+### v1.0.00.zz (2025-11-24)
+- **Improved ICAO Detection**: Altitude-based aerodrome detection instead of GPS speed
+  - Added elevation data to all 85,333 aerodromes in database
+  - Detection now uses horizontal distance (< 2 km) AND altitude difference (< 50 m)
+  - More reliable: works in hangars, without active GPS speed, and prevents false positives when flying over
+  - Elevation data sourced from OurAirports (81%) and Open-Elevation API (19%)
 
 ### v1.0.00.00 (2025-11-19)
 - **New Versioning System**: Changed to w.x.yy.zz format

@@ -527,6 +527,15 @@ Edita cualquier paso → Desplázate a "Funciones Opcionales"
 • Useful for logging events not tied to specific checklist steps
 • Examples: flight start, fuel stops, incidents, observations
 
+**ICAO Code Detection:**
+• Automatically detects when at an aerodrome using:
+  - Horizontal distance < 2 km from aerodrome
+  - Altitude difference < 50 m from aerodrome elevation
+• Database: 85,333+ aerodromes worldwide with elevation
+• More reliable than speed-based detection
+• Works in hangars, parking areas, without active GPS speed
+• Won't detect aerodromes when flying over them
+
 **Automatic Engine Logging (Gliders):**
 • Engine start/stop events logged automatically
 • No manual intervention required
@@ -595,6 +604,15 @@ Columns: Timestamp, Text, Latitude, Longitude, Altitude (m), ICAO Code
 • Código ICAO incluido si estás cerca de un aeródromo (2km y velocidad < 40 km/h)
 • Útil para registrar eventos no vinculados a pasos específicos de checklist
 • Ejemplos: inicio de vuelo, paradas de combustible, incidentes, observaciones
+
+**Detección de Código ICAO:**
+• Detecta automáticamente cuando estás en un aeródromo usando:
+  - Distancia horizontal < 2 km del aeródromo
+  - Diferencia de altitud < 50 m de la elevación del aeródromo
+• Base de datos: 85,333+ aeródromos mundiales con elevación
+• Más fiable que la detección basada en velocidad
+• Funciona en hangares, áreas de parking, sin velocidad GPS activa
+• No detectará aeródromos al sobrevolar
 
 **Logging Automático de Motor (Veleros):**
 • Eventos de encendido/apagado del motor se registran automáticamente

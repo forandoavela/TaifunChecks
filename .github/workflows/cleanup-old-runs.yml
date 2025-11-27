@@ -1,0 +1,30 @@
+name: Cleanup Old Workflow Runs
+
+on:
+  # Ejecutar después de cada build
+  workflow_run:
+    workflows: ["Android Build", "Release APK"]
+    types:
+      - completed
+  # También ejecutar manualmente si es necesario
+  workflow_dispatch:
+  # Ejecutar semanalmente para limpieza general
+  schedule:
+    - cron: '0 0 * * 0'  # Cada domingo a medianoche
+
+jobs:
+  cleanup:
+    name: Delete old workflow runs
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - name: Delete workflow runs (keep last 5)
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0  # No retener por días, solo por cantidad
+          keep_minimum_runs: 5  # Mantener solo los últimos 5 runs de cada workflow
