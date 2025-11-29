@@ -41,9 +41,10 @@ class AerodromeRepository(private val context: Context) {
         android.util.Log.e("AerodromeRepo", "loadAerodromes: Starting to load aerodrome database...")
 
         try {
-            // Usar GZIPInputStream para leer archivo comprimido (reduce tamaño APK en ~70%)
-            android.util.Log.e("AerodromeRepo", "loadAerodromes: Opening aerodromes.csv.gz from assets...")
-            val inputStream = GZIPInputStream(context.assets.open("aerodromes.csv.gz"))
+            // Usar GZIPInputStream para leer archivo comprimido desde res/raw/ (reduce tamaño APK en ~70%)
+            // Movido de assets/ a res/raw/ para evitar que R8 resource shrinking lo elimine
+            android.util.Log.e("AerodromeRepo", "loadAerodromes: Opening aerodromes_db.gz from res/raw/...")
+            val inputStream = GZIPInputStream(context.resources.openRawResource(com.taifun.checks.R.raw.aerodromes_db))
             val reader = BufferedReader(InputStreamReader(inputStream))
 
             android.util.Log.e("AerodromeRepo", "loadAerodromes: Parsing CSV data...")

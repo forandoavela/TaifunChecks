@@ -112,6 +112,12 @@ android {
         }
     }
 
+    // Configuración para NO comprimir archivos .gz en assets
+    // Esto evita que R8/AAPT elimine archivos .gz durante resource shrinking
+    androidResources {
+        noCompress += listOf("gz")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
