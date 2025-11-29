@@ -514,7 +514,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         }
                         else -> {
                             Text(
-                                text = stringResource(R.string.icao_db_loaded, aerodromeCount),
+                                text = stringResource(R.string.icao_db_loaded, aerodromeCount!!),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
