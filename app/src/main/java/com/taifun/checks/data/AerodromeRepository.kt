@@ -33,13 +33,20 @@ class AerodromeRepository(private val context: Context) {
      * Solo se carga una vez en memoria
      */
     private fun loadAerodromes() {
-        if (isLoaded) return
+        if (isLoaded) {
+            android.util.Log.d("AerodromeRepo", "loadAerodromes: already loaded (${aerodromes.size} aerodromes)")
+            return
+        }
+
+        android.util.Log.i("AerodromeRepo", "loadAerodromes: Starting to load aerodrome database...")
 
         try {
             // Usar GZIPInputStream para leer archivo comprimido (reduce tamaño APK en ~70%)
+            android.util.Log.d("AerodromeRepo", "loadAerodromes: Opening aerodromes.csv.gz from assets...")
             val inputStream = GZIPInputStream(context.assets.open("aerodromes.csv.gz"))
             val reader = BufferedReader(InputStreamReader(inputStream))
 
+            android.util.Log.d("AerodromeRepo", "loadAerodromes: Parsing CSV data...")
             aerodromes = reader.useLines { lines ->
                 lines.drop(1) // Skip header
                     .mapNotNull { line ->
@@ -64,8 +71,13 @@ class AerodromeRepository(private val context: Context) {
             }
 
             isLoaded = true
+            android.util.Log.i("AerodromeRepo", "✓ loadAerodromes: Successfully loaded ${aerodromes.size} aerodromes")
         } catch (e: Exception) {
             // Error loading database, keep empty list
+            android.util.Log.e("AerodromeRepo", "✗ loadAerodromes: FAILED to load aerodrome database!", e)
+            android.util.Log.e("AerodromeRepo", "  Error type: ${e.javaClass.simpleName}")
+            android.util.Log.e("AerodromeRepo", "  Error message: ${e.message}")
+            e.printStackTrace()
             aerodromes = emptyList()
         }
     }
