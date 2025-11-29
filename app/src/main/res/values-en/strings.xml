@@ -255,4 +255,5 @@
     <string name="custom_log_error">Error saving log</string>
     <string name="custom_log_no_gps">GPS not available. Make sure location permissions are enabled.</string>
     <string name="custom_log_empty_text">Log text cannot be empty</string>
+    <string name="custom_log_no_permission">Location permissions are required to create custom logs</string>
 </resources>
