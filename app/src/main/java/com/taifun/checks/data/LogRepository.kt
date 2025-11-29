@@ -130,12 +130,8 @@ class LogRepository(
 
             // Detectar aeródromo usando criterios de posición horizontal y altitud
             // Los valores de distancia y altitud son configurables desde Settings
-            android.util.Log.e("LogRepository", "Attempting to find aerodrome for position: lat=$latitude, lon=$longitude, alt=${altitudeMeters}m")
-
-            // Leer configuración actual de filtros ICAO
             val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
             val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
-            android.util.Log.e("LogRepository", "Using ICAO filters: maxDistance=${maxDistanceKm}km, maxAltitudeDiff=${maxAltitudeDiffM}m")
 
             val icaoCode = aerodromeRepository.findNearestAerodrome(
                 latitude = latitude,
@@ -144,7 +140,6 @@ class LogRepository(
                 maxDistanceKm = maxDistanceKm.toDouble(),
                 maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
             )
-            android.util.Log.e("LogRepository", "ICAO detection result: ${icaoCode ?: "null (no aerodrome detected)"}")
 
             // Crear entrada
             val entry = LogEntry(

@@ -453,7 +453,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             // Diagnóstico ICAO
             Text(
-                text = "Diagnóstico ICAO",
+                text = stringResource(R.string.icao_diagnostics_section),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -476,50 +476,50 @@ fun SettingsScreen(onBack: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Base de datos de aeródromos",
+                        text = stringResource(R.string.icao_db_title),
                         style = MaterialTheme.typography.titleSmall
                     )
 
                     when (aerodromeCount) {
                         null -> {
                             Text(
-                                text = "⏳ Cargando...",
+                                text = stringResource(R.string.icao_db_loading),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         -1 -> {
                             Text(
-                                text = "❌ Error al cargar la base de datos",
+                                text = stringResource(R.string.icao_db_error),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
                             )
                             Text(
-                                text = "La detección de ICAO NO funcionará",
+                                text = stringResource(R.string.icao_db_error_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
                         0 -> {
                             Text(
-                                text = "⚠️ Base de datos vacía (0 aeródromos)",
+                                text = stringResource(R.string.icao_db_empty),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.error
                             )
                             Text(
-                                text = "El archivo aerodromes.csv.gz no se cargó correctamente",
+                                text = stringResource(R.string.icao_db_empty_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         else -> {
                             Text(
-                                text = "✓ ${aerodromeCount} aeródromos cargados",
+                                text = stringResource(R.string.icao_db_loaded, aerodromeCount),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "La detección de ICAO está operativa",
+                                text = stringResource(R.string.icao_db_operational),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
