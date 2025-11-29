@@ -1,8 +1,11 @@
 package com.taifun.checks.ui.screens
 
+import android.Manifest
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,9 +47,9 @@ fun LogViewerScreen(
 ) {
     val ctx = LocalContext.current
     val haptic = rememberHapticFeedback()
-    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext) }
-    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
     val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
+    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
+    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
     val scope = rememberCoroutineScope()
 
     var entries by remember { mutableStateOf<List<LogEntry>>(emptyList()) }
@@ -57,6 +60,20 @@ fun LogViewerScreen(
     var showImportConfirm by remember { mutableStateOf(false) }
     var pendingImportUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var showCustomLogDialog by remember { mutableStateOf(false) }
+
+    // Launcher para solicitar permisos de ubicación
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Permiso concedido, iniciar seguimiento y mostrar diálogo
+            sensorRepo.startLocationTracking()
+            showCustomLogDialog = true
+        } else {
+            // Permiso denegado, mostrar mensaje
+            Toast.makeText(ctx, ctx.getString(R.string.custom_log_no_permission), Toast.LENGTH_LONG).show()
+        }
+    }
 
     // Launcher para importar CSV
     val importLauncher = rememberLauncherForActivityResult(
@@ -288,7 +305,18 @@ fun LogViewerScreen(
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback()
-                    showCustomLogDialog = true
+                    // Verificar si tenemos permisos de ubicación
+                    val hasLocationPermission = ContextCompat.checkSelfPermission(
+                        ctx,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (hasLocationPermission) {
+                        showCustomLogDialog = true
+                    } else {
+                        // Solicitar permisos
+                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {

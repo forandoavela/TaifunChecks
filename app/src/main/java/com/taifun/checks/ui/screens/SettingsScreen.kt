@@ -33,6 +33,21 @@ fun SettingsScreen(onBack: () -> Unit) {
     val screenOn by repo.screenOnFlow.collectAsState(initial = false)
     val language by repo.languageFlow.collectAsState(initial = "auto")
     val hapticsEnabled by repo.hapticsFlow.collectAsState(initial = true)
+    val icaoMaxDistanceKm by repo.icaoMaxDistanceKmFlow.collectAsState(initial = 2.0f)
+    val icaoMaxAltitudeDiffM by repo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
+
+    // Estado de diagnóstico de aeródromos
+    var aerodromeCount by remember { mutableStateOf<Int?>(null) }
+
+    // Cargar diagnóstico al abrir la pantalla
+    LaunchedEffect(Unit) {
+        try {
+            val aerodromeRepo = com.taifun.checks.data.AerodromeRepository(ctx)
+            aerodromeCount = aerodromeRepo.getAerodromeCount()
+        } catch (e: Exception) {
+            aerodromeCount = -1 // Error
+        }
+    }
 
     // Obtener versión de la app dinámicamente
     val versionName = remember {
@@ -332,6 +347,183 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 scope.launch { repo.setHaptics(it) }
                             }
                         )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Sección de Filtros ICAO
+            Text(
+                text = stringResource(R.string.icao_filters_section),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Distancia máxima
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.icao_max_distance),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = String.format("%.1f km", icaoMaxDistanceKm),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.icao_max_distance_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Slider(
+                            value = icaoMaxDistanceKm,
+                            onValueChange = { value ->
+                                scope.launch { repo.setIcaoMaxDistanceKm(value) }
+                            },
+                            valueRange = 0.5f..10.0f,
+                            steps = 18 // 0.5 step increments
+                        )
+                    }
+
+                    HorizontalDivider()
+
+                    // Diferencia de altitud máxima
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.icao_max_altitude_diff),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = String.format("%.0f m", icaoMaxAltitudeDiffM),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.icao_max_altitude_diff_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Slider(
+                            value = icaoMaxAltitudeDiffM,
+                            onValueChange = { value ->
+                                scope.launch { repo.setIcaoMaxAltitudeDiffM(value) }
+                            },
+                            valueRange = 10.0f..500.0f,
+                            steps = 48 // 10 step increments
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Diagnóstico ICAO
+            Text(
+                text = stringResource(R.string.icao_diagnostics_section),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.icao_db_title),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                    when (aerodromeCount) {
+                        null -> {
+                            Text(
+                                text = stringResource(R.string.icao_db_loading),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        -1 -> {
+                            Text(
+                                text = stringResource(R.string.icao_db_error),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = stringResource(R.string.icao_db_error_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                        0 -> {
+                            Text(
+                                text = stringResource(R.string.icao_db_empty),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = stringResource(R.string.icao_db_empty_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        else -> {
+                            Text(
+                                text = stringResource(R.string.icao_db_loaded, aerodromeCount!!),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = stringResource(R.string.icao_db_operational),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

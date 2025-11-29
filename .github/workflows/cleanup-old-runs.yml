@@ -21,10 +21,19 @@ jobs:
       contents: read
 
     steps:
-      - name: Delete workflow runs (keep last 5)
+      - name: Delete old workflow runs (keep last 5)
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
           retain_days: 0  # No retener por días, solo por cantidad
           keep_minimum_runs: 5  # Mantener solo los últimos 5 runs de cada workflow
+
+      - name: Delete old cleanup workflow runs (keep last 3)
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 3  # Mantener solo los últimos 3 runs de este workflow
+          delete_workflow_pattern: cleanup-old-runs.yml  # Eliminar runs de este mismo workflow

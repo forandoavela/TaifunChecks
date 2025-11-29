@@ -66,6 +66,20 @@
     <string name="haptics_section">Haptics</string>
     <string name="haptics_enabled">Haptic feedback</string>
     <string name="haptics_desc">Vibrations when pressing buttons</string>
+    <string name="icao_filters_section">ICAO Detection Filters</string>
+    <string name="icao_max_distance">Maximum distance</string>
+    <string name="icao_max_distance_desc">Maximum horizontal distance to detect aerodromes</string>
+    <string name="icao_max_altitude_diff">Maximum altitude difference</string>
+    <string name="icao_max_altitude_diff_desc">Maximum altitude difference between GPS and aerodrome elevation</string>
+    <string name="icao_diagnostics_section">ICAO Diagnostics</string>
+    <string name="icao_db_title">Aerodrome database</string>
+    <string name="icao_db_loading">⏳ Loading...</string>
+    <string name="icao_db_error">❌ Failed to load database</string>
+    <string name="icao_db_error_desc">ICAO detection will NOT work</string>
+    <string name="icao_db_empty">⚠️ Empty database (0 aerodromes)</string>
+    <string name="icao_db_empty_desc">The aerodromes.csv.gz file was not loaded correctly</string>
+    <string name="icao_db_loaded">✓ %d aerodromes loaded</string>
+    <string name="icao_db_operational">ICAO detection is operational</string>
     <string name="help_button">Help</string>
     <string name="app_info_section">App Information</string>
     <string name="app_version">Version 1.0</string>
@@ -241,4 +255,5 @@
     <string name="custom_log_error">Error saving log</string>
     <string name="custom_log_no_gps">GPS not available. Make sure location permissions are enabled.</string>
     <string name="custom_log_empty_text">Log text cannot be empty</string>
+    <string name="custom_log_no_permission">Location permissions are required to create custom logs</string>
 </resources>

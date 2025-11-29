@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +28,8 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_HAPTICS = booleanPreferencesKey("haptics_enabled")
     private val KEY_ACTIVE_CHECKLIST = stringPreferencesKey("active_checklist_file")
     private val KEY_FIRST_LAUNCH = booleanPreferencesKey("first_launch")
+    private val KEY_ICAO_MAX_DISTANCE_KM = floatPreferencesKey("icao_max_distance_km")
+    private val KEY_ICAO_MAX_ALTITUDE_DIFF_M = floatPreferencesKey("icao_max_altitude_diff_m")
 
     // SharedPreferences para acceso síncrono al idioma
     private val syncPrefs: SharedPreferences = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -38,6 +41,8 @@ class SettingsRepository(private val ctx: Context) {
     val hapticsFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_HAPTICS] ?: true }
     val activeChecklistFlow: Flow<String> = ctx.settingsDataStore.data.map { it[KEY_ACTIVE_CHECKLIST] ?: "Taifun17E_ES.yaml" }
     val firstLaunchFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_FIRST_LAUNCH] ?: true }
+    val icaoMaxDistanceKmFlow: Flow<Float> = ctx.settingsDataStore.data.map { it[KEY_ICAO_MAX_DISTANCE_KM] ?: 2.0f }
+    val icaoMaxAltitudeDiffMFlow: Flow<Float> = ctx.settingsDataStore.data.map { it[KEY_ICAO_MAX_ALTITUDE_DIFF_M] ?: 50.0f }
 
     /**
      * Obtiene el idioma de forma síncrona (para usar en attachBaseContext)
@@ -85,5 +90,13 @@ class SettingsRepository(private val ctx: Context) {
         ctx.settingsDataStore.edit { it[KEY_FIRST_LAUNCH] = false }
         // También escribir en SharedPreferences para acceso síncrono
         syncPrefs.edit().putBoolean("first_launch", false).apply()
+    }
+
+    suspend fun setIcaoMaxDistanceKm(distanceKm: Float) {
+        ctx.settingsDataStore.edit { it[KEY_ICAO_MAX_DISTANCE_KM] = distanceKm }
+    }
+
+    suspend fun setIcaoMaxAltitudeDiffM(altitudeDiffM: Float) {
+        ctx.settingsDataStore.edit { it[KEY_ICAO_MAX_ALTITUDE_DIFF_M] = altitudeDiffM }
     }
 }

@@ -66,6 +66,20 @@
     <string name="haptics_section">Hápticos</string>
     <string name="haptics_enabled">Respuesta háptica</string>
     <string name="haptics_desc">Vibraciones al tocar botones</string>
+    <string name="icao_filters_section">Filtros de detección ICAO</string>
+    <string name="icao_max_distance">Distancia máxima</string>
+    <string name="icao_max_distance_desc">Distancia horizontal máxima para detectar aeródromos</string>
+    <string name="icao_max_altitude_diff">Diferencia de altitud máxima</string>
+    <string name="icao_max_altitude_diff_desc">Diferencia de altitud máxima entre GPS y elevación del aeródromo</string>
+    <string name="icao_diagnostics_section">Diagnóstico ICAO</string>
+    <string name="icao_db_title">Base de datos de aeródromos</string>
+    <string name="icao_db_loading">⏳ Cargando...</string>
+    <string name="icao_db_error">❌ Error al cargar la base de datos</string>
+    <string name="icao_db_error_desc">La detección de ICAO NO funcionará</string>
+    <string name="icao_db_empty">⚠️ Base de datos vacía (0 aeródromos)</string>
+    <string name="icao_db_empty_desc">El archivo aerodromes.csv.gz no se cargó correctamente</string>
+    <string name="icao_db_loaded">✓ %d aeródromos cargados</string>
+    <string name="icao_db_operational">La detección de ICAO está operativa</string>
     <string name="help_button">Ayuda</string>
     <string name="app_info_section">Información de la app</string>
     <string name="app_version">Versión 1.0</string>
@@ -240,4 +254,5 @@
     <string name="custom_log_error">Error al guardar log</string>
     <string name="custom_log_no_gps">GPS no disponible. Asegúrate de tener permisos de ubicación activados.</string>
     <string name="custom_log_empty_text">El texto del log no puede estar vacío</string>
+    <string name="custom_log_no_permission">Se necesitan permisos de ubicación para crear logs personalizados</string>
 </resources>
