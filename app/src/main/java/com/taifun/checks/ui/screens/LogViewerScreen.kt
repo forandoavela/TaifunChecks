@@ -44,9 +44,9 @@ fun LogViewerScreen(
 ) {
     val ctx = LocalContext.current
     val haptic = rememberHapticFeedback()
-    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext) }
-    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
     val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
+    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
+    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
     val scope = rememberCoroutineScope()
 
     var entries by remember { mutableStateOf<List<LogEntry>>(emptyList()) }

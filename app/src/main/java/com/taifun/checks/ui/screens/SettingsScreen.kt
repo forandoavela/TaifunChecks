@@ -33,6 +33,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     val screenOn by repo.screenOnFlow.collectAsState(initial = false)
     val language by repo.languageFlow.collectAsState(initial = "auto")
     val hapticsEnabled by repo.hapticsFlow.collectAsState(initial = true)
+    val icaoMaxDistanceKm by repo.icaoMaxDistanceKmFlow.collectAsState(initial = 2.0f)
+    val icaoMaxAltitudeDiffM by repo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
 
     // Obtener versión de la app dinámicamente
     val versionName = remember {
@@ -331,6 +333,104 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 haptic.performHapticFeedback()
                                 scope.launch { repo.setHaptics(it) }
                             }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Sección de Filtros ICAO
+            Text(
+                text = stringResource(R.string.icao_filters_section),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Distancia máxima
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.icao_max_distance),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = String.format("%.1f km", icaoMaxDistanceKm),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.icao_max_distance_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Slider(
+                            value = icaoMaxDistanceKm,
+                            onValueChange = { value ->
+                                scope.launch { repo.setIcaoMaxDistanceKm(value) }
+                            },
+                            valueRange = 0.5f..10.0f,
+                            steps = 18 // 0.5 step increments
+                        )
+                    }
+
+                    HorizontalDivider()
+
+                    // Diferencia de altitud máxima
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = stringResource(R.string.icao_max_altitude_diff),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = String.format("%.0f m", icaoMaxAltitudeDiffM),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.icao_max_altitude_diff_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Slider(
+                            value = icaoMaxAltitudeDiffM,
+                            onValueChange = { value ->
+                                scope.launch { repo.setIcaoMaxAltitudeDiffM(value) }
+                            },
+                            valueRange = 10.0f..500.0f,
+                            steps = 48 // 10 step increments
                         )
                     }
                 }

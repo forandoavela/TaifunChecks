@@ -74,7 +74,7 @@ fun StepScreen(
     val repo = remember(ctx.applicationContext) { ChecklistRepository(ctx.applicationContext) }
     val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
     val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
-    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext) }
+    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
     val haptic = rememberHapticFeedback()
 
     // ViewModel con persistencia de progreso

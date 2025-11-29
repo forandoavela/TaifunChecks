@@ -34,6 +34,7 @@ import com.taifun.checks.domain.Checklist
 import com.taifun.checks.data.ChecklistRepository
 import com.taifun.checks.data.LogRepository
 import com.taifun.checks.data.ProgressRepository
+import com.taifun.checks.data.SettingsRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +53,8 @@ fun HomeScreen(
     // Fix: usar applicationContext para evitar memory leaks en rotaciones
     val repo = remember(ctx.applicationContext) { ChecklistRepository(ctx.applicationContext) }
     val progressRepo = remember(ctx.applicationContext) { ProgressRepository(ctx.applicationContext) }
-    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext) }
+    val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
+    val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
     val scope = rememberCoroutineScope()
     val vm: HomeViewModel = viewModel(factory = androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.getInstance(
         ctx.applicationContext as android.app.Application

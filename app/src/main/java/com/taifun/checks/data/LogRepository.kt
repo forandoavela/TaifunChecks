@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
@@ -28,7 +29,10 @@ data class LogEntry(
  * Repositorio para gestionar el log de vuelo en formato CSV
  * Maneja escritura y lectura de entradas de log
  */
-class LogRepository(private val context: Context) {
+class LogRepository(
+    private val context: Context,
+    private val settingsRepository: SettingsRepository
+) {
 
     private val aerodromeRepository = AerodromeRepository(context)
 
@@ -125,16 +129,20 @@ class LogRepository(private val context: Context) {
             val utcTime = dateFormat.format(Date())
 
             // Detectar aeródromo usando criterios de posición horizontal y altitud
-            // La nueva lógica verifica:
-            // 1. Distancia horizontal < 2 km
-            // 2. Diferencia de altitud < 50 m (más fiable que velocidad GPS)
+            // Los valores de distancia y altitud son configurables desde Settings
             android.util.Log.d("LogRepository", "Attempting to find aerodrome for position: lat=$latitude, lon=$longitude, alt=${altitudeMeters}m")
+
+            // Leer configuración actual de filtros ICAO
+            val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
+            val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
+            android.util.Log.d("LogRepository", "Using ICAO filters: maxDistance=${maxDistanceKm}km, maxAltitudeDiff=${maxAltitudeDiffM}m")
+
             val icaoCode = aerodromeRepository.findNearestAerodrome(
                 latitude = latitude,
                 longitude = longitude,
                 altitudeMeters = altitudeMeters,
-                maxDistanceKm = 2.0,
-                maxAltitudeDifferenceM = 50.0
+                maxDistanceKm = maxDistanceKm.toDouble(),
+                maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
             )
             android.util.Log.i("LogRepository", "ICAO detection result: ${icaoCode ?: "null (no aerodrome detected)"}")
 

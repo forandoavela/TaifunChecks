@@ -66,6 +66,11 @@
     <string name="haptics_section">Hápticos</string>
     <string name="haptics_enabled">Respuesta háptica</string>
     <string name="haptics_desc">Vibraciones al tocar botones</string>
+    <string name="icao_filters_section">Filtros de detección ICAO</string>
+    <string name="icao_max_distance">Distancia máxima</string>
+    <string name="icao_max_distance_desc">Distancia horizontal máxima para detectar aeródromos</string>
+    <string name="icao_max_altitude_diff">Diferencia de altitud máxima</string>
+    <string name="icao_max_altitude_diff_desc">Diferencia de altitud máxima entre GPS y elevación del aeródromo</string>
     <string name="help_button">Ayuda</string>
     <string name="app_info_section">Información de la app</string>
     <string name="app_version">Versión 1.0</string>
