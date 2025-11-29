@@ -91,7 +91,13 @@ class AerodromeRepository(private val context: Context) {
     ): String? {
         loadAerodromes()
 
-        if (aerodromes.isEmpty()) return null
+        android.util.Log.d("AerodromeRepo", "findNearestAerodrome called with: lat=$latitude, lon=$longitude, alt=$altitudeMeters")
+        android.util.Log.d("AerodromeRepo", "Loaded ${aerodromes.size} aerodromes")
+
+        if (aerodromes.isEmpty()) {
+            android.util.Log.w("AerodromeRepo", "No aerodromes loaded!")
+            return null
+        }
 
         var nearestAerodrome: Aerodrome? = null
         var minDistance = Double.MAX_VALUE
@@ -108,6 +114,8 @@ class AerodromeRepository(private val context: Context) {
             }
         }
 
+        android.util.Log.d("AerodromeRepo", "Nearest aerodrome: ${nearestAerodrome?.identifier} at ${String.format("%.3f", minDistance)} km")
+
         // Solo retornar si:
         // 1. Está dentro del radio máximo horizontal (2 km)
         // 2. Si tenemos altitud GPS y elevación del aeródromo, la diferencia debe ser < 50m
@@ -117,17 +125,23 @@ class AerodromeRepository(private val context: Context) {
             // Si tenemos ambas altitudes, verificar diferencia vertical
             if (altitudeMeters != null && aerodrome.elevationMeters != null) {
                 val altitudeDifference = kotlin.math.abs(altitudeMeters - aerodrome.elevationMeters)
+                android.util.Log.d("AerodromeRepo", "Altitude check: GPS=${altitudeMeters}m, Aerodrome=${aerodrome.elevationMeters}m, Diff=${String.format("%.1f", altitudeDifference)}m (max=${maxAltitudeDifferenceM}m)")
+
                 return if (altitudeDifference <= maxAltitudeDifferenceM) {
+                    android.util.Log.i("AerodromeRepo", "✓ ICAO detected: ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km, alt_diff=${String.format("%.1f", altitudeDifference)}m)")
                     aerodrome.identifier
                 } else {
+                    android.util.Log.w("AerodromeRepo", "✗ ICAO rejected: ${aerodrome.identifier} - altitude difference too large (${String.format("%.1f", altitudeDifference)}m > ${maxAltitudeDifferenceM}m)")
                     null
                 }
             } else {
                 // Si no tenemos altitud, usar solo criterio horizontal (comportamiento legacy)
+                android.util.Log.i("AerodromeRepo", "✓ ICAO detected (no altitude check): ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km)")
                 return aerodrome.identifier
             }
         }
 
+        android.util.Log.d("AerodromeRepo", "No aerodrome within ${maxDistanceKm}km radius")
         return null
     }
 

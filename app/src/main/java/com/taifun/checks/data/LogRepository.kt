@@ -128,6 +128,7 @@ class LogRepository(private val context: Context) {
             // La nueva lógica verifica:
             // 1. Distancia horizontal < 2 km
             // 2. Diferencia de altitud < 50 m (más fiable que velocidad GPS)
+            android.util.Log.d("LogRepository", "Attempting to find aerodrome for position: lat=$latitude, lon=$longitude, alt=${altitudeMeters}m")
             val icaoCode = aerodromeRepository.findNearestAerodrome(
                 latitude = latitude,
                 longitude = longitude,
@@ -135,6 +136,7 @@ class LogRepository(private val context: Context) {
                 maxDistanceKm = 2.0,
                 maxAltitudeDifferenceM = 50.0
             )
+            android.util.Log.i("LogRepository", "ICAO detection result: ${icaoCode ?: "null (no aerodrome detected)"}")
 
             // Crear entrada
             val entry = LogEntry(
