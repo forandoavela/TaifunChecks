@@ -36,6 +36,19 @@ fun SettingsScreen(onBack: () -> Unit) {
     val icaoMaxDistanceKm by repo.icaoMaxDistanceKmFlow.collectAsState(initial = 2.0f)
     val icaoMaxAltitudeDiffM by repo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
 
+    // Estado de diagnóstico de aeródromos
+    var aerodromeCount by remember { mutableStateOf<Int?>(null) }
+
+    // Cargar diagnóstico al abrir la pantalla
+    LaunchedEffect(Unit) {
+        try {
+            val aerodromeRepo = com.taifun.checks.data.AerodromeRepository(ctx)
+            aerodromeCount = aerodromeRepo.getAerodromeCount()
+        } catch (e: Exception) {
+            aerodromeCount = -1 // Error
+        }
+    }
+
     // Obtener versión de la app dinámicamente
     val versionName = remember {
         try {
@@ -432,6 +445,85 @@ fun SettingsScreen(onBack: () -> Unit) {
                             valueRange = 10.0f..500.0f,
                             steps = 48 // 10 step increments
                         )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Diagnóstico ICAO
+            Text(
+                text = "Diagnóstico ICAO",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Base de datos de aeródromos",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                    when (aerodromeCount) {
+                        null -> {
+                            Text(
+                                text = "⏳ Cargando...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        -1 -> {
+                            Text(
+                                text = "❌ Error al cargar la base de datos",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = "La detección de ICAO NO funcionará",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                        0 -> {
+                            Text(
+                                text = "⚠️ Base de datos vacía (0 aeródromos)",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                            Text(
+                                text = "El archivo aerodromes.csv.gz no se cargó correctamente",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        else -> {
+                            Text(
+                                text = "✓ ${aerodromeCount} aeródromos cargados",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "La detección de ICAO está operativa",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
