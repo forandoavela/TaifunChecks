@@ -34,19 +34,19 @@ class AerodromeRepository(private val context: Context) {
      */
     private fun loadAerodromes() {
         if (isLoaded) {
-            android.util.Log.d("AerodromeRepo", "loadAerodromes: already loaded (${aerodromes.size} aerodromes)")
+            android.util.Log.e("AerodromeRepo", "loadAerodromes: already loaded (${aerodromes.size} aerodromes)")
             return
         }
 
-        android.util.Log.i("AerodromeRepo", "loadAerodromes: Starting to load aerodrome database...")
+        android.util.Log.e("AerodromeRepo", "loadAerodromes: Starting to load aerodrome database...")
 
         try {
             // Usar GZIPInputStream para leer archivo comprimido (reduce tamaño APK en ~70%)
-            android.util.Log.d("AerodromeRepo", "loadAerodromes: Opening aerodromes.csv.gz from assets...")
+            android.util.Log.e("AerodromeRepo", "loadAerodromes: Opening aerodromes.csv.gz from assets...")
             val inputStream = GZIPInputStream(context.assets.open("aerodromes.csv.gz"))
             val reader = BufferedReader(InputStreamReader(inputStream))
 
-            android.util.Log.d("AerodromeRepo", "loadAerodromes: Parsing CSV data...")
+            android.util.Log.e("AerodromeRepo", "loadAerodromes: Parsing CSV data...")
             aerodromes = reader.useLines { lines ->
                 lines.drop(1) // Skip header
                     .mapNotNull { line ->
@@ -71,7 +71,7 @@ class AerodromeRepository(private val context: Context) {
             }
 
             isLoaded = true
-            android.util.Log.i("AerodromeRepo", "✓ loadAerodromes: Successfully loaded ${aerodromes.size} aerodromes")
+            android.util.Log.e("AerodromeRepo", "✓ loadAerodromes: Successfully loaded ${aerodromes.size} aerodromes")
         } catch (e: Exception) {
             // Error loading database, keep empty list
             android.util.Log.e("AerodromeRepo", "✗ loadAerodromes: FAILED to load aerodrome database!", e)
@@ -103,11 +103,11 @@ class AerodromeRepository(private val context: Context) {
     ): String? {
         loadAerodromes()
 
-        android.util.Log.d("AerodromeRepo", "findNearestAerodrome called with: lat=$latitude, lon=$longitude, alt=$altitudeMeters")
-        android.util.Log.d("AerodromeRepo", "Loaded ${aerodromes.size} aerodromes")
+        android.util.Log.e("AerodromeRepo", "findNearestAerodrome called with: lat=$latitude, lon=$longitude, alt=$altitudeMeters")
+        android.util.Log.e("AerodromeRepo", "Loaded ${aerodromes.size} aerodromes")
 
         if (aerodromes.isEmpty()) {
-            android.util.Log.w("AerodromeRepo", "No aerodromes loaded!")
+            android.util.Log.e("AerodromeRepo", "No aerodromes loaded!")
             return null
         }
 
@@ -126,7 +126,7 @@ class AerodromeRepository(private val context: Context) {
             }
         }
 
-        android.util.Log.d("AerodromeRepo", "Nearest aerodrome: ${nearestAerodrome?.identifier} at ${String.format("%.3f", minDistance)} km")
+        android.util.Log.e("AerodromeRepo", "Nearest aerodrome: ${nearestAerodrome?.identifier} at ${String.format("%.3f", minDistance)} km")
 
         // Solo retornar si:
         // 1. Está dentro del radio máximo horizontal (2 km)
@@ -137,23 +137,23 @@ class AerodromeRepository(private val context: Context) {
             // Si tenemos ambas altitudes, verificar diferencia vertical
             if (altitudeMeters != null && aerodrome.elevationMeters != null) {
                 val altitudeDifference = kotlin.math.abs(altitudeMeters - aerodrome.elevationMeters)
-                android.util.Log.d("AerodromeRepo", "Altitude check: GPS=${altitudeMeters}m, Aerodrome=${aerodrome.elevationMeters}m, Diff=${String.format("%.1f", altitudeDifference)}m (max=${maxAltitudeDifferenceM}m)")
+                android.util.Log.e("AerodromeRepo", "Altitude check: GPS=${altitudeMeters}m, Aerodrome=${aerodrome.elevationMeters}m, Diff=${String.format("%.1f", altitudeDifference)}m (max=${maxAltitudeDifferenceM}m)")
 
                 return if (altitudeDifference <= maxAltitudeDifferenceM) {
-                    android.util.Log.i("AerodromeRepo", "✓ ICAO detected: ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km, alt_diff=${String.format("%.1f", altitudeDifference)}m)")
+                    android.util.Log.e("AerodromeRepo", "✓ ICAO detected: ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km, alt_diff=${String.format("%.1f", altitudeDifference)}m)")
                     aerodrome.identifier
                 } else {
-                    android.util.Log.w("AerodromeRepo", "✗ ICAO rejected: ${aerodrome.identifier} - altitude difference too large (${String.format("%.1f", altitudeDifference)}m > ${maxAltitudeDifferenceM}m)")
+                    android.util.Log.e("AerodromeRepo", "✗ ICAO rejected: ${aerodrome.identifier} - altitude difference too large (${String.format("%.1f", altitudeDifference)}m > ${maxAltitudeDifferenceM}m)")
                     null
                 }
             } else {
                 // Si no tenemos altitud, usar solo criterio horizontal (comportamiento legacy)
-                android.util.Log.i("AerodromeRepo", "✓ ICAO detected (no altitude check): ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km)")
+                android.util.Log.e("AerodromeRepo", "✓ ICAO detected (no altitude check): ${aerodrome.identifier} (distance=${String.format("%.3f", minDistance)}km)")
                 return aerodrome.identifier
             }
         }
 
-        android.util.Log.d("AerodromeRepo", "No aerodrome within ${maxDistanceKm}km radius")
+        android.util.Log.e("AerodromeRepo", "No aerodrome within ${maxDistanceKm}km radius")
         return null
     }
 
