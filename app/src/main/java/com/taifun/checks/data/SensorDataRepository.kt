@@ -109,17 +109,23 @@ class SensorDataRepository(private val context: Context) {
      * Call this method when receiving LK8EX1 data from BluetoothGpsRepository
      * @param pressure Barometric pressure in hPa
      * @param baroAltitude Barometric altitude in meters (QNE)
+     *
+     * Note: Variometer data is independent from GPS source - you can have:
+     * - Internal GPS + Bluetooth Variometer
+     * - Bluetooth GPS + Bluetooth Variometer
+     * - Internal GPS + Internal Barometer + Bluetooth Variometer (vario overrides)
      */
     fun updateExternalBarometerData(
         pressure: Float?,
         baroAltitude: Double?
     ) {
-        if (_gpsSource.value == GpsSource.BLUETOOTH) {
-            pressure?.let { _pressure.value = it }
-            // If we have barometric altitude but no GPS altitude, use it
-            if (baroAltitude != null && _altitude.value == null) {
-                _altitude.value = baroAltitude
-            }
+        // Always update pressure from external variometer (independent from GPS source)
+        pressure?.let { _pressure.value = it }
+
+        // If we have barometric altitude but no GPS altitude, use it
+        // This is useful when there's no GPS fix
+        if (baroAltitude != null && _altitude.value == null) {
+            _altitude.value = baroAltitude
         }
     }
 
