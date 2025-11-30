@@ -53,13 +53,24 @@ fun BluetoothGpsSettings(
     val btDeviceAddress by settingsRepo.btGpsDeviceAddressFlow.collectAsState(initial = null)
     val btAutoConnect by settingsRepo.btGpsAutoConnectFlow.collectAsState(initial = false)
 
+    // Variometer settings
+    val btVarioDeviceName by settingsRepo.btVarioDeviceNameFlow.collectAsState(initial = null)
+    val btVarioDeviceAddress by settingsRepo.btVarioDeviceAddressFlow.collectAsState(initial = null)
+    val btVarioAutoConnect by settingsRepo.btVarioAutoConnectFlow.collectAsState(initial = false)
+
     // Bluetooth state
     val isConnected by bluetoothGpsRepo.isConnected.collectAsState()
     val connectionStatus by bluetoothGpsRepo.connectionStatus.collectAsState()
     val nmeaData by bluetoothGpsRepo.nmeaData.collectAsState()
 
+    // Variometer Bluetooth state
+    val isVarioConnected by bluetoothVarioRepo.isConnected.collectAsState()
+    val varioConnectionStatus by bluetoothVarioRepo.connectionStatus.collectAsState()
+    val varioNmeaData by bluetoothVarioRepo.nmeaData.collectAsState()
+
     // UI state
     var showDeviceDialog by remember { mutableStateOf(false) }
+    var showVarioDeviceDialog by remember { mutableStateOf(false) }
     var pairedDevices by remember { mutableStateOf<List<BluetoothDevice>>(emptyList()) }
     var hasBluetoothPermission by remember { mutableStateOf(false) }
 
@@ -387,6 +398,217 @@ fun BluetoothGpsSettings(
                 }
             }
         }
+
+        // Variometer Card (independent device)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.vario_section),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                    shape = MaterialTheme.shapes.medium
+                ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Description
+                Text(
+                    text = stringResource(R.string.vario_section_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                HorizontalDivider()
+
+                // Connection status
+                Text(
+                    text = stringResource(R.string.bt_vario_status),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val statusIcon = when {
+                        isVarioConnected -> Icons.Default.BluetoothConnected
+                        btVarioDeviceAddress != null -> Icons.Default.Bluetooth
+                        else -> Icons.Default.BluetoothDisabled
+                    }
+
+                    val statusText = when {
+                        isVarioConnected -> btVarioDeviceName ?: btVarioDeviceAddress ?: "Connected"
+                        btVarioDeviceAddress != null -> stringResource(
+                            R.string.bt_vario_disconnected,
+                            btVarioDeviceName ?: btVarioDeviceAddress ?: ""
+                        )
+                        else -> stringResource(R.string.bt_vario_no_device)
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            statusIcon,
+                            contentDescription = null,
+                            tint = if (isVarioConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = statusText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (isVarioConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    // Device selection/change button
+                    FilledTonalButton(
+                        onClick = {
+                            haptic.performHapticFeedback()
+                            if (hasBluetoothPermission) {
+                                showVarioDeviceDialog = true
+                            } else {
+                                val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                    arrayOf(
+                                        Manifest.permission.BLUETOOTH_SCAN,
+                                        Manifest.permission.BLUETOOTH_CONNECT
+                                    )
+                                } else {
+                                    arrayOf(Manifest.permission.BLUETOOTH)
+                                }
+                                permissionLauncher.launch(permissions)
+                            }
+                        },
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (btVarioDeviceAddress != null) R.string.bt_vario_change_device
+                                else R.string.bt_vario_select_device
+                            )
+                        )
+                    }
+                }
+
+                // Show variometer data when connected
+                if (isVarioConnected && (varioNmeaData.pressure != null || varioNmeaData.vario != null || varioNmeaData.baroAltitude != null)) {
+                    HorizontalDivider()
+
+                    Text(
+                        text = buildString {
+                            varioNmeaData.vario?.let { append("Vario: %+.1f m/s  ".format(it)) }
+                            varioNmeaData.pressure?.let { append("P: %.1f hPa  ".format(it)) }
+                            varioNmeaData.baroAltitude?.let { append("Alt: %.0fm  ".format(it)) }
+                            varioNmeaData.temperature?.let { append("T: %.1f°C".format(it)) }
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                // Connection buttons (only show if device is configured)
+                if (btVarioDeviceAddress != null) {
+                    HorizontalDivider()
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Connect/Disconnect button
+                        Button(
+                            onClick = {
+                                haptic.performHapticFeedback()
+                                scope.launch {
+                                    if (isVarioConnected) {
+                                        bluetoothVarioRepo.disconnect()
+                                    } else {
+                                        bluetoothVarioRepo.connect(btVarioDeviceAddress!!)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = if (isVarioConnected) Icons.Default.BluetoothDisabled else Icons.Default.Bluetooth,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                stringResource(
+                                    if (isVarioConnected) R.string.bt_vario_disconnect
+                                    else R.string.bt_vario_connect
+                                )
+                            )
+                        }
+
+                        // Reconnect button (only when disconnected)
+                        if (!isVarioConnected) {
+                            OutlinedButton(
+                                onClick = {
+                                    haptic.performHapticFeedback()
+                                    scope.launch {
+                                        bluetoothVarioRepo.disconnect()
+                                        bluetoothVarioRepo.connect(btVarioDeviceAddress!!)
+                                    }
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(stringResource(R.string.bt_vario_reconnect))
+                            }
+                        }
+                    }
+
+                    // Auto-connect switch
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                            Text(
+                                stringResource(R.string.bt_vario_auto_connect),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                stringResource(R.string.bt_vario_auto_connect_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = btVarioAutoConnect,
+                            onCheckedChange = {
+                                scope.launch {
+                                    settingsRepo.setBtVarioAutoConnect(it)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // Device selection dialog
@@ -408,6 +630,27 @@ fun BluetoothGpsSettings(
             }
         )
     }
+
+    // Variometer device selection dialog
+    if (showVarioDeviceDialog) {
+        BluetoothDeviceDialog(
+            devices = pairedDevices,
+            currentDeviceAddress = btVarioDeviceAddress,
+            onDeviceSelected = { device ->
+                haptic.performHapticFeedback()
+                scope.launch {
+                    settingsRepo.setBtVarioDevice(device.name, device.address)
+                    // Auto-connect to new device
+                    bluetoothVarioRepo.connect(device.address)
+                }
+                showVarioDeviceDialog = false
+            },
+            onDismiss = {
+                showVarioDeviceDialog = false
+            },
+            title = stringResource(R.string.bt_vario_select_device)
+        )
+    }
 }
 
 /**
@@ -419,11 +662,12 @@ private fun BluetoothDeviceDialog(
     devices: List<BluetoothDevice>,
     currentDeviceAddress: String?,
     onDeviceSelected: (BluetoothDevice) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    title: String? = null
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.bt_gps_select_device)) },
+        title = { Text(title ?: stringResource(R.string.bt_gps_select_device)) },
         text = {
             if (devices.isEmpty()) {
                 Text(stringResource(R.string.bt_gps_no_paired_devices))
