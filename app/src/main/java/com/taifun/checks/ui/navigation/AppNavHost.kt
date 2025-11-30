@@ -30,7 +30,8 @@ fun AppNavHost(
     nav: NavHostController,
     startDestination: String = Routes.HOME,
     sensorDataRepo: SensorDataRepository,
-    bluetoothGpsRepo: BluetoothGpsRepository
+    bluetoothGpsRepo: BluetoothGpsRepository,
+    bluetoothVarioRepo: BluetoothGpsRepository
 ) {
     NavHost(
         navController = nav,
@@ -78,7 +79,8 @@ fun AppNavHost(
             SettingsScreen(
                 onBack = { nav.popBackStack() },
                 sensorDataRepo = sensorDataRepo,
-                bluetoothGpsRepo = bluetoothGpsRepo
+                bluetoothGpsRepo = bluetoothGpsRepo,
+                bluetoothVarioRepo = bluetoothVarioRepo
             )
         }
 

@@ -27,7 +27,8 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     onBack: () -> Unit,
     sensorDataRepo: SensorDataRepository,
-    bluetoothGpsRepo: BluetoothGpsRepository
+    bluetoothGpsRepo: BluetoothGpsRepository,
+    bluetoothVarioRepo: BluetoothGpsRepository
 ) {
     val ctx = LocalContext.current
     val repo = remember { SettingsRepository(ctx) }
@@ -549,7 +550,8 @@ fun SettingsScreen(
             BluetoothGpsSettings(
                 settingsRepo = repo,
                 sensorDataRepo = sensorDataRepo,
-                bluetoothGpsRepo = bluetoothGpsRepo
+                bluetoothGpsRepo = bluetoothGpsRepo,
+                bluetoothVarioRepo = bluetoothVarioRepo
             )
 
             Spacer(modifier = Modifier.height(8.dp))

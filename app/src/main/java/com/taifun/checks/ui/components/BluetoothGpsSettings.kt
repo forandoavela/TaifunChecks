@@ -40,6 +40,7 @@ fun BluetoothGpsSettings(
     settingsRepo: SettingsRepository,
     sensorDataRepo: SensorDataRepository,
     bluetoothGpsRepo: BluetoothGpsRepository,
+    bluetoothVarioRepo: BluetoothGpsRepository,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current

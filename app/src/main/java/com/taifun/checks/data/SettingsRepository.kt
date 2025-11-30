@@ -37,6 +37,11 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_BT_GPS_DEVICE_ADDRESS = stringPreferencesKey("bt_gps_device_address")
     private val KEY_BT_GPS_AUTO_CONNECT = booleanPreferencesKey("bt_gps_auto_connect")
 
+    // Bluetooth Variometer settings (independent device)
+    private val KEY_BT_VARIO_DEVICE_NAME = stringPreferencesKey("bt_vario_device_name")
+    private val KEY_BT_VARIO_DEVICE_ADDRESS = stringPreferencesKey("bt_vario_device_address")
+    private val KEY_BT_VARIO_AUTO_CONNECT = booleanPreferencesKey("bt_vario_auto_connect")
+
     // SharedPreferences para acceso síncrono al idioma
     private val syncPrefs: SharedPreferences = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -55,6 +60,11 @@ class SettingsRepository(private val ctx: Context) {
     val btGpsDeviceNameFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_GPS_DEVICE_NAME] }
     val btGpsDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_GPS_DEVICE_ADDRESS] }
     val btGpsAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_GPS_AUTO_CONNECT] ?: false }
+
+    // Bluetooth Variometer flows
+    val btVarioDeviceNameFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_NAME] }
+    val btVarioDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_ADDRESS] }
+    val btVarioAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_AUTO_CONNECT] ?: false }
 
     /**
      * Obtiene el idioma de forma síncrona (para usar en attachBaseContext)
@@ -126,5 +136,17 @@ class SettingsRepository(private val ctx: Context) {
 
     suspend fun setBtGpsAutoConnect(enabled: Boolean) {
         ctx.settingsDataStore.edit { it[KEY_BT_GPS_AUTO_CONNECT] = enabled }
+    }
+
+    // Bluetooth Variometer setters
+    suspend fun setBtVarioDevice(name: String?, address: String?) {
+        ctx.settingsDataStore.edit { prefs ->
+            if (name != null) prefs[KEY_BT_VARIO_DEVICE_NAME] = name else prefs.remove(KEY_BT_VARIO_DEVICE_NAME)
+            if (address != null) prefs[KEY_BT_VARIO_DEVICE_ADDRESS] = address else prefs.remove(KEY_BT_VARIO_DEVICE_ADDRESS)
+        }
+    }
+
+    suspend fun setBtVarioAutoConnect(enabled: Boolean) {
+        ctx.settingsDataStore.edit { it[KEY_BT_VARIO_AUTO_CONNECT] = enabled }
     }
 }

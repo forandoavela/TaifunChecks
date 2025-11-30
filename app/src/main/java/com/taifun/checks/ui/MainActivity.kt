@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsRepo: SettingsRepository
     private lateinit var sensorDataRepo: SensorDataRepository
     private lateinit var bluetoothGpsRepo: BluetoothGpsRepository
+    private lateinit var bluetoothVarioRepo: BluetoothGpsRepository  // Independent variometer device
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
         settingsRepo = SettingsRepository(this)
         sensorDataRepo = SensorDataRepository(this)
         bluetoothGpsRepo = BluetoothGpsRepository(this)
+        bluetoothVarioRepo = BluetoothGpsRepository(this)  // Second instance for variometer
 
         // Leer el estado de primer lanzamiento de forma síncrona
         val isFirstLaunch = settingsRepo.getFirstLaunchSync()
@@ -62,8 +64,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Auto-conectar GPS Bluetooth si está configurado
+        // Auto-conectar GPS y Variometer Bluetooth si están configurados
         setupBluetoothGpsAutoConnect()
+        setupBluetoothVarioAutoConnect()
     }
 
     private fun setupBluetoothGpsAutoConnect() {
@@ -124,12 +127,57 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun setupBluetoothVarioAutoConnect() {
+        // Observar configuración de Variometer: auto-connect y device address
+        lifecycleScope.launch {
+            combine(
+                settingsRepo.btVarioAutoConnectFlow,
+                settingsRepo.btVarioDeviceAddressFlow
+            ) { autoConnect, deviceAddress ->
+                Pair(autoConnect, deviceAddress)
+            }
+                .distinctUntilChanged()
+                .collect { (autoConnect, deviceAddress) ->
+                    // Auto-conectar variometer si está habilitado y hay un dispositivo configurado
+                    if (autoConnect && !deviceAddress.isNullOrEmpty()) {
+                        try {
+                            bluetoothVarioRepo.connect(deviceAddress)
+                        } catch (e: Exception) {
+                            // Silenciar errores de auto-conexión
+                        }
+                    } else {
+                        // Desconectar si auto-connect está deshabilitado
+                        try {
+                            bluetoothVarioRepo.disconnect()
+                        } catch (e: Exception) {
+                            // Silenciar errores
+                        }
+                    }
+                }
+        }
+
+        // Observar datos NMEA del Variometer Bluetooth y actualizar SensorDataRepository
+        // Solo actualiza datos de barómetro/variometer (presión, altitud barométrica, vario)
+        lifecycleScope.launch {
+            bluetoothVarioRepo.nmeaData.collect { nmeaData ->
+                // Actualizar solo datos de barómetro/variometer (ignorar GPS data)
+                if (nmeaData.pressure != null || nmeaData.baroAltitude != null) {
+                    sensorDataRepo.updateExternalBarometerData(
+                        pressure = nmeaData.pressure,
+                        baroAltitude = nmeaData.baroAltitude
+                    )
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Desconectar Bluetooth GPS al destruir la actividad
+        // Desconectar Bluetooth GPS y Variometer al destruir la actividad
         lifecycleScope.launch {
             try {
                 bluetoothGpsRepo.disconnect()
+                bluetoothVarioRepo.disconnect()
             } catch (e: Exception) {
                 // Silenciar errores de desconexión
             }
@@ -150,7 +198,8 @@ class MainActivity : ComponentActivity() {
                     nav = nav,
                     startDestination = startDestination,
                     sensorDataRepo = sensorDataRepo,
-                    bluetoothGpsRepo = bluetoothGpsRepo
+                    bluetoothGpsRepo = bluetoothGpsRepo,
+                    bluetoothVarioRepo = bluetoothVarioRepo
                 )
             }
         }
