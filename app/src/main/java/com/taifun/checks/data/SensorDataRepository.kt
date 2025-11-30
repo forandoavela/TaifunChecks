@@ -18,13 +18,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.pow
 
 /**
+ * Data source for GPS/location data
+ */
+enum class GpsSource {
+    INTERNAL,   // Device's internal GPS
+    BLUETOOTH   // External Bluetooth GPS device
+}
+
+/**
  * Repositorio para gestionar datos de sensores (GPS, barómetro)
  * utilizados en funciones opcionales de pasos
+ * Supports both internal GPS and external Bluetooth GPS sources
  */
 class SensorDataRepository(private val context: Context) {
 
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+    // Current GPS source
+    private val _gpsSource = MutableStateFlow(GpsSource.INTERNAL)
+    val gpsSource: StateFlow<GpsSource> = _gpsSource.asStateFlow()
 
     // Flujos de datos
     private val _altitude = MutableStateFlow<Double?>(null)
@@ -46,6 +59,39 @@ class SensorDataRepository(private val context: Context) {
     private var pressureListener: SensorEventListener? = null
 
     /**
+     * Set the GPS data source
+     */
+    fun setGpsSource(source: GpsSource) {
+        _gpsSource.value = source
+
+        // If switching to internal GPS, stop internal tracking and restart it
+        // If switching to Bluetooth, stop internal tracking
+        if (source == GpsSource.INTERNAL && locationListener == null) {
+            startLocationTracking()
+        } else if (source == GpsSource.BLUETOOTH) {
+            stopLocationTracking()
+        }
+    }
+
+    /**
+     * Update GPS data from external source (e.g., Bluetooth)
+     * Call this method when receiving data from BluetoothGpsRepository
+     */
+    fun updateExternalGpsData(
+        latitude: Double?,
+        longitude: Double?,
+        altitude: Double?,
+        speedKmh: Float?
+    ) {
+        if (_gpsSource.value == GpsSource.BLUETOOTH) {
+            _latitude.value = latitude
+            _longitude.value = longitude
+            _altitude.value = altitude
+            _speedKmh.value = speedKmh
+        }
+    }
+
+    /**
      * Inicia el seguimiento de ubicación GPS
      */
     fun startLocationTracking() {
@@ -53,6 +99,9 @@ class SensorDataRepository(private val context: Context) {
 
         // Si ya hay un listener, no crear otro
         if (locationListener != null) return
+
+        // Only start if using internal GPS
+        if (_gpsSource.value != GpsSource.INTERNAL) return
 
         try {
             val listener = object : LocationListener {

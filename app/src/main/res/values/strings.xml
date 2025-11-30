@@ -80,6 +80,29 @@
     <string name="icao_db_empty_desc">El archivo aerodromes.csv.gz no se cargó correctamente</string>
     <string name="icao_db_loaded">✓ %d aeródromos cargados</string>
     <string name="icao_db_operational">La detección de ICAO está operativa</string>
+
+    <!-- Bluetooth GPS Settings -->
+    <string name="gps_section">GPS</string>
+    <string name="gps_source_label">Fuente de datos GPS</string>
+    <string name="gps_source_internal">GPS interno</string>
+    <string name="gps_source_bluetooth">GPS Bluetooth (NMEA)</string>
+    <string name="gps_source_bluetooth_desc">Usar dispositivo GPS externo vía Bluetooth</string>
+    <string name="bt_gps_status">Estado de conexión</string>
+    <string name="bt_gps_disconnected">Desconectado (%s)</string>
+    <string name="bt_gps_no_device">Sin dispositivo configurado</string>
+    <string name="bt_gps_data">GPS: %.5f°, %.5f° | Alt: %.0fm</string>
+    <string name="bt_gps_select_device">Seleccionar dispositivo</string>
+    <string name="bt_gps_change_device">Cambiar dispositivo</string>
+    <string name="bt_gps_connect">Conectar</string>
+    <string name="bt_gps_disconnect">Desconectar</string>
+    <string name="bt_gps_reconnect">Reconectar</string>
+    <string name="bt_gps_auto_connect">Conectar automáticamente</string>
+    <string name="bt_gps_auto_connect_desc">Conectar al iniciar la aplicación</string>
+    <string name="bt_gps_no_paired_devices">No hay dispositivos Bluetooth emparejados. Empareja un dispositivo GPS en los ajustes de Bluetooth del sistema.</string>
+    <string name="bt_gps_paired_devices">Dispositivos emparejados:</string>
+    <string name="bt_gps_unknown_device">Dispositivo desconocido</string>
+    <string name="cancel">Cancelar</string>
+
     <string name="help_button">Ayuda</string>
     <string name="app_info_section">Información de la app</string>
     <string name="app_version">Versión 1.0</string>

@@ -15,7 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
+import com.taifun.checks.data.BluetoothGpsRepository
+import com.taifun.checks.data.SensorDataRepository
 import com.taifun.checks.data.SettingsRepository
+import com.taifun.checks.ui.components.BluetoothGpsSettings
 import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
 
@@ -24,6 +27,8 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(onBack: () -> Unit) {
     val ctx = LocalContext.current
     val repo = remember { SettingsRepository(ctx) }
+    val sensorDataRepo = remember { SensorDataRepository(ctx) }
+    val bluetoothGpsRepo = remember { BluetoothGpsRepository(ctx) }
     val scope = rememberCoroutineScope()
     val haptic = rememberHapticFeedback()
     val scrollState = rememberScrollState()
@@ -46,6 +51,14 @@ fun SettingsScreen(onBack: () -> Unit) {
             aerodromeCount = aerodromeRepo.getAerodromeCount()
         } catch (e: Exception) {
             aerodromeCount = -1 // Error
+        }
+    }
+
+    // Cleanup Bluetooth resources when leaving screen
+    DisposableEffect(Unit) {
+        onDispose {
+            // Don't disconnect here - keep connection alive
+            // bluetoothGpsRepo.cleanup()
         }
     }
 
@@ -527,6 +540,15 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Bluetooth GPS Settings
+            BluetoothGpsSettings(
+                settingsRepo = repo,
+                sensorDataRepo = sensorDataRepo,
+                bluetoothGpsRepo = bluetoothGpsRepo
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
