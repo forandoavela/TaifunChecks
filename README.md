@@ -56,6 +56,7 @@ A professional aviation checklist application designed specifically for Taifun 1
 ### Optional Step Features (NEW in v1.4)
 - **Altitude Display**: Show real-time GPS altitude in meters or feet
 - **QNH Calculation**: Calculate QNH using barometer + GPS (ICAO formula)
+- **Bluetooth GPS Support**: Connect external GPS devices via Bluetooth for enhanced accuracy (NEW in v1.0.01)
 - **Link Opening**: Tap steps to open URLs (weather, charts, etc.)
 - **App Launching**: Tap steps to launch apps (ForeFlight, Garmin, etc.)
 - **Time Display**: Show local or UTC time in real-time
@@ -76,6 +77,7 @@ A professional aviation checklist application designed specifically for Taifun 1
   - Microphone (optional, for voice control)
   - Storage (for import/export)
   - Location (optional, for altitude/QNH features)
+  - Bluetooth (optional, for external GPS devices)
   - Internet (optional, for link feature)
 - **Screen**: Minimum 5" recommended for optimal experience
 - **Sensors**: Barometer (optional, for QNH calculation)
@@ -690,6 +692,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Maintainer**: Jorge Mármol
 
 ## Changelog
+
+### v1.0.01.zz (2025-11-30)
+- **Bluetooth GPS Support**: Connect external GPS devices via Bluetooth
+  - NMEA 0183 parser supporting GPGGA, GPRMC, and GPGLL sentences
+  - Select between internal GPS and external Bluetooth GPS in Settings
+  - Auto-connect functionality to restore connection on app startup
+  - Real-time GPS data display with connection status indicator
+  - Paired device selection from system Bluetooth settings
+  - Enhanced accuracy for altitude-dependent features and flight logging
+  - Compatible with professional aviation GPS devices (Garmin GLO, Bad Elf, etc.)
 
 ### v1.0.00.zz (2025-11-24)
 - **Improved ICAO Detection**: Altitude-based aerodrome detection instead of GPS speed

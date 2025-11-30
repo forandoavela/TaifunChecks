@@ -56,6 +56,9 @@ FlightChecks/
 │   │   │   │   ├── SensorDataRepository.kt     (227 lines - GPS, barometer, QNH)
 │   │   │   │   ├── LogRepository.kt            (464 lines - flight logging)
 │   │   │   │   ├── AerodromeRepository.kt      (144 lines - aerodrome database)
+│   │   │   │   ├── BluetoothGpsRepository.kt   (267 lines - Bluetooth GPS connections)
+│   │   │   │   ├── nmea/
+│   │   │   │   │   └── NmeaParser.kt           (227 lines - NMEA 0183 parser)
 │   │   │   │   └── yaml/
 │   │   │   │       └── YamlParser.kt           (YAML parsing with SnakeYAML)
 │   │   │   ├── domain/            # Domain models
@@ -73,7 +76,8 @@ FlightChecks/
 │   │   │       │   ├── LogViewerScreen.kt      (557 lines)
 │   │   │       │   └── HelpScreen.kt           (1,143 lines)
 │   │   │       ├── components/                 (Reusable UI components)
-│   │   │       │   └── ColorPickerDialog.kt
+│   │   │       │   ├── ColorPickerDialog.kt
+│   │   │       │   └── BluetoothGpsSettings.kt (422 lines - Bluetooth GPS config UI)
 │   │   │       ├── navigation/
 │   │   │       │   └── AppNavHost.kt           (Navigation setup)
 │   │   │       ├── theme/
@@ -144,7 +148,8 @@ FlightChecks/
 │                 │  • ProgressRepository
 │                 │  • SensorDataRepository
 │                 │  • LogRepository
-└────────┬────────┘  • AerodromeRepository
+│                 │  • AerodromeRepository
+└────────┬────────┘  • BluetoothGpsRepository
          │
          ↓ uses
 ┌─────────────────┐
@@ -517,6 +522,164 @@ If implementing tests, consider:
 
 ---
 
+## Bluetooth GPS Integration
+
+### Overview (NEW in v1.0.01)
+
+FlightChecks now supports external GPS devices via Bluetooth, allowing pilots to use professional aviation GPS hardware (Garmin GLO, Bad Elf GPS Pro, etc.) for enhanced position and altitude accuracy.
+
+### Architecture
+
+**Three Main Components**:
+
+1. **NmeaParser.kt** (`data/nmea/NmeaParser.kt`, 227 lines)
+   - Parses NMEA 0183 sentences (GPGGA, GPRMC, GPGLL)
+   - Validates checksums
+   - Extracts: latitude, longitude, altitude, speed, fix quality, satellites
+   - Supports GNSS variants (GN*, GL*, GA*)
+
+2. **BluetoothGpsRepository.kt** (`data/BluetoothGpsRepository.kt`, 267 lines)
+   - Manages Bluetooth SPP (Serial Port Profile) connections
+   - Lists paired Bluetooth devices
+   - Connects/disconnects with auto-reconnect capability
+   - Reads NMEA stream continuously in coroutine
+   - Exposes StateFlows for connection status and GPS data
+
+3. **BluetoothGpsSettings.kt** (`ui/components/BluetoothGpsSettings.kt`, 422 lines)
+   - Composable UI for Bluetooth GPS configuration
+   - Device selection from paired devices
+   - Connection status indicator
+   - Real-time GPS data display
+   - Auto-connect toggle
+
+### Integration with SensorDataRepository
+
+**Dual GPS Source Support**:
+
+`SensorDataRepository.kt` now supports switching between:
+- `GpsSource.INTERNAL` - Device's built-in GPS
+- `GpsSource.BLUETOOTH` - External Bluetooth GPS
+
+**Key Methods**:
+```kotlin
+// Switch GPS source
+fun setGpsSource(source: GpsSource)
+
+// Update from Bluetooth (called by BluetoothGpsRepository)
+fun updateExternalGpsData(
+    latitude: Double?,
+    longitude: Double?,
+    altitude: Double?,
+    speedKmh: Float?
+)
+```
+
+**Data Flow**:
+```
+BluetoothGpsRepository → Reads NMEA stream → Parses with NmeaParser
+                      ↓
+                   Updates nmeaData StateFlow
+                      ↓
+BluetoothGpsSettings → Observes nmeaData → Calls updateExternalGpsData()
+                      ↓
+              SensorDataRepository → Updates GPS StateFlows
+                      ↓
+                Other components (StepScreen, LogRepository) use GPS data
+```
+
+### Settings Storage
+
+**SettingsRepository.kt** stores:
+- `gps_source`: "INTERNAL" or "BLUETOOTH"
+- `bt_gps_device_name`: Name of selected device
+- `bt_gps_device_address`: MAC address for connection
+- `bt_gps_auto_connect`: Boolean for auto-connect on startup
+
+### Permissions
+
+**AndroidManifest.xml** includes:
+- `BLUETOOTH` / `BLUETOOTH_ADMIN` (Android ≤ 30)
+- `BLUETOOTH_SCAN` (Android ≥ 31, with `neverForLocation` flag)
+- `BLUETOOTH_CONNECT` (Android ≥ 31)
+
+### Usage Example
+
+**User Workflow**:
+1. Pair GPS device in Android Bluetooth settings
+2. Open FlightChecks → Settings → GPS section
+3. Select "GPS Bluetooth (NMEA)"
+4. Tap "Select device" → Choose from paired devices
+5. Tap "Connect"
+6. (Optional) Enable "Auto-connect"
+
+**Code Integration**:
+```kotlin
+// In SettingsScreen.kt
+val bluetoothGpsRepo = remember { BluetoothGpsRepository(ctx) }
+val sensorDataRepo = remember { SensorDataRepository(ctx) }
+
+BluetoothGpsSettings(
+    settingsRepo = repo,
+    sensorDataRepo = sensorDataRepo,
+    bluetoothGpsRepo = bluetoothGpsRepo
+)
+```
+
+### NMEA Sentence Support
+
+**Supported Messages**:
+- **GPGGA**: Fix data (lat, lon, alt, quality, sats, HDOP)
+- **GPRMC**: Recommended minimum (lat, lon, speed, timestamp)
+- **GPGLL**: Geographic position (lat, lon, timestamp)
+
+**Checksum Validation**:
+- All sentences validated with XOR checksum
+- Invalid sentences silently ignored
+
+**Example NMEA**:
+```
+$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
+$GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+```
+
+### Safety Considerations
+
+**Critical GPS Features**:
+- Altitude data used for altitude-dependent checklist steps
+- Position data used for aerodrome detection (ICAO)
+- Data used for flight logging
+
+**Error Handling**:
+- Connection failures handled gracefully
+- Auto-reconnect with exponential backoff (2s, 4s, 8s)
+- Invalid NMEA sentences ignored
+- Connection status always visible to user
+- User can switch back to internal GPS anytime
+
+### Testing Recommendations
+
+If implementing tests for Bluetooth GPS:
+
+**Unit Tests**:
+- NmeaParser checksum validation
+- NmeaParser coordinate conversion (DDMM.MMMM → decimal degrees)
+- NmeaParser sentence parsing (GPGGA, GPRMC, GPGLL)
+
+**Integration Tests**:
+- Bluetooth connection/disconnection flow
+- NMEA stream reading and parsing
+- GPS source switching
+- Settings persistence
+
+**Manual Testing**:
+- Pair real GPS device (Garmin GLO, Bad Elf, etc.)
+- Verify connection status indicator
+- Check GPS data updates in real-time
+- Test auto-reconnect on app restart
+- Verify data used correctly in altitude steps and logging
+
+---
+
 ## Common Tasks
 
 ### Adding a New Screen
@@ -867,6 +1030,7 @@ When explaining code to developers:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-11-30 | 1.2 | Added Bluetooth GPS support documentation |
 | 2025-11-19 | 1.1 | Updated versioning system to w.x.yy.zz format |
 | 2025-11-17 | 1.0 | Initial CLAUDE.md creation |
 
