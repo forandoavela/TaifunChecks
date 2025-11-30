@@ -14,16 +14,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.taifun.checks.data.BluetoothGpsRepository
+import com.taifun.checks.data.SensorDataRepository
 import com.taifun.checks.data.SettingsRepository
 import com.taifun.checks.ui.navigation.AppNavHost
 import com.taifun.checks.ui.navigation.Routes
 import com.taifun.checks.ui.theme.TaifunTheme
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var settingsRepo: SettingsRepository
+    private lateinit var sensorDataRepo: SensorDataRepository
+    private lateinit var bluetoothGpsRepo: BluetoothGpsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +39,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         settingsRepo = SettingsRepository(this)
+        sensorDataRepo = SensorDataRepository(this)
+        bluetoothGpsRepo = BluetoothGpsRepository(this)
 
         // Leer el estado de primer lanzamiento de forma síncrona
         val isFirstLaunch = settingsRepo.getFirstLaunchSync()
@@ -53,6 +61,79 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        // Auto-conectar GPS Bluetooth si está configurado
+        setupBluetoothGpsAutoConnect()
+    }
+
+    private fun setupBluetoothGpsAutoConnect() {
+        // Observar configuración de GPS source, auto-connect y device address
+        lifecycleScope.launch {
+            combine(
+                settingsRepo.gpsSourceFlow,
+                settingsRepo.btGpsAutoConnectFlow,
+                settingsRepo.btGpsDeviceAddressFlow
+            ) { gpsSource, autoConnect, deviceAddress ->
+                Triple(gpsSource, autoConnect, deviceAddress)
+            }
+                .distinctUntilChanged()
+                .collect { (gpsSource, autoConnect, deviceAddress) ->
+                    // Actualizar fuente de GPS en SensorDataRepository
+                    if (gpsSource == "BLUETOOTH") {
+                        sensorDataRepo.setGpsSource(com.taifun.checks.data.GpsSource.BLUETOOTH)
+
+                        // Auto-conectar si está habilitado y hay un dispositivo configurado
+                        if (autoConnect && !deviceAddress.isNullOrEmpty()) {
+                            try {
+                                bluetoothGpsRepo.connect(deviceAddress)
+                            } catch (e: Exception) {
+                                // Silenciar errores de auto-conexión
+                            }
+                        }
+                    } else {
+                        sensorDataRepo.setGpsSource(com.taifun.checks.data.GpsSource.INTERNAL)
+                        // Desconectar Bluetooth GPS si no es la fuente activa
+                        try {
+                            bluetoothGpsRepo.disconnect()
+                        } catch (e: Exception) {
+                            // Silenciar errores
+                        }
+                    }
+                }
+        }
+
+        // Observar datos NMEA del Bluetooth GPS y actualizar SensorDataRepository
+        lifecycleScope.launch {
+            bluetoothGpsRepo.nmeaData.collect { nmeaData ->
+                // Actualizar GPS data
+                sensorDataRepo.updateExternalGpsData(
+                    latitude = nmeaData.latitude,
+                    longitude = nmeaData.longitude,
+                    altitude = nmeaData.altitude,
+                    speedKmh = nmeaData.speedKmh
+                )
+
+                // Actualizar datos de barómetro/variometer si existen
+                if (nmeaData.pressure != null || nmeaData.baroAltitude != null) {
+                    sensorDataRepo.updateExternalBarometerData(
+                        pressure = nmeaData.pressure,
+                        baroAltitude = nmeaData.baroAltitude
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Desconectar Bluetooth GPS al destruir la actividad
+        lifecycleScope.launch {
+            try {
+                bluetoothGpsRepo.disconnect()
+            } catch (e: Exception) {
+                // Silenciar errores de desconexión
+            }
+        }
     }
 
     private fun setupContent(startDestination: String) {
@@ -67,7 +148,9 @@ class MainActivity : ComponentActivity() {
                 val nav = rememberNavController()
                 AppNavHost(
                     nav = nav,
-                    startDestination = startDestination
+                    startDestination = startDestination,
+                    sensorDataRepo = sensorDataRepo,
+                    bluetoothGpsRepo = bluetoothGpsRepo
                 )
             }
         }

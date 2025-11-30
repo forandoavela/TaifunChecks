@@ -67,13 +67,14 @@ import androidx.compose.ui.graphics.Color
 fun StepScreen(
     checklistId: String,
     onBack: () -> Unit,
-    onEdit: (String) -> Unit = {}
+    onEdit: (String) -> Unit = {},
+    sensorDataRepo: SensorDataRepository
 ) {
     val ctx = LocalContext.current
     // Fix: usar applicationContext para evitar memory leaks
     val repo = remember(ctx.applicationContext) { ChecklistRepository(ctx.applicationContext) }
     val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
-    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
+    val sensorRepo = sensorDataRepo  // Usar la instancia persistente de MainActivity
     val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
     val haptic = rememberHapticFeedback()
 

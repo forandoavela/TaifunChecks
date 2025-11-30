@@ -102,24 +102,8 @@ fun BluetoothGpsSettings(
         }
     }
 
-    // Update SensorDataRepository when NMEA data changes
-    LaunchedEffect(nmeaData) {
-        if (isConnected && gpsSource == "BLUETOOTH") {
-            // Update GPS data (from GPGGA/GPRMC/GPGLL)
-            sensorDataRepo.updateExternalGpsData(
-                latitude = nmeaData.latitude,
-                longitude = nmeaData.longitude,
-                altitude = nmeaData.altitude,
-                speedKmh = nmeaData.speedKmh
-            )
-
-            // Update barometer/vario data (from LK8EX1)
-            sensorDataRepo.updateExternalBarometerData(
-                pressure = nmeaData.pressure,
-                baroAltitude = nmeaData.baroAltitude
-            )
-        }
-    }
+    // Note: MainActivity now handles updating SensorDataRepository with NMEA data
+    // This ensures the Bluetooth GPS connection persists across screen changes
 
     Column(
         modifier = modifier,

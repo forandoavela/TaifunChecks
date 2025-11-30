@@ -24,11 +24,13 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    sensorDataRepo: SensorDataRepository,
+    bluetoothGpsRepo: BluetoothGpsRepository
+) {
     val ctx = LocalContext.current
     val repo = remember { SettingsRepository(ctx) }
-    val sensorDataRepo = remember { SensorDataRepository(ctx) }
-    val bluetoothGpsRepo = remember { BluetoothGpsRepository(ctx) }
     val scope = rememberCoroutineScope()
     val haptic = rememberHapticFeedback()
     val scrollState = rememberScrollState()

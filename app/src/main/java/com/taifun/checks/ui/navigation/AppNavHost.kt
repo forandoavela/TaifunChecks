@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.taifun.checks.data.BluetoothGpsRepository
+import com.taifun.checks.data.SensorDataRepository
 import com.taifun.checks.ui.screens.*
 
 object Routes {
@@ -26,7 +28,9 @@ object Routes {
 @Composable
 fun AppNavHost(
     nav: NavHostController,
-    startDestination: String = Routes.HOME
+    startDestination: String = Routes.HOME,
+    sensorDataRepo: SensorDataRepository,
+    bluetoothGpsRepo: BluetoothGpsRepository
 ) {
     NavHost(
         navController = nav,
@@ -72,7 +76,9 @@ fun AppNavHost(
 
         composable(Routes.SETTINGS) {
             SettingsScreen(
-                onBack = { nav.popBackStack() }
+                onBack = { nav.popBackStack() },
+                sensorDataRepo = sensorDataRepo,
+                bluetoothGpsRepo = bluetoothGpsRepo
             )
         }
 
@@ -96,7 +102,8 @@ fun AppNavHost(
             StepScreen(
                 checklistId = checklistId,
                 onBack = { nav.popBackStack() },
-                onEdit = { id -> nav.navigate("${Routes.EDIT_CHECKLIST}/$id") }
+                onEdit = { id -> nav.navigate("${Routes.EDIT_CHECKLIST}/$id") },
+                sensorDataRepo = sensorDataRepo
             )
         }
 
