@@ -85,6 +85,7 @@
     <string name="gps_section">GPS</string>
     <string name="gps_source_label">GPS data source</string>
     <string name="gps_source_internal">Internal GPS</string>
+    <string name="gps_not_available">GPS not available on this device</string>
     <string name="gps_source_bluetooth">Bluetooth GPS (NMEA)</string>
     <string name="gps_source_bluetooth_desc">Use external GPS device via Bluetooth</string>
     <string name="bt_gps_status">Connection status</string>

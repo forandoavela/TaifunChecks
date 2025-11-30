@@ -94,6 +94,12 @@ fun BluetoothGpsSettings(
                 bluetoothGpsRepo.connect(btDeviceAddress!!)
             }
         }
+
+        // If device has no GPS hardware, automatically switch to Bluetooth
+        if (!sensorDataRepo.hasGpsHardware() && gpsSource == "INTERNAL") {
+            settingsRepo.setGpsSource("BLUETOOTH")
+            sensorDataRepo.setGpsSource(GpsSource.BLUETOOTH)
+        }
     }
 
     // Update SensorDataRepository when NMEA data changes
@@ -155,12 +161,23 @@ fun BluetoothGpsSettings(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        stringResource(R.string.gps_source_internal),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                        Text(
+                            stringResource(R.string.gps_source_internal),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        // Show message if device has no GPS hardware
+                        if (!sensorDataRepo.hasGpsHardware()) {
+                            Text(
+                                stringResource(R.string.gps_not_available),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                     RadioButton(
                         selected = gpsSource == "INTERNAL",
+                        enabled = sensorDataRepo.hasGpsHardware(), // Disable if no GPS hardware
                         onClick = {
                             haptic.performHapticFeedback()
                             scope.launch {

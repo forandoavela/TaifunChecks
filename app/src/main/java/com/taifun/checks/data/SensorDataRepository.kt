@@ -32,7 +32,11 @@ enum class GpsSource {
  */
 class SensorDataRepository(private val context: Context) {
 
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val locationManager: LocationManager? = try {
+        context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+    } catch (e: Exception) {
+        null
+    }
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     // Current GPS source
@@ -71,6 +75,15 @@ class SensorDataRepository(private val context: Context) {
         } else if (source == GpsSource.BLUETOOTH) {
             stopLocationTracking()
         }
+    }
+
+    /**
+     * Check if device has GPS hardware
+     */
+    fun hasGpsHardware(): Boolean {
+        return locationManager?.allProviders?.any { provider ->
+            provider == LocationManager.GPS_PROVIDER || provider == LocationManager.NETWORK_PROVIDER
+        } ?: false
     }
 
     /**
@@ -114,6 +127,9 @@ class SensorDataRepository(private val context: Context) {
      * Inicia el seguimiento de ubicación GPS
      */
     fun startLocationTracking() {
+        // Check if LocationManager is available
+        if (locationManager == null) return
+
         if (!hasLocationPermission()) return
 
         // Si ya hay un listener, no crear otro
@@ -121,6 +137,9 @@ class SensorDataRepository(private val context: Context) {
 
         // Only start if using internal GPS
         if (_gpsSource.value != GpsSource.INTERNAL) return
+
+        // Check if GPS hardware is available
+        if (!hasGpsHardware()) return
 
         try {
             val listener = object : LocationListener {
@@ -166,8 +185,13 @@ class SensorDataRepository(private val context: Context) {
             }
 
             // Obtener última ubicación conocida de ambos proveedores
-            val gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            val gpsLocation = try {
+                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            } catch (e: Exception) { null }
+
+            val networkLocation = try {
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            } catch (e: Exception) { null }
 
             // Usar la más reciente
             val lastKnown = when {
@@ -219,7 +243,9 @@ class SensorDataRepository(private val context: Context) {
      * Detiene el seguimiento de ubicación
      */
     fun stopLocationTracking() {
-        locationListener?.let { locationManager.removeUpdates(it) }
+        locationListener?.let {
+            locationManager?.removeUpdates(it)
+        }
         locationListener = null
     }
 
