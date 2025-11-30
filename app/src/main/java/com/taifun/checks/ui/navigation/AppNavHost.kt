@@ -90,7 +90,8 @@ fun AppNavHost(
 
         composable(Routes.LOG_VIEWER) {
             LogViewerScreen(
-                onBack = { nav.popBackStack() }
+                onBack = { nav.popBackStack() },
+                sensorDataRepo = sensorDataRepo
             )
         }
 
