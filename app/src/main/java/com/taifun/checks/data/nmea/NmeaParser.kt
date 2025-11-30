@@ -1,5 +1,6 @@
 package com.taifun.checks.data.nmea
 
+import android.util.Log
 import kotlin.math.abs
 
 /**
@@ -8,6 +9,8 @@ import kotlin.math.abs
  * Also supports GNSS variants (GN*, GL*, GA*)
  */
 object NmeaParser {
+
+    private const val TAG = "NmeaParser"
 
     /**
      * Parsed NMEA data container
@@ -38,6 +41,7 @@ object NmeaParser {
      */
     fun parse(sentence: String): NmeaData? {
         if (!isValidChecksum(sentence)) {
+            Log.w(TAG, "Invalid checksum: $sentence")
             return null
         }
 
@@ -51,8 +55,14 @@ object NmeaParser {
             messageType.endsWith("GGA") -> parseGGA(parts)
             messageType.endsWith("RMC") -> parseRMC(parts)
             messageType.endsWith("GLL") -> parseGLL(parts)
-            messageType == "LK8EX1" -> parseLK8EX1(parts)
-            else -> null // Ignore other message types for now
+            messageType == "LK8EX1" -> {
+                Log.d(TAG, "Parsing LK8EX1: $sentence")
+                parseLK8EX1(parts)
+            }
+            else -> {
+                Log.v(TAG, "Ignoring message type: $messageType")
+                null // Ignore other message types for now
+            }
         }
     }
 
@@ -144,7 +154,12 @@ object NmeaParser {
      * Used by Bluetooth variometers: BlueFlyVario, XCTracer, Blues II, BlueBip, etc.
      */
     private fun parseLK8EX1(parts: List<String>): NmeaData? {
-        if (parts.size < 6) return null
+        if (parts.size < 6) {
+            Log.w(TAG, "LK8EX1 too few fields: ${parts.size}, parts=$parts")
+            return null
+        }
+
+        Log.d(TAG, "LK8EX1 parts: $parts")
 
         // Parse pressure (hPa*100)
         val pressureRaw = parts.getOrNull(1)?.toIntOrNull()
@@ -170,13 +185,17 @@ object NmeaParser {
         // Parse battery (voltage)
         val battery = parts.getOrNull(5)?.toFloatOrNull()
 
-        return NmeaData(
+        val result = NmeaData(
             pressure = pressure,
             baroAltitude = baroAlt,
             vario = vario,
             temperature = temperature,
             battery = battery
         )
+
+        Log.d(TAG, "LK8EX1 parsed: pressure=$pressure hPa, baroAlt=$baroAlt m, vario=$vario m/s, temp=$temperature°C, battery=$battery")
+
+        return result
     }
 
     /**
