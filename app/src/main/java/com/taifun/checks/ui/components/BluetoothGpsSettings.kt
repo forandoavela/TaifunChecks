@@ -435,80 +435,47 @@ fun BluetoothGpsSettings(
                 HorizontalDivider()
 
                 // Connection status
-                Text(
-                    text = stringResource(R.string.bt_vario_status),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val statusIcon = when {
-                        isVarioConnected -> Icons.Default.BluetoothConnected
-                        btVarioDeviceAddress != null -> Icons.Default.Bluetooth
-                        else -> Icons.Default.BluetoothDisabled
-                    }
-
-                    val statusText = when {
-                        isVarioConnected -> btVarioDeviceName ?: btVarioDeviceAddress ?: "Connected"
-                        btVarioDeviceAddress != null -> stringResource(
-                            R.string.bt_vario_disconnected,
-                            btVarioDeviceName ?: btVarioDeviceAddress ?: ""
-                        )
-                        else -> stringResource(R.string.bt_vario_no_device)
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            statusIcon,
-                            contentDescription = null,
-                            tint = if (isVarioConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = statusText,
+                            text = stringResource(R.string.bt_vario_status),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isVarioConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    }
-
-                    // Device selection/change button
-                    FilledTonalButton(
-                        onClick = {
-                            haptic.performHapticFeedback()
-                            if (hasBluetoothPermission) {
-                                showVarioDeviceDialog = true
-                            } else {
-                                val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                    arrayOf(
-                                        Manifest.permission.BLUETOOTH_SCAN,
-                                        Manifest.permission.BLUETOOTH_CONNECT
-                                    )
-                                } else {
-                                    arrayOf(Manifest.permission.BLUETOOTH)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = when {
+                                    isVarioConnected -> Icons.Default.BluetoothConnected
+                                    bluetoothVarioRepo.isBluetoothAvailable() -> Icons.Default.Bluetooth
+                                    else -> Icons.Default.BluetoothDisabled
+                                },
+                                contentDescription = null,
+                                tint = when {
+                                    isVarioConnected -> MaterialTheme.colorScheme.primary
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
                                 }
-                                permissionLauncher.launch(permissions)
-                            }
-                        },
-                        modifier = Modifier.height(36.dp)
-                    ) {
-                        Text(
-                            text = stringResource(
-                                if (btVarioDeviceAddress != null) R.string.bt_vario_change_device
-                                else R.string.bt_vario_select_device
                             )
-                        )
+                            Text(
+                                text = when {
+                                    isVarioConnected -> "$varioConnectionStatus"
+                                    btVarioDeviceName != null -> stringResource(R.string.bt_vario_disconnected, btVarioDeviceName!!)
+                                    else -> stringResource(R.string.bt_vario_no_device)
+                                },
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 }
 
-                // Show variometer data when connected
-                if (isVarioConnected && (varioNmeaData.pressure != null || varioNmeaData.vario != null || varioNmeaData.baroAltitude != null)) {
-                    HorizontalDivider()
-
+                // Variometer data indicator (when connected)
+                if (isVarioConnected && (varioNmeaData.pressure != null || varioNmeaData.vario != null)) {
                     Text(
                         text = buildString {
                             varioNmeaData.vario?.let { append("Vario: %+.1f m/s  ".format(it)) }
@@ -516,20 +483,50 @@ fun BluetoothGpsSettings(
                             varioNmeaData.baroAltitude?.let { append("Alt: %.0fm  ".format(it)) }
                             varioNmeaData.temperature?.let { append("T: %.1f°C".format(it)) }
                         },
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
-                // Connection buttons (only show if device is configured)
-                if (btVarioDeviceAddress != null) {
-                    HorizontalDivider()
+                // Select device button
+                Button(
+                    onClick = {
+                        haptic.performHapticFeedback()
+                        if (!hasBluetoothPermission) {
+                            // Request permission
+                            val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                arrayOf(
+                                    Manifest.permission.BLUETOOTH_SCAN,
+                                    Manifest.permission.BLUETOOTH_CONNECT
+                                )
+                            } else {
+                                arrayOf(Manifest.permission.BLUETOOTH)
+                            }
+                            permissionLauncher.launch(permissions)
+                        } else {
+                            pairedDevices = bluetoothVarioRepo.getPairedDevices()
+                            showVarioDeviceDialog = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Default.Bluetooth, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        if (btVarioDeviceName != null) {
+                            stringResource(R.string.bt_vario_change_device)
+                        } else {
+                            stringResource(R.string.bt_vario_select_device)
+                        }
+                    )
+                }
 
+                // Connect/Disconnect button
+                if (btVarioDeviceAddress != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Connect/Disconnect button
                         Button(
                             onClick = {
                                 haptic.performHapticFeedback()
@@ -543,44 +540,33 @@ fun BluetoothGpsSettings(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
-                                imageVector = if (isVarioConnected) Icons.Default.BluetoothDisabled else Icons.Default.Bluetooth,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                stringResource(
-                                    if (isVarioConnected) R.string.bt_vario_disconnect
-                                    else R.string.bt_vario_connect
-                                )
+                                if (isVarioConnected) {
+                                    stringResource(R.string.bt_vario_disconnect)
+                                } else {
+                                    stringResource(R.string.bt_vario_connect)
+                                }
                             )
                         }
 
-                        // Reconnect button (only when disconnected)
+                        // Reconnect button (only show when disconnected)
                         if (!isVarioConnected) {
-                            OutlinedButton(
+                            IconButton(
                                 onClick = {
                                     haptic.performHapticFeedback()
                                     scope.launch {
-                                        bluetoothVarioRepo.disconnect()
-                                        bluetoothVarioRepo.connect(btVarioDeviceAddress!!)
+                                        bluetoothVarioRepo.autoReconnect(btVarioDeviceAddress!!)
                                     }
-                                },
-                                modifier = Modifier.weight(1f)
+                                }
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Refresh,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(stringResource(R.string.bt_vario_reconnect))
+                                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.bt_vario_reconnect))
                             }
                         }
                     }
+                }
 
-                    // Auto-connect switch
+                // Auto-connect option
+                if (btVarioDeviceAddress != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -588,18 +574,19 @@ fun BluetoothGpsSettings(
                     ) {
                         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                             Text(
-                                stringResource(R.string.bt_vario_auto_connect),
+                                text = stringResource(R.string.bt_vario_auto_connect),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Text(
-                                stringResource(R.string.bt_vario_auto_connect_desc),
-                                style = MaterialTheme.typography.bodySmall,
+                                text = stringResource(R.string.bt_vario_auto_connect_desc),
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Switch(
                             checked = btVarioAutoConnect,
                             onCheckedChange = {
+                                haptic.performHapticFeedback()
                                 scope.launch {
                                     settingsRepo.setBtVarioAutoConnect(it)
                                 }
