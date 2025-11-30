@@ -74,7 +74,7 @@ class SensorDataRepository(private val context: Context) {
     }
 
     /**
-     * Update GPS data from external source (e.g., Bluetooth)
+     * Update GPS data from external source (e.g., Bluetooth GPS)
      * Call this method when receiving data from BluetoothGpsRepository
      */
     fun updateExternalGpsData(
@@ -88,6 +88,25 @@ class SensorDataRepository(private val context: Context) {
             _longitude.value = longitude
             _altitude.value = altitude
             _speedKmh.value = speedKmh
+        }
+    }
+
+    /**
+     * Update barometer/pressure data from external source (e.g., Bluetooth Vario)
+     * Call this method when receiving LK8EX1 data from BluetoothGpsRepository
+     * @param pressure Barometric pressure in hPa
+     * @param baroAltitude Barometric altitude in meters (QNE)
+     */
+    fun updateExternalBarometerData(
+        pressure: Float?,
+        baroAltitude: Double?
+    ) {
+        if (_gpsSource.value == GpsSource.BLUETOOTH) {
+            pressure?.let { _pressure.value = it }
+            // If we have barometric altitude but no GPS altitude, use it
+            if (baroAltitude != null && _altitude.value == null) {
+                _altitude.value = baroAltitude
+            }
         }
     }
 

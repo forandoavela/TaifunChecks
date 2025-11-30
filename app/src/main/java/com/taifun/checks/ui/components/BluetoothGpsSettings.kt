@@ -99,11 +99,18 @@ fun BluetoothGpsSettings(
     // Update SensorDataRepository when NMEA data changes
     LaunchedEffect(nmeaData) {
         if (isConnected && gpsSource == "BLUETOOTH") {
+            // Update GPS data (from GPGGA/GPRMC/GPGLL)
             sensorDataRepo.updateExternalGpsData(
                 latitude = nmeaData.latitude,
                 longitude = nmeaData.longitude,
                 altitude = nmeaData.altitude,
                 speedKmh = nmeaData.speedKmh
+            )
+
+            // Update barometer/vario data (from LK8EX1)
+            sensorDataRepo.updateExternalBarometerData(
+                pressure = nmeaData.pressure,
+                baroAltitude = nmeaData.baroAltitude
             )
         }
     }
@@ -249,6 +256,23 @@ fun BluetoothGpsSettings(
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    // Vario/Barometer data indicator (when connected and LK8EX1 data available)
+                    if (isConnected && (nmeaData.pressure != null || nmeaData.vario != null)) {
+                        Text(
+                            text = buildString {
+                                append("Vario: ")
+                                nmeaData.pressure?.let { append("P: %.1f hPa  ".format(it)) }
+                                nmeaData.baroAltitude?.let { append("Alt: %.0fm  ".format(it)) }
+                                nmeaData.vario?.let {
+                                    append("V: %+.1f m/s".format(it))
+                                }
+                                nmeaData.temperature?.let { append("  T: %.1f°C".format(it)) }
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 

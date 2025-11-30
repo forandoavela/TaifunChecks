@@ -526,16 +526,17 @@ If implementing tests, consider:
 
 ### Overview (NEW in v1.0.01)
 
-FlightChecks now supports external GPS devices via Bluetooth, allowing pilots to use professional aviation GPS hardware (Garmin GLO, Bad Elf GPS Pro, etc.) for enhanced position and altitude accuracy.
+FlightChecks now supports external GPS and variometer devices via Bluetooth, allowing pilots to use professional aviation GPS hardware (Garmin GLO, Bad Elf GPS Pro, etc.) and Bluetooth variometers (BlueFlyVario, XCTracer, Blues II, BlueBip, etc.) for enhanced position, altitude, and climb/sink rate accuracy.
 
 ### Architecture
 
 **Three Main Components**:
 
-1. **NmeaParser.kt** (`data/nmea/NmeaParser.kt`, 227 lines)
-   - Parses NMEA 0183 sentences (GPGGA, GPRMC, GPGLL)
+1. **NmeaParser.kt** (`data/nmea/NmeaParser.kt`, 290 lines)
+   - Parses NMEA 0183 sentences (GPGGA, GPRMC, GPGLL, LK8EX1)
    - Validates checksums
-   - Extracts: latitude, longitude, altitude, speed, fix quality, satellites
+   - Extracts GPS data: latitude, longitude, altitude, speed, fix quality, satellites
+   - Extracts variometer data: pressure, barometric altitude, vario, temperature, battery
    - Supports GNSS variants (GN*, GL*, GA*)
 
 2. **BluetoothGpsRepository.kt** (`data/BluetoothGpsRepository.kt`, 267 lines)
@@ -628,9 +629,18 @@ BluetoothGpsSettings(
 ### NMEA Sentence Support
 
 **Supported Messages**:
+
+**GPS Sentences**:
 - **GPGGA**: Fix data (lat, lon, alt, quality, sats, HDOP)
 - **GPRMC**: Recommended minimum (lat, lon, speed, timestamp)
 - **GPGLL**: Geographic position (lat, lon, timestamp)
+
+**Variometer Sentences** (NEW in v1.0.01):
+- **LK8EX1**: Variometer/barometer data (pressure, baro altitude, vario, temperature, battery)
+  - Format: `$LK8EX1,pressure,altitude,vario,temperature,battery,*checksum`
+  - Pressure in hPa×100 (e.g., 1013.25 → 101325)
+  - Vario in m/s (climb/sink rate)
+  - Used by BlueFlyVario, XCTracer, Blues II, BlueBip, and other Bluetooth variometers
 
 **Checksum Validation**:
 - All sentences validated with XOR checksum
@@ -640,6 +650,7 @@ BluetoothGpsSettings(
 ```
 $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
 $GPRMC,123519,A,4807.038,N,01131.000,E,022.4,084.4,230394,003.1,W*6A
+$LK8EX1,101325,430,0.4,28.5,4.2,*XX
 ```
 
 ### Safety Considerations
@@ -663,7 +674,8 @@ If implementing tests for Bluetooth GPS:
 **Unit Tests**:
 - NmeaParser checksum validation
 - NmeaParser coordinate conversion (DDMM.MMMM → decimal degrees)
-- NmeaParser sentence parsing (GPGGA, GPRMC, GPGLL)
+- NmeaParser sentence parsing (GPGGA, GPRMC, GPGLL, LK8EX1)
+- LK8EX1 pressure conversion (hPa×100 → hPa)
 
 **Integration Tests**:
 - Bluetooth connection/disconnection flow
@@ -672,11 +684,12 @@ If implementing tests for Bluetooth GPS:
 - Settings persistence
 
 **Manual Testing**:
-- Pair real GPS device (Garmin GLO, Bad Elf, etc.)
+- Pair real GPS device (Garmin GLO, Bad Elf, etc.) or variometer (BlueFlyVario, etc.)
 - Verify connection status indicator
 - Check GPS data updates in real-time
+- Check variometer data (pressure, altitude, vario) in real-time
 - Test auto-reconnect on app restart
-- Verify data used correctly in altitude steps and logging
+- Verify data used correctly in altitude steps, QNH calculation, and logging
 
 ---
 
