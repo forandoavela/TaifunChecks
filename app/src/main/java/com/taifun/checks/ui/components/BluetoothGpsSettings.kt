@@ -67,10 +67,12 @@ fun BluetoothGpsSettings(
     val isVarioConnected by bluetoothVarioRepo.isConnected.collectAsState()
     val varioConnectionStatus by bluetoothVarioRepo.connectionStatus.collectAsState()
     val varioNmeaData by bluetoothVarioRepo.nmeaData.collectAsState()
+    val varioRawSentences by bluetoothVarioRepo.rawNmeaSentences.collectAsState()
 
     // UI state
     var showDeviceDialog by remember { mutableStateOf(false) }
     var showVarioDeviceDialog by remember { mutableStateOf(false) }
+    var showVarioDebug by remember { mutableStateOf(false) }
     var pairedDevices by remember { mutableStateOf<List<BluetoothDevice>>(emptyList()) }
     var hasBluetoothPermission by remember { mutableStateOf(false) }
 
@@ -592,6 +594,66 @@ fun BluetoothGpsSettings(
                                 }
                             }
                         )
+                    }
+                }
+
+                // Debug section: Show raw NMEA sentences
+                if (isVarioConnected && varioRawSentences.isNotEmpty()) {
+                    HorizontalDivider()
+
+                    // Toggle button to show/hide raw data
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                haptic.performHapticFeedback()
+                                showVarioDebug = !showVarioDebug
+                            }
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Tramas NMEA (Debug)",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Icon(
+                            imageVector = if (showVarioDebug) Icons.Default.Refresh else Icons.Default.Bluetooth,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    // Show raw NMEA sentences if expanded
+                    if (showVarioDebug) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "Últimas ${varioRawSentences.size} tramas:",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                varioRawSentences.forEach { sentence ->
+                                    Text(
+                                        text = sentence,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

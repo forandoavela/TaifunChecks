@@ -53,9 +53,9 @@ class BluetoothGpsRepository(private val context: Context) {
     private val _nmeaData = MutableStateFlow(NmeaParser.NmeaData())
     val nmeaData: StateFlow<NmeaParser.NmeaData> = _nmeaData.asStateFlow()
 
-    // Last raw NMEA sentence received (for debugging)
-    private val _lastNmeaSentence = MutableStateFlow<String?>(null)
-    val lastNmeaSentence: StateFlow<String?> = _lastNmeaSentence.asStateFlow()
+    // Last raw NMEA sentences received (for debugging) - keeps last 20
+    private val _rawNmeaSentences = MutableStateFlow<List<String>>(emptyList())
+    val rawNmeaSentences: StateFlow<List<String>> = _rawNmeaSentences.asStateFlow()
 
     private var bluetoothSocket: BluetoothSocket? = null
     private var readJob: Job? = null
@@ -181,7 +181,13 @@ class BluetoothGpsRepository(private val context: Context) {
                     try {
                         val line = reader.readLine()
                         if (line != null && line.isNotEmpty()) {
-                            _lastNmeaSentence.value = line
+                            // Add to raw sentences list (keep last 20)
+                            val currentList = _rawNmeaSentences.value.toMutableList()
+                            currentList.add(line)
+                            if (currentList.size > 20) {
+                                currentList.removeAt(0)
+                            }
+                            _rawNmeaSentences.value = currentList
 
                             // Parse NMEA sentence
                             val parsedData = NmeaParser.parse(line)
@@ -194,7 +200,7 @@ class BluetoothGpsRepository(private val context: Context) {
                                     _nmeaData.value = accumulatedData
                                     Log.d(TAG, "GPS fix: lat=${accumulatedData.latitude}, " +
                                               "lon=${accumulatedData.longitude}, " +
-                                              "alt=${accumulatedData.altitude}m")
+                                              "alt=${accumulatedData.latitude}m")
                                 }
                             }
                         }
@@ -235,7 +241,7 @@ class BluetoothGpsRepository(private val context: Context) {
         _isConnected.value = false
         _connectionStatus.value = null
         _nmeaData.value = NmeaParser.NmeaData()
-        _lastNmeaSentence.value = null
+        _rawNmeaSentences.value = emptyList()
 
         Log.d(TAG, "Disconnected")
     }
