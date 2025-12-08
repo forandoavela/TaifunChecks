@@ -89,11 +89,14 @@ object NmeaParser {
     /**
      * Parse BlueFlyVario protocol
      * Format: "COMMAND VALUE" (space-separated)
-     * Commands:
-     * - PRS xxxxx: Pressure in Pascals (divide by 100 for hPa)
-     * - BAT xxxx: Battery in millivolts
-     * - TMP xxx: Temperature in tenths of degrees Celsius
-     * - PAS xxxxx: Secondary pressure sensor (if available)
+     * Commands (values are in HEXADECIMAL):
+     * - PRS xxxxx: Pressure in Pascals (hex, divide by 100 for hPa)
+     * - BAT xxxx: Battery in millivolts (hex, divide by 1000 for V)
+     * - TMP xxx: Temperature in tenths of degrees Celsius (hex)
+     * - PAS xxxxx: Secondary pressure sensor (hex, in Pascals)
+     *
+     * Reference: XCSoar BlueFlyVario driver
+     * https://github.com/XCSoar/XCSoar/blob/master/src/Device/Driver/BlueFly/Parser.cpp
      */
     private fun parseBlueFlyVario(sentence: String): NmeaData? {
         val parts = sentence.split(' ', limit = 2)
@@ -107,47 +110,47 @@ object NmeaParser {
 
         return when (command) {
             "PRS" -> {
-                // Pressure in Pascals -> convert to hPa
-                val pressurePa = valueStr.toIntOrNull()
+                // Pressure in hexadecimal Pascals -> convert to hPa
+                val pressurePa = valueStr.toLongOrNull(16)
                 if (pressurePa != null) {
                     val pressureHpa = pressurePa / 100.0f
-                    Log.d(TAG, "BlueFlyVario PRS: $pressurePa Pa = $pressureHpa hPa")
+                    Log.d(TAG, "BlueFlyVario PRS: 0x$valueStr = $pressurePa Pa = $pressureHpa hPa")
                     NmeaData(pressure = pressureHpa)
                 } else {
-                    Log.w(TAG, "Invalid PRS value: $valueStr")
+                    Log.w(TAG, "Invalid PRS value (not hex): $valueStr")
                     null
                 }
             }
             "BAT" -> {
-                // Battery in millivolts -> convert to volts
-                val batteryMv = valueStr.toIntOrNull()
+                // Battery in hexadecimal millivolts -> convert to volts
+                val batteryMv = valueStr.toIntOrNull(16)
                 if (batteryMv != null) {
                     val batteryV = batteryMv / 1000.0f
-                    Log.d(TAG, "BlueFlyVario BAT: $batteryMv mV = $batteryV V")
+                    Log.d(TAG, "BlueFlyVario BAT: 0x$valueStr = $batteryMv mV = $batteryV V")
                     NmeaData(battery = batteryV)
                 } else {
-                    Log.w(TAG, "Invalid BAT value: $valueStr")
+                    Log.w(TAG, "Invalid BAT value (not hex): $valueStr")
                     null
                 }
             }
             "TMP" -> {
-                // Temperature in tenths of degrees -> convert to degrees
-                val tempTenths = valueStr.toIntOrNull()
+                // Temperature in hexadecimal tenths of degrees -> convert to degrees
+                val tempTenths = valueStr.toIntOrNull(16)
                 if (tempTenths != null) {
                     val tempC = tempTenths / 10.0f
-                    Log.d(TAG, "BlueFlyVario TMP: $tempTenths tenths = $tempC °C")
+                    Log.d(TAG, "BlueFlyVario TMP: 0x$valueStr = $tempTenths tenths = $tempC °C")
                     NmeaData(temperature = tempC)
                 } else {
-                    Log.w(TAG, "Invalid TMP value: $valueStr")
+                    Log.w(TAG, "Invalid TMP value (not hex): $valueStr")
                     null
                 }
             }
             "PAS" -> {
-                // Secondary pressure sensor (treat same as PRS)
-                val pressurePa = valueStr.toIntOrNull()
+                // Secondary pressure sensor (hexadecimal Pascals)
+                val pressurePa = valueStr.toLongOrNull(16)
                 if (pressurePa != null) {
                     val pressureHpa = pressurePa / 100.0f
-                    Log.d(TAG, "BlueFlyVario PAS: $pressurePa Pa = $pressureHpa hPa")
+                    Log.d(TAG, "BlueFlyVario PAS: 0x$valueStr = $pressurePa Pa = $pressureHpa hPa")
                     NmeaData(pressure = pressureHpa)
                 } else {
                     null
