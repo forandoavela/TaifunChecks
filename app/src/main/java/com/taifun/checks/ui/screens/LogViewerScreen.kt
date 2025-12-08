@@ -293,11 +293,7 @@ fun LogViewerScreen(
         CustomLogDialog(
             onDismiss = { showCustomLogDialog = false },
             onSave = { logText ->
-                if (logText.isBlank()) {
-                    Toast.makeText(ctx, ctx.getString(R.string.custom_log_empty_text), Toast.LENGTH_SHORT).show()
-                    return@CustomLogDialog
-                }
-
+                // logText already has default text if user left it empty
                 // Check if GPS is accurate enough
                 if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
                     // GPS is good, save directly
@@ -726,9 +722,8 @@ private fun CustomLogDialog(
     onSave: (String) -> Unit,
     haptic: com.taifun.checks.ui.HapticFeedbackHelper
 ) {
-    // Use key(Unit) to ensure state resets when dialog is shown
     var logText by remember { mutableStateOf("") }
-    val isTextEmpty = logText.isBlank()
+    val defaultText = stringResource(R.string.custom_log_text_label) // "Texto del Log" / "Log Text"
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -750,25 +745,18 @@ private fun CustomLogDialog(
                     placeholder = { Text(stringResource(R.string.custom_log_text_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
-                    maxLines = 4,
-                    isError = false, // No error state, just require text
-                    supportingText = if (isTextEmpty) {
-                        { Text(stringResource(R.string.custom_log_required)) }
-                    } else null
+                    maxLines = 4
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    val trimmedText = logText.trim()
-                    // Double-check text is not empty before saving
-                    if (trimmedText.isNotEmpty()) {
-                        haptic.performStrongFeedback()
-                        onSave(trimmedText)
-                    }
-                },
-                enabled = !isTextEmpty
+                    haptic.performStrongFeedback()
+                    // If text is empty, use default label text
+                    val textToSave = logText.trim().ifEmpty { defaultText }
+                    onSave(textToSave)
+                }
             ) {
                 Text(stringResource(R.string.aceptar))
             }
