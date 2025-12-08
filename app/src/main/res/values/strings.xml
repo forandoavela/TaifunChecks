@@ -294,4 +294,21 @@
     <string name="custom_log_no_gps">GPS no disponible. Asegúrate de tener permisos de ubicación activados.</string>
     <string name="custom_log_empty_text">El texto del log no puede estar vacío</string>
     <string name="custom_log_no_permission">Se necesitan permisos de ubicación para crear logs personalizados</string>
+
+    <!-- GPS Accuracy Dialog -->
+    <string name="gps_waiting_title">Esperando GPS</string>
+    <string name="gps_waiting_message">Obteniendo posición precisa (≤50m)…</string>
+    <string name="gps_accuracy_current">Precisión actual: %1$s</string>
+    <string name="gps_accuracy_unknown">Precisión actual: desconocida</string>
+    <string name="gps_altitude_waiting">Esperando altitud GPS…</string>
+    <string name="gps_altitude_ok">Altitud: %.0f m</string>
+    <string name="gps_timeout">No se pudo obtener posición precisa. ¿Guardar con datos actuales?</string>
+    <string name="gps_save_anyway">Guardar igualmente</string>
+    <string name="gps_wait_more">Esperar más</string>
+
+    <!-- Checklist Completion Dialog -->
+    <string name="checklist_completed_title">Checklist Completado</string>
+    <string name="checklist_completed_message">Has completado todos los pasos de este checklist.</string>
+    <string name="checklist_exit">Salir</string>
+    <string name="checklist_back">Volver</string>
 </resources>

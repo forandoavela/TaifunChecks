@@ -61,6 +61,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.taifun.checks.ui.components.GpsWaitingDialog
+import com.taifun.checks.ui.components.isGpsAccurateForLogging
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +109,7 @@ fun StepScreen(
     var checklist by remember { mutableStateOf<Checklist?>(null) }
     var total by remember { mutableStateOf(0) }
     var showResetDialog by remember { mutableStateOf(false) }
+    var showCompletionDialog by remember { mutableStateOf(false) }
 
     // Observar estado del ViewModel (persistido)
     val index by vm.index.collectAsState()
@@ -191,6 +194,36 @@ fun StepScreen(
         )
     }
 
+    // Checklist completion dialog
+    if (showCompletionDialog) {
+        AlertDialog(
+            onDismissRequest = { /* Don't dismiss on outside click */ },
+            title = { Text(stringResource(R.string.checklist_completed_title)) },
+            text = { Text(stringResource(R.string.checklist_completed_message)) },
+            confirmButton = {
+                // Exit button (right side) - reset and go home
+                TextButton(onClick = {
+                    haptic.performStrongFeedback()
+                    vm.reset() // Reset checklist progress
+                    showCompletionDialog = false
+                    onBack() // Go to home
+                }) {
+                    Text(stringResource(R.string.checklist_exit))
+                }
+            },
+            dismissButton = {
+                // Back button (left side) - return to previous step/page
+                TextButton(onClick = {
+                    haptic.performLightFeedback()
+                    showCompletionDialog = false
+                    // Go back to previous step/page (no need to navigate, just close dialog)
+                }) {
+                    Text(stringResource(R.string.checklist_back))
+                }
+            }
+        )
+    }
+
     // Speech recognizer
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(ctx)) {
@@ -221,9 +254,9 @@ fun StepScreen(
         if (isFullList) {
             val pasos = checklist?.pasos.orEmpty()
             val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / 10 + 1)
-            if (page < totalPages - 1) vm.nextPage(totalPages - 1) else onBack()
+            if (page < totalPages - 1) vm.nextPage(totalPages - 1) else showCompletionDialog = true
         } else {
-            if (index < total - 1) vm.nextStep(total - 1) else onBack()
+            if (index < total - 1) vm.nextStep(total - 1) else showCompletionDialog = true
         }
     }
 
@@ -393,6 +426,7 @@ fun StepScreen(
                     vm.setPage(newPage) // Persistir en ViewModel
                 },
                 onBack = onBack,
+                onComplete = { showCompletionDialog = true },
                 showButtons = !voiceControlEnabled,
                 altitude = altitude,
                 pressure = pressure,
@@ -458,6 +492,11 @@ private fun StepByStepMode(
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+    // GPS accuracy for logging
+    val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    var showGpsWaitingDialog by remember { mutableStateOf(false) }
+    var pendingLogText by remember { mutableStateOf<String?>(null) }
+
     // Launcher para permisos de ubicación
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -481,6 +520,57 @@ private fun StepByStepMode(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         }
+    }
+
+    // Function to execute log save
+    val executeLogSave: (String) -> Unit = { logText ->
+        coroutineScope.launch {
+            val lang = if (language == "en") "en" else "es"
+            val success = logRepo.addLogEntry(
+                latitude = latitude,
+                longitude = longitude,
+                altitudeMeters = altitude,
+                speedKmh = speedKmh,
+                logText = logText,
+                language = lang
+            )
+
+            if (success) {
+                Toast.makeText(
+                    ctx,
+                    if (lang == "en") "Log entry saved" else "Entrada guardada",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    ctx,
+                    if (lang == "en") "Error saving log" else "Error al guardar",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    // GPS Waiting Dialog
+    if (showGpsWaitingDialog && pendingLogText != null) {
+        GpsWaitingDialog(
+            accuracy = gpsAccuracy,
+            altitude = altitude,
+            onDismiss = {
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onSaveAnyway = {
+                pendingLogText?.let { executeLogSave(it) }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onGpsReady = {
+                pendingLogText?.let { executeLogSave(it) }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            }
+        )
     }
 
     val paso = checklist?.pasos?.getOrNull(index)
@@ -704,39 +794,15 @@ private fun StepByStepMode(
                                             return@Button
                                         }
 
-                                        // Verificar que tenemos datos GPS válidos
-                                        if (latitude != null && longitude != null && altitude != null) {
-                                            coroutineScope.launch {
-                                                val lang = if (language == "en") "en" else "es"
-                                                val success = logRepo.addLogEntry(
-                                                    latitude = latitude,
-                                                    longitude = longitude,
-                                                    altitudeMeters = altitude,
-                                                    speedKmh = speedKmh,
-                                                    logText = paso.log ?: "",
-                                                    language = lang
-                                                )
-
-                                                if (success) {
-                                                    Toast.makeText(
-                                                        ctx,
-                                                        if (lang == "en") "Log entry saved" else "Entrada guardada",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                } else {
-                                                    Toast.makeText(
-                                                        ctx,
-                                                        if (lang == "en") "Error saving log" else "Error al guardar",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
-                                                }
-                                            }
+                                        // Check if GPS is accurate enough
+                                        val logText = paso.log ?: ""
+                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                            // GPS is good, save directly
+                                            executeLogSave(logText)
                                         } else {
-                                            Toast.makeText(
-                                                ctx,
-                                                if (language == "en") "GPS data not available" else "Datos GPS no disponibles",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            // GPS not accurate, show waiting dialog
+                                            pendingLogText = logText
+                                            showGpsWaitingDialog = true
                                         }
                                     },
                                     modifier = Modifier.wrapContentWidth()
@@ -827,39 +893,15 @@ private fun StepByStepMode(
                                     return@Button
                                 }
 
-                                // Verificar que tenemos datos GPS válidos
-                                if (latitude != null && longitude != null && altitude != null) {
-                                    coroutineScope.launch {
-                                        val lang = if (language == "en") "en" else "es"
-                                        val success = logRepo.addLogEntry(
-                                            latitude = latitude,
-                                            longitude = longitude,
-                                            altitudeMeters = altitude,
-                                            speedKmh = speedKmh,
-                                            logText = paso.log ?: "",
-                                            language = lang
-                                        )
-
-                                        if (success) {
-                                            Toast.makeText(
-                                                ctx,
-                                                if (lang == "en") "Log entry saved" else "Entrada guardada",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        } else {
-                                            Toast.makeText(
-                                                ctx,
-                                                if (lang == "en") "Error saving log" else "Error al guardar",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
+                                // Check if GPS is accurate enough
+                                val logText = paso.log ?: ""
+                                if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                    // GPS is good, save directly
+                                    executeLogSave(logText)
                                 } else {
-                                    Toast.makeText(
-                                        ctx,
-                                        if (language == "en") "GPS data not available" else "Datos GPS no disponibles",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    // GPS not accurate, show waiting dialog
+                                    pendingLogText = logText
+                                    showGpsWaitingDialog = true
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(0.7f)
@@ -945,6 +987,7 @@ private fun FullListMode(
     page: Int,
     onPageChange: (Int) -> Unit,
     onBack: () -> Unit,
+    onComplete: () -> Unit,
     showButtons: Boolean,
     altitude: Double?,
     pressure: Float?,
@@ -984,6 +1027,63 @@ private fun FullListMode(
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         }
     }
+
+    // GPS accuracy for logging
+    val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    var showGpsWaitingDialog by remember { mutableStateOf(false) }
+    var pendingLogText by remember { mutableStateOf<String?>(null) }
+
+    // Function to execute log save
+    val executeLogSave: (String) -> Unit = { logText ->
+        coroutineScope.launch {
+            val lang = if (language == "en") "en" else "es"
+            val success = logRepo.addLogEntry(
+                latitude = latitude,
+                longitude = longitude,
+                altitudeMeters = altitude,
+                speedKmh = speedKmh,
+                logText = logText,
+                language = lang
+            )
+
+            if (success) {
+                Toast.makeText(
+                    ctx,
+                    if (lang == "en") "Log entry saved" else "Entrada guardada",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    ctx,
+                    if (lang == "en") "Error saving log" else "Error al guardar",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    // GPS Waiting Dialog
+    if (showGpsWaitingDialog && pendingLogText != null) {
+        GpsWaitingDialog(
+            accuracy = gpsAccuracy,
+            altitude = altitude,
+            onDismiss = {
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onSaveAnyway = {
+                pendingLogText?.let { executeLogSave(it) }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onGpsReady = {
+                pendingLogText?.let { executeLogSave(it) }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            }
+        )
+    }
+
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
@@ -1009,7 +1109,7 @@ private fun FullListMode(
             if (page < totalPages - 1) {
                 onPageChange(page + 1)
             } else {
-                onBack()
+                onComplete()
             }
         }
     }
@@ -1249,39 +1349,15 @@ private fun FullListMode(
                                         return@Button
                                     }
 
-                                    // Verificar que tenemos datos GPS válidos
-                                    if (latitude != null && longitude != null && altitude != null) {
-                                        coroutineScope.launch {
-                                            val lang = if (language == "en") "en" else "es"
-                                            val success = logRepo.addLogEntry(
-                                                latitude = latitude,
-                                                longitude = longitude,
-                                                altitudeMeters = altitude,
-                                                speedKmh = speedKmh,
-                                                logText = p.log ?: "",
-                                                language = lang
-                                            )
-
-                                            if (success) {
-                                                Toast.makeText(
-                                                    ctx,
-                                                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            } else {
-                                                Toast.makeText(
-                                                    ctx,
-                                                    if (lang == "en") "Error saving log" else "Error al guardar",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
-                                            }
-                                        }
+                                    // Check if GPS is accurate enough
+                                    val logText = p.log ?: ""
+                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                        // GPS is good, save directly
+                                        executeLogSave(logText)
                                     } else {
-                                        Toast.makeText(
-                                            ctx,
-                                            if (language == "en") "GPS data not available" else "Datos GPS no disponibles",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        // GPS not accurate, show waiting dialog
+                                        pendingLogText = logText
+                                        showGpsWaitingDialog = true
                                     }
                                 },
                                 modifier = Modifier.fillMaxWidth()

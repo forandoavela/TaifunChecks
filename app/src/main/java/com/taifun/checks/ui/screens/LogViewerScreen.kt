@@ -36,6 +36,8 @@ import com.taifun.checks.data.LogRepository
 import com.taifun.checks.data.SensorDataRepository
 import com.taifun.checks.data.SettingsRepository
 import com.taifun.checks.ui.rememberHapticFeedback
+import com.taifun.checks.ui.components.GpsWaitingDialog
+import com.taifun.checks.ui.components.isGpsAccurateForLogging
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,6 +63,11 @@ fun LogViewerScreen(
     var showImportConfirm by remember { mutableStateOf(false) }
     var pendingImportUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var showCustomLogDialog by remember { mutableStateOf(false) }
+
+    // GPS accuracy for logging
+    val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    var showGpsWaitingDialog by remember { mutableStateOf(false) }
+    var pendingLogText by remember { mutableStateOf<String?>(null) }
 
     // Launcher para solicitar permisos de ubicación
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -261,39 +268,112 @@ fun LogViewerScreen(
         val altitude by sensorRepo.altitude.collectAsState()
         val speedKmh by sensorRepo.speedKmh.collectAsState()
 
+        // Function to execute log save
+        val executeLogSave: (String) -> Unit = { logText ->
+            scope.launch {
+                val success = logRepo.addLogEntry(
+                    latitude = latitude,
+                    longitude = longitude,
+                    altitudeMeters = altitude,
+                    speedKmh = speedKmh,
+                    logText = logText,
+                    language = if (language == "en") "en" else "es"
+                )
+
+                if (success) {
+                    Toast.makeText(ctx, ctx.getString(R.string.custom_log_success), Toast.LENGTH_SHORT).show()
+                    reloadEntries()
+                    showCustomLogDialog = false
+                } else {
+                    Toast.makeText(ctx, ctx.getString(R.string.custom_log_error), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         CustomLogDialog(
             onDismiss = { showCustomLogDialog = false },
             onSave = { logText ->
-                scope.launch {
-                    if (logText.isBlank()) {
-                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_empty_text), Toast.LENGTH_SHORT).show()
-                        return@launch
-                    }
+                if (logText.isBlank()) {
+                    Toast.makeText(ctx, ctx.getString(R.string.custom_log_empty_text), Toast.LENGTH_SHORT).show()
+                    return@CustomLogDialog
+                }
 
-                    // Permitir guardar sin GPS (coordenadas vacías pero con hora y texto)
-                    val lat = latitude
-                    val lon = longitude
-                    val alt = altitude
-
-                    val success = logRepo.addLogEntry(
-                        latitude = lat,
-                        longitude = lon,
-                        altitudeMeters = alt,
-                        speedKmh = speedKmh,
-                        logText = logText,
-                        language = if (language == "en") "en" else "es"
-                    )
-
-                    if (success) {
-                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_success), Toast.LENGTH_SHORT).show()
-                        reloadEntries()
-                        showCustomLogDialog = false
-                    } else {
-                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_error), Toast.LENGTH_SHORT).show()
-                    }
+                // Check if GPS is accurate enough
+                if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                    // GPS is good, save directly
+                    executeLogSave(logText)
+                } else {
+                    // GPS not accurate, show waiting dialog
+                    pendingLogText = logText
+                    showCustomLogDialog = false
+                    showGpsWaitingDialog = true
                 }
             },
             haptic = haptic
+        )
+    }
+
+    // GPS Waiting Dialog for custom logs
+    if (showGpsWaitingDialog && pendingLogText != null) {
+        val language by settingsRepo.languageFlow.collectAsState(initial = "auto")
+        val latitude by sensorRepo.latitude.collectAsState()
+        val longitude by sensorRepo.longitude.collectAsState()
+        val altitude by sensorRepo.altitude.collectAsState()
+        val speedKmh by sensorRepo.speedKmh.collectAsState()
+
+        GpsWaitingDialog(
+            accuracy = gpsAccuracy,
+            altitude = altitude,
+            onDismiss = {
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onSaveAnyway = {
+                pendingLogText?.let { logText ->
+                    scope.launch {
+                        val success = logRepo.addLogEntry(
+                            latitude = latitude,
+                            longitude = longitude,
+                            altitudeMeters = altitude,
+                            speedKmh = speedKmh,
+                            logText = logText,
+                            language = if (language == "en") "en" else "es"
+                        )
+
+                        if (success) {
+                            Toast.makeText(ctx, ctx.getString(R.string.custom_log_success), Toast.LENGTH_SHORT).show()
+                            reloadEntries()
+                        } else {
+                            Toast.makeText(ctx, ctx.getString(R.string.custom_log_error), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            },
+            onGpsReady = {
+                pendingLogText?.let { logText ->
+                    scope.launch {
+                        val success = logRepo.addLogEntry(
+                            latitude = latitude,
+                            longitude = longitude,
+                            altitudeMeters = altitude,
+                            speedKmh = speedKmh,
+                            logText = logText,
+                            language = if (language == "en") "en" else "es"
+                        )
+
+                        if (success) {
+                            Toast.makeText(ctx, ctx.getString(R.string.custom_log_success), Toast.LENGTH_SHORT).show()
+                            reloadEntries()
+                        } else {
+                            Toast.makeText(ctx, ctx.getString(R.string.custom_log_error), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                showGpsWaitingDialog = false
+                pendingLogText = null
+            }
         )
     }
 

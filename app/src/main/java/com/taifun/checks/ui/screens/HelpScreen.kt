@@ -664,6 +664,68 @@ Columnas: Timestamp, Texto, Latitud, Longitud, Altitud (m), Código ICAO
                 """.trimIndent()
             )
 
+            // 6c. GPS Accuracy & Checklist Completion
+            HelpCard(
+                title = if (isEnglish) "6c. GPS Accuracy & Completion" else "6c. Precisión GPS y Finalización",
+                content = if (isEnglish) """
+**GPS Accuracy for Logging**
+When creating log entries, the app waits for accurate GPS data:
+• Required accuracy: 50 meters or better
+• Required: Valid altitude reading
+• Progress indicator shown while waiting
+• Option to save with current data if GPS takes too long
+
+This ensures your flight logs have accurate position data, especially useful for:
+• Tracking takeoff/landing locations
+• Recording waypoints during flight
+• Maintaining accurate flight records
+
+**Checklist Completion**
+When you finish a checklist, a confirmation dialog appears:
+• Shows "Checklist Completed" message
+• **Exit button**: Returns to home screen AND resets checklist progress (ready for next use)
+• **Back button**: Returns to previous step/page to review
+
+This applies to both modes:
+• Step-by-step: When pressing Next on last step
+• Full-list: When all checkboxes are checked on last page
+
+**Benefits:**
+• Prevents accidental exits before finishing
+• Clear confirmation of completion
+• Quick reset for repeated use
+• Option to review before exiting
+                """.trimIndent() else """
+**Precisión GPS para Logging**
+Al crear entradas de log, la app espera datos GPS precisos:
+• Precisión requerida: 50 metros o mejor
+• Requerido: Lectura de altitud válida
+• Indicador de progreso mientras espera
+• Opción de guardar con datos actuales si GPS tarda demasiado
+
+Esto asegura que tus logs de vuelo tengan datos de posición precisos, útil para:
+• Rastrear ubicaciones de despegue/aterrizaje
+• Registrar waypoints durante el vuelo
+• Mantener registros de vuelo precisos
+
+**Finalización de Checklist**
+Al terminar un checklist, aparece un diálogo de confirmación:
+• Muestra mensaje "Checklist Completado"
+• **Botón Salir**: Regresa a pantalla principal Y reinicia progreso del checklist (listo para próximo uso)
+• **Botón Volver**: Regresa al paso/página anterior para revisar
+
+Aplica a ambos modos:
+• Paso a paso: Al presionar Siguiente en el último paso
+• Lista completa: Cuando todas las casillas están marcadas en la última página
+
+**Beneficios:**
+• Evita salidas accidentales antes de terminar
+• Confirmación clara de finalización
+• Reinicio rápido para uso repetido
+• Opción de revisar antes de salir
+                """.trimIndent()
+            )
+
             // 7. YAML Editor
             HelpCard(
                 title = if (isEnglish) "8. YAML Editor - Advanced Editing" else "8. Editor YAML - Edición Avanzada",

@@ -56,6 +56,9 @@ class SensorDataRepository(private val context: Context) {
     private val _speedKmh = MutableStateFlow<Float?>(null)
     val speedKmh: StateFlow<Float?> = _speedKmh.asStateFlow()
 
+    private val _accuracy = MutableStateFlow<Float?>(null)
+    val accuracy: StateFlow<Float?> = _accuracy.asStateFlow()
+
     private val _pressure = MutableStateFlow<Float?>(null)
     val pressure: StateFlow<Float?> = _pressure.asStateFlow()
 
@@ -159,6 +162,12 @@ class SensorDataRepository(private val context: Context) {
                     } else {
                         null
                     }
+                    // Accuracy in meters
+                    _accuracy.value = if (location.hasAccuracy()) {
+                        location.accuracy
+                    } else {
+                        null
+                    }
                 }
 
                 @Deprecated("Deprecated in API 29")
@@ -214,6 +223,7 @@ class SensorDataRepository(private val context: Context) {
                 _latitude.value = it.latitude
                 _longitude.value = it.longitude
                 _speedKmh.value = if (it.hasSpeed()) it.speed * 3.6f else null
+                _accuracy.value = if (it.hasAccuracy()) it.accuracy else null
             }
 
         } catch (e: SecurityException) {
