@@ -114,9 +114,9 @@ class LogRepository(
      * @return true si se guardó correctamente
      */
     suspend fun addLogEntry(
-        latitude: Double,
-        longitude: Double,
-        altitudeMeters: Double,
+        latitude: Double?,
+        longitude: Double?,
+        altitudeMeters: Double?,
         speedKmh: Float?,
         logText: String,
         language: String = "es"
@@ -128,25 +128,28 @@ class LogRepository(
             // Obtener timestamp UTC
             val utcTime = dateFormat.format(Date())
 
-            // Detectar aeródromo usando criterios de posición horizontal y altitud
-            // Los valores de distancia y altitud son configurables desde Settings
-            val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
-            val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
+            // Detectar aeródromo solo si tenemos coordenadas válidas
+            val icaoCode = if (latitude != null && longitude != null && altitudeMeters != null) {
+                val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
+                val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
 
-            val icaoCode = aerodromeRepository.findNearestAerodrome(
-                latitude = latitude,
-                longitude = longitude,
-                altitudeMeters = altitudeMeters,
-                maxDistanceKm = maxDistanceKm.toDouble(),
-                maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
-            )
+                aerodromeRepository.findNearestAerodrome(
+                    latitude = latitude,
+                    longitude = longitude,
+                    altitudeMeters = altitudeMeters,
+                    maxDistanceKm = maxDistanceKm.toDouble(),
+                    maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
+                )
+            } else {
+                null
+            }
 
-            // Crear entrada
+            // Crear entrada (permitiendo coordenadas NULL)
             val entry = LogEntry(
                 utcTime = utcTime,
-                latitude = latitude,
-                longitude = longitude,
-                altitudeMeters = altitudeMeters,
+                latitude = latitude ?: 0.0,
+                longitude = longitude ?: 0.0,
+                altitudeMeters = altitudeMeters ?: 0.0,
                 icaoCode = icaoCode,
                 logText = logText
             )
@@ -156,11 +159,18 @@ class LogRepository(
                 val line = buildString {
                     append(entry.utcTime)
                     append(";")
-                    append(String.format(Locale.US, "%.6f", entry.latitude))
+                    // Dejar vacío si no hay coordenadas
+                    if (latitude != null) {
+                        append(String.format(Locale.US, "%.6f", latitude))
+                    }
                     append(";")
-                    append(String.format(Locale.US, "%.6f", entry.longitude))
+                    if (longitude != null) {
+                        append(String.format(Locale.US, "%.6f", longitude))
+                    }
                     append(";")
-                    append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                    if (altitudeMeters != null) {
+                        append(String.format(Locale.US, "%.1f", altitudeMeters))
+                    }
                     append(";")
                     append(entry.icaoCode ?: "")
                     append(";")

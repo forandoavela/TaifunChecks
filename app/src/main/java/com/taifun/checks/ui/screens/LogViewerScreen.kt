@@ -43,13 +43,14 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogViewerScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    sensorDataRepo: SensorDataRepository
 ) {
     val ctx = LocalContext.current
     val haptic = rememberHapticFeedback()
     val settingsRepo = remember(ctx.applicationContext) { SettingsRepository(ctx.applicationContext) }
     val logRepo = remember(ctx.applicationContext) { LogRepository(ctx.applicationContext, settingsRepo) }
-    val sensorRepo = remember(ctx.applicationContext) { SensorDataRepository(ctx.applicationContext) }
+    val sensorRepo = sensorDataRepo  // Usar la instancia persistente de MainActivity
     val scope = rememberCoroutineScope()
 
     var entries by remember { mutableStateOf<List<LogEntry>>(emptyList()) }
@@ -269,14 +270,10 @@ fun LogViewerScreen(
                         return@launch
                     }
 
+                    // Permitir guardar sin GPS (coordenadas vacías pero con hora y texto)
                     val lat = latitude
                     val lon = longitude
                     val alt = altitude
-
-                    if (lat == null || lon == null || alt == null) {
-                        Toast.makeText(ctx, ctx.getString(R.string.custom_log_no_gps), Toast.LENGTH_LONG).show()
-                        return@launch
-                    }
 
                     val success = logRepo.addLogEntry(
                         latitude = lat,
@@ -305,18 +302,9 @@ fun LogViewerScreen(
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback()
-                    // Verificar si tenemos permisos de ubicación
-                    val hasLocationPermission = ContextCompat.checkSelfPermission(
-                        ctx,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                    if (hasLocationPermission) {
-                        showCustomLogDialog = true
-                    } else {
-                        // Solicitar permisos
-                        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
+                    // Permitir crear logs personalizados siempre
+                    // Si no hay GPS disponible, guardará solo hora y texto (coordenadas vacías)
+                    showCustomLogDialog = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {

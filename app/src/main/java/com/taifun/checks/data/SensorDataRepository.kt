@@ -18,13 +18,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.pow
 
 /**
+ * Data source for GPS/location data
+ */
+enum class GpsSource {
+    INTERNAL,   // Device's internal GPS
+    BLUETOOTH   // External Bluetooth GPS device
+}
+
+/**
  * Repositorio para gestionar datos de sensores (GPS, barómetro)
  * utilizados en funciones opcionales de pasos
+ * Supports both internal GPS and external Bluetooth GPS sources
  */
 class SensorDataRepository(private val context: Context) {
 
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val locationManager: LocationManager? = try {
+        context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+    } catch (e: Exception) {
+        null
+    }
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
+    // Current GPS source
+    private val _gpsSource = MutableStateFlow(GpsSource.INTERNAL)
+    val gpsSource: StateFlow<GpsSource> = _gpsSource.asStateFlow()
 
     // Flujos de datos
     private val _altitude = MutableStateFlow<Double?>(null)
@@ -46,13 +63,89 @@ class SensorDataRepository(private val context: Context) {
     private var pressureListener: SensorEventListener? = null
 
     /**
+     * Set the GPS data source
+     */
+    fun setGpsSource(source: GpsSource) {
+        _gpsSource.value = source
+
+        // If switching to internal GPS, stop internal tracking and restart it
+        // If switching to Bluetooth, stop internal tracking
+        if (source == GpsSource.INTERNAL && locationListener == null) {
+            startLocationTracking()
+        } else if (source == GpsSource.BLUETOOTH) {
+            stopLocationTracking()
+        }
+    }
+
+    /**
+     * Check if device has GPS hardware
+     */
+    fun hasGpsHardware(): Boolean {
+        return locationManager?.allProviders?.any { provider ->
+            provider == LocationManager.GPS_PROVIDER || provider == LocationManager.NETWORK_PROVIDER
+        } ?: false
+    }
+
+    /**
+     * Update GPS data from external source (e.g., Bluetooth GPS)
+     * Call this method when receiving data from BluetoothGpsRepository
+     */
+    fun updateExternalGpsData(
+        latitude: Double?,
+        longitude: Double?,
+        altitude: Double?,
+        speedKmh: Float?
+    ) {
+        if (_gpsSource.value == GpsSource.BLUETOOTH) {
+            _latitude.value = latitude
+            _longitude.value = longitude
+            _altitude.value = altitude
+            _speedKmh.value = speedKmh
+        }
+    }
+
+    /**
+     * Update barometer/pressure data from external source (e.g., Bluetooth Vario)
+     * Call this method when receiving LK8EX1 data from BluetoothGpsRepository
+     * @param pressure Barometric pressure in hPa
+     * @param baroAltitude Barometric altitude in meters (QNE)
+     *
+     * Note: Variometer data is independent from GPS source - you can have:
+     * - Internal GPS + Bluetooth Variometer
+     * - Bluetooth GPS + Bluetooth Variometer
+     * - Internal GPS + Internal Barometer + Bluetooth Variometer (vario overrides)
+     */
+    fun updateExternalBarometerData(
+        pressure: Float?,
+        baroAltitude: Double?
+    ) {
+        // Always update pressure from external variometer (independent from GPS source)
+        pressure?.let { _pressure.value = it }
+
+        // If we have barometric altitude but no GPS altitude, use it
+        // This is useful when there's no GPS fix
+        if (baroAltitude != null && _altitude.value == null) {
+            _altitude.value = baroAltitude
+        }
+    }
+
+    /**
      * Inicia el seguimiento de ubicación GPS
      */
     fun startLocationTracking() {
+        // Check if LocationManager is available
+        if (locationManager == null) return
+
         if (!hasLocationPermission()) return
 
         // Si ya hay un listener, no crear otro
         if (locationListener != null) return
+
+        // Only start if using internal GPS
+        if (_gpsSource.value != GpsSource.INTERNAL) return
+
+        // Check if GPS hardware is available
+        if (!hasGpsHardware()) return
 
         try {
             val listener = object : LocationListener {
@@ -98,8 +191,13 @@ class SensorDataRepository(private val context: Context) {
             }
 
             // Obtener última ubicación conocida de ambos proveedores
-            val gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            val gpsLocation = try {
+                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            } catch (e: Exception) { null }
+
+            val networkLocation = try {
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            } catch (e: Exception) { null }
 
             // Usar la más reciente
             val lastKnown = when {
@@ -151,7 +249,9 @@ class SensorDataRepository(private val context: Context) {
      * Detiene el seguimiento de ubicación
      */
     fun stopLocationTracking() {
-        locationListener?.let { locationManager.removeUpdates(it) }
+        locationListener?.let {
+            locationManager?.removeUpdates(it)
+        }
         locationListener = null
     }
 

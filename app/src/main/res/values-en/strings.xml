@@ -80,6 +80,45 @@
     <string name="icao_db_empty_desc">The aerodromes.csv.gz file was not loaded correctly</string>
     <string name="icao_db_loaded">✓ %d aerodromes loaded</string>
     <string name="icao_db_operational">ICAO detection is operational</string>
+
+    <!-- Bluetooth GPS Settings -->
+    <string name="gps_section">GPS</string>
+    <string name="gps_source_label">GPS data source</string>
+    <string name="gps_source_internal">Internal GPS</string>
+    <string name="gps_not_available">GPS not available on this device</string>
+    <string name="gps_source_bluetooth">Bluetooth GPS (NMEA)</string>
+    <string name="gps_source_bluetooth_desc">Use external GPS device via Bluetooth</string>
+    <string name="bt_gps_status">Connection status</string>
+    <string name="bt_gps_disconnected">Disconnected (%s)</string>
+    <string name="bt_gps_no_device">No device configured</string>
+    <string name="bt_gps_data">GPS: %.5f°, %.5f° | Alt: %.0fm</string>
+    <string name="bt_gps_select_device">Select device</string>
+    <string name="bt_gps_change_device">Change device</string>
+    <string name="bt_gps_connect">Connect</string>
+    <string name="bt_gps_disconnect">Disconnect</string>
+    <string name="bt_gps_reconnect">Reconnect</string>
+    <string name="bt_gps_auto_connect">Auto-connect</string>
+    <string name="bt_gps_auto_connect_desc">Connect on app startup</string>
+    <string name="bt_gps_no_paired_devices">No paired Bluetooth devices. Pair a GPS device in system Bluetooth settings.</string>
+    <string name="bt_gps_paired_devices">Paired devices:</string>
+    <string name="bt_gps_unknown_device">Unknown device</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Bluetooth Variometer Settings -->
+    <string name="vario_section">Bluetooth Variometer</string>
+    <string name="vario_section_desc">Independent device for pressure, barometric altitude and vario</string>
+    <string name="bt_vario_status">Variometer status</string>
+    <string name="bt_vario_disconnected">Variometer disconnected (%s)</string>
+    <string name="bt_vario_no_device">No variometer configured</string>
+    <string name="bt_vario_data">Vario: %+.1f m/s | P: %.1f hPa | Baro alt: %.0fm</string>
+    <string name="bt_vario_select_device">Select variometer</string>
+    <string name="bt_vario_change_device">Change variometer</string>
+    <string name="bt_vario_connect">Connect variometer</string>
+    <string name="bt_vario_disconnect">Disconnect variometer</string>
+    <string name="bt_vario_reconnect">Reconnect variometer</string>
+    <string name="bt_vario_auto_connect">Auto-connect variometer</string>
+    <string name="bt_vario_auto_connect_desc">Connect variometer on startup</string>
+
     <string name="help_button">Help</string>
     <string name="app_info_section">App Information</string>
     <string name="app_version">Version 1.0</string>

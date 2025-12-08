@@ -23,7 +23,7 @@ android {
 
         val majorVersion = 1      // w - versión principal
         val minorVersion = 0      // x - grandes funcionalidades
-        val patchVersion = 3      // yy - grupos de mejoras (00-99)
+        val patchVersion = 4      // yy - grupos de mejoras (00-99)
 
         // Intentar obtener el número de commits desde el último tag para zz (auto-incrementado)
         val buildVersion = try {

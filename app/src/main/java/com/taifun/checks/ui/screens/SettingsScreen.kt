@@ -15,13 +15,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
+import com.taifun.checks.data.BluetoothGpsRepository
+import com.taifun.checks.data.SensorDataRepository
 import com.taifun.checks.data.SettingsRepository
+import com.taifun.checks.ui.components.BluetoothGpsSettings
 import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    sensorDataRepo: SensorDataRepository,
+    bluetoothGpsRepo: BluetoothGpsRepository,
+    bluetoothVarioRepo: BluetoothGpsRepository
+) {
     val ctx = LocalContext.current
     val repo = remember { SettingsRepository(ctx) }
     val scope = rememberCoroutineScope()
@@ -46,6 +54,14 @@ fun SettingsScreen(onBack: () -> Unit) {
             aerodromeCount = aerodromeRepo.getAerodromeCount()
         } catch (e: Exception) {
             aerodromeCount = -1 // Error
+        }
+    }
+
+    // Cleanup Bluetooth resources when leaving screen
+    DisposableEffect(Unit) {
+        onDispose {
+            // Don't disconnect here - keep connection alive
+            // bluetoothGpsRepo.cleanup()
         }
     }
 
@@ -527,6 +543,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Bluetooth GPS Settings
+            BluetoothGpsSettings(
+                settingsRepo = repo,
+                sensorDataRepo = sensorDataRepo,
+                bluetoothGpsRepo = bluetoothGpsRepo,
+                bluetoothVarioRepo = bluetoothVarioRepo
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 

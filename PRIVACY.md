@@ -1,7 +1,7 @@
 # Política de Privacidad / Privacy Policy
 
-**Última actualización / Last updated**: 2025-11-19
-**Versión / Version**: 1.0.00.00
+**Última actualización / Last updated**: 2025-11-30
+**Versión / Version**: 1.0.01.zz
 
 ---
 
@@ -79,7 +79,34 @@ La aplicación utiliza el GPS de dos formas distintas y opcionales:
 - **No se graban, almacenan ni transmiten conversaciones**
 - Solo se procesan comandos de navegación específicos ("Anterior", "Siguiente", etc.)
 
-#### 2.4 Archivos de Checklist
+#### 2.4 Conexión Bluetooth (Opcional)
+
+**Propósito:**
+- Conectar dispositivos GPS externos vía Bluetooth para obtener datos de ubicación y altitud más precisos
+- Usar dispositivos GPS profesionales de aviación (Garmin GLO, Bad Elf GPS, etc.)
+
+**Cómo Funciona:**
+- **Completamente opcional**: La aplicación funciona plenamente sin usar GPS Bluetooth
+- **Control total del usuario**: Usted decide si conectar un dispositivo Bluetooth y cuándo
+- **Solo dispositivos emparejados**: Solo puede conectarse a dispositivos que YA haya emparejado en los ajustes de Bluetooth del sistema
+- **Solo comunicación local**: La conexión Bluetooth es directa entre su teléfono y el dispositivo GPS
+
+**Datos Recibidos (cuando conectado a GPS Bluetooth):**
+- Mensajes NMEA estándar del dispositivo GPS (latitud, longitud, altitud, velocidad)
+- Estos datos reemplazan temporalmente los datos del GPS interno del teléfono
+- Se procesan de la misma forma que los datos del GPS interno (ver secciones 2.1A y 2.1B)
+
+**Privacidad:**
+- **No se escanean dispositivos automáticamente**: Solo muestra dispositivos ya emparejados
+- **No se transmiten datos fuera del dispositivo**: La conexión Bluetooth es solo para recibir datos del GPS
+- **Misma política de privacidad**: Los datos GPS recibidos vía Bluetooth se tratan igual que los datos del GPS interno
+- **Configuración persistente**: La aplicación guarda el nombre y dirección del dispositivo seleccionado para reconexión automática (opcional)
+
+**Permisos solicitados:**
+- `BLUETOOTH` / `BLUETOOTH_ADMIN` (Android 11 y anteriores)
+- `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` (Android 12+)
+
+#### 2.5 Archivos de Checklist
 
 - Los checklists creados o modificados se almacenan **localmente** en su dispositivo
 - La aplicación **no tiene acceso a internet** para transmitir datos
@@ -183,6 +210,8 @@ La aplicación solicita los siguientes permisos:
 |---------|-----|-------------|
 | `ACCESS_FINE_LOCATION` | (A) Obtener altitud GPS para calibración de altímetro (temporal, no se guarda)<br>(B) Obtener coordenadas GPS para flight logging (solo cuando el usuario lo activa) | No |
 | `ACCESS_COARSE_LOCATION` | Respaldo para GPS | No |
+| `BLUETOOTH` / `BLUETOOTH_ADMIN` | Conectar a dispositivos GPS externos vía Bluetooth (Android 11 y anteriores) | No |
+| `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` | Conectar a dispositivos GPS externos vía Bluetooth (Android 12+) | No |
 | `RECORD_AUDIO` | Control por voz (comandos de navegación) | No |
 | `INTERNET` | Abrir enlaces en navegador (función opcional de pasos) | No |
 | `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` | Guardar logs CSV en Download/FlightChecks/ e importar logs existentes | No |
@@ -297,7 +326,34 @@ The application uses GPS in two distinct and optional ways:
 - **Conversations are NOT recorded, stored, or transmitted**
 - Only specific navigation commands are processed ("Previous", "Next", etc.)
 
-#### 2.4 Checklist Files
+#### 2.4 Bluetooth Connection (Optional)
+
+**Purpose:**
+- Connect external GPS devices via Bluetooth to obtain more accurate location and altitude data
+- Use professional aviation GPS devices (Garmin GLO, Bad Elf GPS, etc.)
+
+**How It Works:**
+- **Completely optional**: The application works fully without using Bluetooth GPS
+- **Full user control**: You decide whether to connect a Bluetooth device and when
+- **Paired devices only**: Can only connect to devices you have ALREADY paired in system Bluetooth settings
+- **Local communication only**: Bluetooth connection is direct between your phone and the GPS device
+
+**Data Received (when connected to Bluetooth GPS):**
+- Standard NMEA messages from GPS device (latitude, longitude, altitude, speed)
+- This data temporarily replaces data from the phone's internal GPS
+- Processed the same way as internal GPS data (see sections 2.1A and 2.1B)
+
+**Privacy:**
+- **No automatic device scanning**: Only shows already paired devices
+- **No data transmitted outside device**: Bluetooth connection is only for receiving GPS data
+- **Same privacy policy**: GPS data received via Bluetooth is treated the same as internal GPS data
+- **Persistent configuration**: App saves selected device name and address for auto-reconnect (optional)
+
+**Permissions requested:**
+- `BLUETOOTH` / `BLUETOOTH_ADMIN` (Android 11 and earlier)
+- `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` (Android 12+)
+
+#### 2.5 Checklist Files
 
 - Created or modified checklists are stored **locally** on your device
 - The application **has no internet access** to transmit data
@@ -401,6 +457,8 @@ The application requests the following permissions:
 |------------|-----|----------|
 | `ACCESS_FINE_LOCATION` | (A) Obtain GPS altitude for altimeter calibration (temporary, not saved)<br>(B) Obtain GPS coordinates for flight logging (only when user activates it) | No |
 | `ACCESS_COARSE_LOCATION` | Backup for GPS | No |
+| `BLUETOOTH` / `BLUETOOTH_ADMIN` | Connect to external GPS devices via Bluetooth (Android 11 and earlier) | No |
+| `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT` | Connect to external GPS devices via Bluetooth (Android 12+) | No |
 | `RECORD_AUDIO` | Voice control (navigation commands) | No |
 | `INTERNET` | Open links in browser (optional step feature) | No |
 | `READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE` | Save CSV logs to Download/FlightChecks/ and import existing logs | No |
