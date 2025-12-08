@@ -39,8 +39,9 @@ fun GpsWaitingDialog(
     onSaveAnyway: () -> Unit,
     onGpsReady: () -> Unit
 ) {
-    // Check if GPS is good enough
-    val isGpsGood = accuracy != null && accuracy <= GPS_REQUIRED_ACCURACY_M && altitude != null
+    // Check if GPS is good enough using same logic as isGpsAccurateForLogging
+    // For Bluetooth/NMEA GPS without accuracy data, only require altitude
+    val isGpsGood = isGpsAccurateForLogging(accuracy, altitude)
 
     // Track if we've timed out
     var hasTimedOut by remember { mutableStateOf(false) }
@@ -97,6 +98,7 @@ fun GpsWaitingDialog(
                 }
 
                 // Show current accuracy
+                // For NMEA GPS without accuracy data, show neutral color if altitude is available
                 Text(
                     text = if (accuracy != null) {
                         stringResource(R.string.gps_accuracy_current, String.format(Locale.US, "%.0f m", accuracy))
@@ -104,10 +106,10 @@ fun GpsWaitingDialog(
                         stringResource(R.string.gps_accuracy_unknown)
                     },
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (accuracy != null && accuracy <= GPS_REQUIRED_ACCURACY_M) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.error
+                    color = when {
+                        accuracy != null && accuracy <= GPS_REQUIRED_ACCURACY_M -> MaterialTheme.colorScheme.primary
+                        accuracy == null && altitude != null -> MaterialTheme.colorScheme.onSurfaceVariant // NMEA GPS OK
+                        else -> MaterialTheme.colorScheme.error
                     }
                 )
 
@@ -145,10 +147,19 @@ fun GpsWaitingDialog(
 /**
  * Checks if GPS data meets logging requirements
  *
- * @param accuracy GPS accuracy in meters
+ * For internal GPS: requires accuracy <= 50m and valid altitude
+ * For Bluetooth/NMEA GPS: if accuracy data is not available (null),
+ * only requires valid altitude (skip accuracy verification)
+ *
+ * @param accuracy GPS accuracy in meters (null for NMEA GPS without accuracy data)
  * @param altitude GPS altitude in meters
  * @return true if GPS data is accurate enough for logging
  */
 fun isGpsAccurateForLogging(accuracy: Float?, altitude: Double?): Boolean {
-    return accuracy != null && accuracy <= GPS_REQUIRED_ACCURACY_M && altitude != null
+    // Must have altitude in all cases
+    if (altitude == null) return false
+    // If accuracy is null (e.g., Bluetooth/NMEA GPS without accuracy data), skip accuracy check
+    if (accuracy == null) return true
+    // Otherwise require accuracy <= 50m
+    return accuracy <= GPS_REQUIRED_ACCURACY_M
 }

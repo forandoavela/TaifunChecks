@@ -194,35 +194,6 @@ fun StepScreen(
         )
     }
 
-    // Checklist completion dialog
-    if (showCompletionDialog) {
-        AlertDialog(
-            onDismissRequest = { /* Don't dismiss on outside click */ },
-            title = { Text(stringResource(R.string.checklist_completed_title)) },
-            text = { Text(stringResource(R.string.checklist_completed_message)) },
-            confirmButton = {
-                // Exit button (right side) - reset and go home
-                TextButton(onClick = {
-                    haptic.performStrongFeedback()
-                    vm.reset() // Reset checklist progress
-                    showCompletionDialog = false
-                    onBack() // Go to home
-                }) {
-                    Text(stringResource(R.string.checklist_exit))
-                }
-            },
-            dismissButton = {
-                // Back button (left side) - return to previous step/page
-                TextButton(onClick = {
-                    haptic.performLightFeedback()
-                    showCompletionDialog = false
-                    // Go back to previous step/page (no need to navigate, just close dialog)
-                }) {
-                    Text(stringResource(R.string.checklist_back))
-                }
-            }
-        )
-    }
 
     // Speech recognizer
     val speechRecognizer = remember {
@@ -240,9 +211,13 @@ fun StepScreen(
     }
 
     // Funciones de navegación (usando ViewModel para persistencia)
+    // Also handles voice commands when completion screen is shown
     val onPrevious = {
         haptic.performHapticFeedback()
-        if (isFullList) {
+        if (showCompletionDialog) {
+            // Voice command "anterior/previous" on completion screen -> go back to previous step
+            showCompletionDialog = false
+        } else if (isFullList) {
             if (page > 0) vm.prevPage() else onBack()
         } else {
             if (index > 0) vm.prevStep() else onBack()
@@ -251,7 +226,12 @@ fun StepScreen(
 
     val onNext = {
         haptic.performHapticFeedback()
-        if (isFullList) {
+        if (showCompletionDialog) {
+            // Voice command "siguiente/next" on completion screen -> exit (reset and go home)
+            vm.reset()
+            showCompletionDialog = false
+            onBack()
+        } else if (isFullList) {
             val pasos = checklist?.pasos.orEmpty()
             val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / 10 + 1)
             if (page < totalPages - 1) vm.nextPage(totalPages - 1) else showCompletionDialog = true
@@ -396,49 +376,71 @@ fun StepScreen(
             )
         }
     ) { pad ->
-        if (!isFullList) {
-            StepByStepMode(
-                checklist = checklist,
-                index = index,
-                total = total,
-                onPrevious = onPrevious,
-                onNext = onNext,
-                showButtons = !voiceControlEnabled,
-                altitude = altitude,
-                pressure = pressure,
-                latitude = latitude,
-                longitude = longitude,
-                speedKmh = speedKmh,
-                sensorRepo = sensorRepo,
-                logRepo = logRepo,
-                language = currentLanguage,
-                modifier = Modifier.padding(pad)
-            )
-        } else {
-            FullListMode(
-                checklist = checklist,
-                checked = checked,
-                onCheckedChange = { newChecked ->
-                    vm.setChecked(newChecked) // Persistir en ViewModel
-                },
-                page = page,
-                onPageChange = { newPage ->
-                    vm.setPage(newPage) // Persistir en ViewModel
-                },
-                onBack = onBack,
-                onComplete = { showCompletionDialog = true },
-                showButtons = !voiceControlEnabled,
-                altitude = altitude,
-                pressure = pressure,
-                latitude = latitude,
-                longitude = longitude,
-                speedKmh = speedKmh,
-                sensorRepo = sensorRepo,
-                logRepo = logRepo,
-                language = currentLanguage,
-                haptic = haptic,
-                modifier = Modifier.padding(pad)
-            )
+        when {
+            showCompletionDialog -> {
+                // Full screen completion view - same look and feel as step-by-step mode
+                CompletionScreen(
+                    checklistTitle = checklist?.titulo ?: "",
+                    onBack = {
+                        haptic.performLightFeedback()
+                        showCompletionDialog = false
+                        // Return to previous step/page
+                    },
+                    onExit = {
+                        haptic.performStrongFeedback()
+                        vm.reset() // Reset checklist progress
+                        showCompletionDialog = false
+                        onBack() // Go to home
+                    },
+                    showButtons = !voiceControlEnabled,
+                    modifier = Modifier.padding(pad)
+                )
+            }
+            !isFullList -> {
+                StepByStepMode(
+                    checklist = checklist,
+                    index = index,
+                    total = total,
+                    onPrevious = onPrevious,
+                    onNext = onNext,
+                    showButtons = !voiceControlEnabled,
+                    altitude = altitude,
+                    pressure = pressure,
+                    latitude = latitude,
+                    longitude = longitude,
+                    speedKmh = speedKmh,
+                    sensorRepo = sensorRepo,
+                    logRepo = logRepo,
+                    language = currentLanguage,
+                    modifier = Modifier.padding(pad)
+                )
+            }
+            else -> {
+                FullListMode(
+                    checklist = checklist,
+                    checked = checked,
+                    onCheckedChange = { newChecked ->
+                        vm.setChecked(newChecked) // Persistir en ViewModel
+                    },
+                    page = page,
+                    onPageChange = { newPage ->
+                        vm.setPage(newPage) // Persistir en ViewModel
+                    },
+                    onBack = onBack,
+                    onComplete = { showCompletionDialog = true },
+                    showButtons = !voiceControlEnabled,
+                    altitude = altitude,
+                    pressure = pressure,
+                    latitude = latitude,
+                    longitude = longitude,
+                    speedKmh = speedKmh,
+                    sensorRepo = sensorRepo,
+                    logRepo = logRepo,
+                    language = currentLanguage,
+                    haptic = haptic,
+                    modifier = Modifier.padding(pad)
+                )
+            }
         }
     }
 }
@@ -1404,6 +1406,153 @@ private fun FullListMode(
                     modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
                     Text(stringResource(R.string.siguiente))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Full-screen completion view with same look and feel as step-by-step mode.
+ * Designed for glove use with large buttons and voice control support.
+ *
+ * Voice commands: "siguiente/next" to exit, "anterior/previous" to go back
+ */
+@Composable
+private fun CompletionScreen(
+    checklistTitle: String,
+    onBack: () -> Unit,
+    onExit: () -> Unit,
+    showButtons: Boolean,
+    modifier: Modifier = Modifier
+) {
+    // Usar BoxWithConstraints para detectar orientación de forma confiable
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Calcular orientación basado en las dimensiones reales del contenedor
+        val isPortrait = maxHeight > maxWidth
+        val screenHeight = maxHeight
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Título indicando finalización
+            Text(
+                text = stringResource(R.string.checklist_completed_title),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            // Contenido central con mensaje de completado
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // Icono de check grande
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = stringResource(R.string.checklist_completed_title),
+                        modifier = Modifier.size(if (isPortrait) 96.dp else 80.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+
+                    // Mensaje de completado
+                    Text(
+                        text = stringResource(R.string.checklist_completed_message),
+                        fontSize = if (isPortrait) 28.sp else 32.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineLarge,
+                        lineHeight = if (isPortrait) 34.sp else 38.sp,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    // Nombre del checklist
+                    if (checklistTitle.isNotEmpty()) {
+                        Text(
+                            text = checklistTitle,
+                            fontSize = if (isPortrait) 18.sp else 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // Botones grandes (solo si no está en modo voz)
+            if (showButtons) {
+                // Ajustar altura de botones según orientación (igual que StepByStepMode)
+                val buttonHeight = if (isPortrait) {
+                    // Vertical: 20% con mínimo 100dp
+                    (screenHeight * 0.20f).coerceAtLeast(100.dp)
+                } else {
+                    // Horizontal: 40dp fijo (pequeño para dar espacio al contenido)
+                    40.dp
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(buttonHeight),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Botón "Volver" (izquierda) - vuelve al paso anterior
+                    Button(
+                        onClick = onBack,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 2.dp,
+                            pressedElevation = 6.dp
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.checklist_back),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    // Botón "Salir" (derecha) - resetea y va al inicio
+                    Button(
+                        onClick = onExit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 2.dp,
+                            pressedElevation = 6.dp
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.checklist_exit),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
