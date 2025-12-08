@@ -42,6 +42,9 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_BT_VARIO_DEVICE_ADDRESS = stringPreferencesKey("bt_vario_device_address")
     private val KEY_BT_VARIO_AUTO_CONNECT = booleanPreferencesKey("bt_vario_auto_connect")
 
+    // Voice control (persistent across app)
+    private val KEY_VOICE_CONTROL = booleanPreferencesKey("voice_control_enabled")
+
     // SharedPreferences para acceso síncrono al idioma
     private val syncPrefs: SharedPreferences = ctx.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -65,6 +68,9 @@ class SettingsRepository(private val ctx: Context) {
     val btVarioDeviceNameFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_NAME] }
     val btVarioDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_ADDRESS] }
     val btVarioAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_AUTO_CONNECT] ?: false }
+
+    // Voice control flow (persistent across all checklists)
+    val voiceControlFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_VOICE_CONTROL] ?: false }
 
     /**
      * Obtiene el idioma de forma síncrona (para usar en attachBaseContext)
@@ -148,5 +154,10 @@ class SettingsRepository(private val ctx: Context) {
 
     suspend fun setBtVarioAutoConnect(enabled: Boolean) {
         ctx.settingsDataStore.edit { it[KEY_BT_VARIO_AUTO_CONNECT] = enabled }
+    }
+
+    // Voice control setter (persistent across all checklists)
+    suspend fun setVoiceControl(enabled: Boolean) {
+        ctx.settingsDataStore.edit { it[KEY_VOICE_CONTROL] = enabled }
     }
 }

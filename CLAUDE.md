@@ -1,8 +1,8 @@
 # CLAUDE.md - AI Assistant Guide for FlightChecks
 
-**Last Updated**: 2025-11-19
+**Last Updated**: 2025-12-08
 **Project**: Taifun Checks - Aviation Checklist App
-**Version**: 1.0.00.00 (New versioning system: w.x.yy.zz)
+**Version**: 1.0.05.00 (Versioning system: w.x.yy.zz)
 **Type**: Android Native (Kotlin + Jetpack Compose)
 
 ---
@@ -1043,6 +1043,7 @@ When explaining code to developers:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-12-08 | 1.4 | Added GPS accuracy logging, checklist completion dialog, independent variometer docs |
 | 2025-11-30 | 1.2 | Added Bluetooth GPS support documentation |
 | 2025-11-19 | 1.1 | Updated versioning system to w.x.yy.zz format |
 | 2025-11-17 | 1.0 | Initial CLAUDE.md creation |

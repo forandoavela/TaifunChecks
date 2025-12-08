@@ -1,6 +1,6 @@
 # Taifun Checks - Aviation Checklist App
 
-![Version](https://img.shields.io/badge/version-1.0.00.00-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.05.00-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Android-green.svg)
 ![Language](https://img.shields.io/badge/language-Kotlin-purple.svg)
 
@@ -689,11 +689,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 1.0.00.00
-**Last Updated**: 2025-11-19
+**Version**: 1.0.05.00
+**Last Updated**: 2025-12-08
 **Maintainer**: Jorge Mármol
 
 ## Changelog
+
+### v1.0.05.zz (2025-12-08)
+- **GPS Accuracy for Logging**: Logs now wait for accurate GPS fix (≤50m accuracy with valid altitude)
+  - Progress indicator shown while waiting for GPS lock
+  - Prevents logging inaccurate or stale location data
+- **Checklist Completion Dialog**: New confirmation dialog when finishing a checklist
+  - Exit button to return to home and reset progress
+  - Back button to review previous steps
+  - Applies to both step-by-step and full-list modes
+
+### v1.0.04.zz (2025-12-01)
+- **Independent Bluetooth Variometer**: Support for variometer as separate device from GPS
+  - Can use internal GPS + Bluetooth variometer simultaneously
+  - Dedicated settings section for variometer configuration
+  - Real-time vario, pressure, and barometric altitude display
+- **BlueFlyVario Protocol Improvements**: Fixed hexadecimal value parsing
+  - Auto-detection of BlueFlyVario-specific protocol variants
+  - Debug UI to display raw NMEA sentences for troubleshooting
+- **Unified Bluetooth UI**: Consistent styling between GPS and variometer sections
+- **Persistent Bluetooth Connections**: GPS connection maintained across screen changes
+- **Optional Hardware Features**: GPS, Bluetooth, and microphone marked as optional
+  - App works on devices without GPS hardware
+  - Graceful fallback when hardware unavailable
+- **Custom Log Improvements**: Allow creating logs without GPS data
 
 ### v1.0.01.zz (2025-11-30)
 - **Bluetooth GPS & Variometer Support**: Connect external GPS and variometer devices via Bluetooth

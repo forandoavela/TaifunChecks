@@ -664,6 +664,72 @@ Columnas: Timestamp, Texto, Latitud, Longitud, Altitud (m), Código ICAO
                 """.trimIndent()
             )
 
+            // 6c. GPS Accuracy & Checklist Completion
+            HelpCard(
+                title = if (isEnglish) "6c. GPS Accuracy & Completion" else "6c. Precisión GPS y Finalización",
+                content = if (isEnglish) """
+**GPS Accuracy for Logging**
+When creating log entries, the app waits for accurate GPS data:
+• **Internal GPS**: Required accuracy ≤50 meters + valid altitude
+• **Bluetooth/NMEA GPS**: Only altitude required (accuracy check skipped)
+• Progress indicator shown while waiting
+• Option to save with current data if GPS takes too long (30s timeout)
+
+This ensures your flight logs have accurate position data, especially useful for:
+• Tracking takeoff/landing locations
+• Recording waypoints during flight
+• Maintaining accurate flight records
+
+**Checklist Completion Screen**
+When you finish a checklist, a full-screen completion view appears:
+• Shows "Checklist Completed" message with check icon
+• Large buttons optimized for glove use
+• **Exit button (right)**: Returns to home AND resets progress
+• **Back button (left)**: Returns to previous step to review
+• **Voice control**: Say "siguiente/next" to exit, "anterior/previous" to go back
+
+This applies to both modes:
+• Step-by-step: When pressing Next on last step
+• Full-list: When all checkboxes are checked on last page
+
+**Benefits:**
+• Prevents accidental exits before finishing
+• Large buttons work well with gloves
+• Voice commands for hands-free operation
+• Quick reset for repeated use
+                """.trimIndent() else """
+**Precisión GPS para Logging**
+Al crear entradas de log, la app espera datos GPS precisos:
+• **GPS Interno**: Precisión requerida ≤50 metros + altitud válida
+• **GPS Bluetooth/NMEA**: Solo altitud requerida (sin verificación de precisión)
+• Indicador de progreso mientras espera
+• Opción de guardar con datos actuales si GPS tarda (timeout 30s)
+
+Esto asegura que tus logs de vuelo tengan datos de posición precisos, útil para:
+• Rastrear ubicaciones de despegue/aterrizaje
+• Registrar waypoints durante el vuelo
+• Mantener registros de vuelo precisos
+
+**Pantalla de Finalización de Checklist**
+Al terminar un checklist, aparece una pantalla completa de finalización:
+• Muestra mensaje "Checklist Completado" con icono de check
+• Botones grandes optimizados para uso con guantes
+• **Botón Salir (derecha)**: Regresa al inicio Y reinicia progreso
+• **Botón Volver (izquierda)**: Regresa al paso anterior para revisar
+• **Control por voz**: Di "siguiente/next" para salir, "anterior/previous" para volver
+
+Aplica a ambos modos:
+• Paso a paso: Al presionar Siguiente en el último paso
+• Lista completa: Cuando todas las casillas están marcadas en la última página
+
+**Beneficios:**
+• Evita salidas accidentales antes de terminar
+• Botones grandes funcionan bien con guantes
+• Comandos de voz para operación manos libres
+• Reinicio rápido para uso repetido
+                """.trimIndent()
+            )
+
             // 7. YAML Editor
             HelpCard(
                 title = if (isEnglish) "8. YAML Editor - Advanced Editing" else "8. Editor YAML - Edición Avanzada",
