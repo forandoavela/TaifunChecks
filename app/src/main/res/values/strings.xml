@@ -293,6 +293,7 @@
     <string name="custom_log_error">Error al guardar log</string>
     <string name="custom_log_no_gps">GPS no disponible. Asegúrate de tener permisos de ubicación activados.</string>
     <string name="custom_log_empty_text">El texto del log no puede estar vacío</string>
+    <string name="custom_log_required">Texto requerido</string>
     <string name="custom_log_no_permission">Se necesitan permisos de ubicación para crear logs personalizados</string>
 
     <!-- GPS Accuracy Dialog -->

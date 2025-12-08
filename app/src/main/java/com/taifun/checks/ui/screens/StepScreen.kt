@@ -116,7 +116,10 @@ fun StepScreen(
     val page by vm.page.collectAsState()
     val checked by vm.checked.collectAsState()
     val userPreferredFullList by vm.fullList.collectAsState()
-    val voiceControlEnabled by vm.voiceControl.collectAsState()
+
+    // Voice control from SettingsRepository (persistent across all checklists)
+    val voiceControlEnabled by settingsRepo.voiceControlFlow.collectAsState(initial = false)
+    val coroutineScope = rememberCoroutineScope()
 
     // Modo: si el usuario tiene preferencia, usar esa, sino usar la del checklist
     val isFullList = userPreferredFullList ?: (checklist?.fullList == true)
@@ -128,7 +131,7 @@ fun StepScreen(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            vm.setVoiceControl(true)
+            coroutineScope.launch { settingsRepo.setVoiceControl(true) }
         } else {
             Toast.makeText(ctx, ctx.getString(R.string.permission_needed), Toast.LENGTH_SHORT).show()
         }
@@ -345,14 +348,14 @@ fun StepScreen(
                         )
                     }
 
-                    // Control por voz
+                    // Control por voz (persistente en toda la app)
                     IconButton(
                         onClick = {
                             haptic.performHapticFeedback()
                             if (!voiceControlEnabled) {
                                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                             } else {
-                                vm.setVoiceControl(false) // Persistir en ViewModel
+                                coroutineScope.launch { settingsRepo.setVoiceControl(false) }
                             }
                         }
                     ) {

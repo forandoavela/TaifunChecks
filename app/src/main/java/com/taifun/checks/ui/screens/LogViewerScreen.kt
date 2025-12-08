@@ -726,7 +726,9 @@ private fun CustomLogDialog(
     onSave: (String) -> Unit,
     haptic: com.taifun.checks.ui.HapticFeedbackHelper
 ) {
+    // Use key(Unit) to ensure state resets when dialog is shown
     var logText by remember { mutableStateOf("") }
+    val isTextEmpty = logText.isBlank()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -748,17 +750,25 @@ private fun CustomLogDialog(
                     placeholder = { Text(stringResource(R.string.custom_log_text_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
-                    maxLines = 4
+                    maxLines = 4,
+                    isError = false, // No error state, just require text
+                    supportingText = if (isTextEmpty) {
+                        { Text(stringResource(R.string.custom_log_required)) }
+                    } else null
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    haptic.performStrongFeedback()
-                    onSave(logText.trim())
+                    val trimmedText = logText.trim()
+                    // Double-check text is not empty before saving
+                    if (trimmedText.isNotEmpty()) {
+                        haptic.performStrongFeedback()
+                        onSave(trimmedText)
+                    }
                 },
-                enabled = logText.isNotBlank()
+                enabled = !isTextEmpty
             ) {
                 Text(stringResource(R.string.aceptar))
             }
