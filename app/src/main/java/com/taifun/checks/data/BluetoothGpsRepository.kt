@@ -189,18 +189,31 @@ class BluetoothGpsRepository(private val context: Context) {
                             }
                             _rawNmeaSentences.value = currentList
 
-                            // Parse NMEA sentence
+                            // Parse sentence (NMEA or BlueFlyVario)
                             val parsedData = NmeaParser.parse(line)
                             if (parsedData != null) {
                                 // Merge with accumulated data
                                 accumulatedData = NmeaParser.merge(accumulatedData, parsedData)
 
-                                // Update flow with accumulated data
-                                if (NmeaParser.isValidFix(accumulatedData)) {
+                                // Update flow if we have GPS fix OR variometer data
+                                val hasGpsFix = NmeaParser.isValidFix(accumulatedData)
+                                val hasVarioData = accumulatedData.pressure != null ||
+                                                   accumulatedData.vario != null ||
+                                                   accumulatedData.baroAltitude != null
+
+                                if (hasGpsFix || hasVarioData) {
                                     _nmeaData.value = accumulatedData
-                                    Log.d(TAG, "GPS fix: lat=${accumulatedData.latitude}, " +
-                                              "lon=${accumulatedData.longitude}, " +
-                                              "alt=${accumulatedData.latitude}m")
+
+                                    if (hasGpsFix) {
+                                        Log.d(TAG, "GPS fix: lat=${accumulatedData.latitude}, " +
+                                                  "lon=${accumulatedData.longitude}, " +
+                                                  "alt=${accumulatedData.altitude}m")
+                                    }
+                                    if (hasVarioData) {
+                                        Log.d(TAG, "Variometer data: pressure=${accumulatedData.pressure} hPa, " +
+                                                  "vario=${accumulatedData.vario} m/s, " +
+                                                  "temp=${accumulatedData.temperature}°C")
+                                    }
                                 }
                             }
                         }

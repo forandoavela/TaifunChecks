@@ -4,9 +4,11 @@ import android.util.Log
 import kotlin.math.abs
 
 /**
- * Parser for NMEA 0183 GPS messages and variometer data
- * Supports common sentence types: GPGGA, GPRMC, GPGLL, GPGSA, GPGSV, LK8EX1
- * Also supports GNSS variants (GN*, GL*, GA*)
+ * Parser for NMEA 0183 GPS messages, variometer data, and BlueFlyVario protocol
+ * Supports:
+ * - NMEA sentences: GPGGA, GPRMC, GPGLL, GPGSA, GPGSV, LK8EX1
+ * - GNSS variants (GN*, GL*, GA*)
+ * - BlueFlyVario protocol: PRS, BAT, TMP, etc.
  */
 object NmeaParser {
 
@@ -35,13 +37,31 @@ object NmeaParser {
     )
 
     /**
-     * Parse a single NMEA sentence
-     * @param sentence Raw NMEA sentence (e.g., "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47")
+     * Parse a single sentence (NMEA or BlueFlyVario)
+     * Auto-detects protocol based on format:
+     * - NMEA: Starts with $ and has checksum (e.g., "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47")
+     * - BlueFlyVario: Plain text commands (e.g., "PRS 16035", "BAT 4200", "TMP 285")
      * @return NmeaData with available fields populated, or null if invalid
      */
     fun parse(sentence: String): NmeaData? {
+        val trimmed = sentence.trim()
+
+        // Auto-detect protocol
+        return if (trimmed.startsWith('$')) {
+            // NMEA 0183 format
+            parseNmea(trimmed)
+        } else {
+            // BlueFlyVario or other plain text format
+            parseBlueFlyVario(trimmed)
+        }
+    }
+
+    /**
+     * Parse NMEA 0183 sentence
+     */
+    private fun parseNmea(sentence: String): NmeaData? {
         if (!isValidChecksum(sentence)) {
-            Log.w(TAG, "Invalid checksum: $sentence")
+            Log.w(TAG, "Invalid NMEA checksum: $sentence")
             return null
         }
 
@@ -60,8 +80,82 @@ object NmeaParser {
                 parseLK8EX1(parts)
             }
             else -> {
-                Log.v(TAG, "Ignoring message type: $messageType")
-                null // Ignore other message types for now
+                Log.v(TAG, "Ignoring NMEA message type: $messageType")
+                null
+            }
+        }
+    }
+
+    /**
+     * Parse BlueFlyVario protocol
+     * Format: "COMMAND VALUE" (space-separated)
+     * Commands:
+     * - PRS xxxxx: Pressure in Pascals (divide by 100 for hPa)
+     * - BAT xxxx: Battery in millivolts
+     * - TMP xxx: Temperature in tenths of degrees Celsius
+     * - PAS xxxxx: Secondary pressure sensor (if available)
+     */
+    private fun parseBlueFlyVario(sentence: String): NmeaData? {
+        val parts = sentence.split(' ', limit = 2)
+        if (parts.size < 2) {
+            Log.v(TAG, "Invalid BlueFlyVario format: $sentence")
+            return null
+        }
+
+        val command = parts[0].uppercase()
+        val valueStr = parts[1].trim()
+
+        return when (command) {
+            "PRS" -> {
+                // Pressure in Pascals -> convert to hPa
+                val pressurePa = valueStr.toIntOrNull()
+                if (pressurePa != null) {
+                    val pressureHpa = pressurePa / 100.0f
+                    Log.d(TAG, "BlueFlyVario PRS: $pressurePa Pa = $pressureHpa hPa")
+                    NmeaData(pressure = pressureHpa)
+                } else {
+                    Log.w(TAG, "Invalid PRS value: $valueStr")
+                    null
+                }
+            }
+            "BAT" -> {
+                // Battery in millivolts -> convert to volts
+                val batteryMv = valueStr.toIntOrNull()
+                if (batteryMv != null) {
+                    val batteryV = batteryMv / 1000.0f
+                    Log.d(TAG, "BlueFlyVario BAT: $batteryMv mV = $batteryV V")
+                    NmeaData(battery = batteryV)
+                } else {
+                    Log.w(TAG, "Invalid BAT value: $valueStr")
+                    null
+                }
+            }
+            "TMP" -> {
+                // Temperature in tenths of degrees -> convert to degrees
+                val tempTenths = valueStr.toIntOrNull()
+                if (tempTenths != null) {
+                    val tempC = tempTenths / 10.0f
+                    Log.d(TAG, "BlueFlyVario TMP: $tempTenths tenths = $tempC °C")
+                    NmeaData(temperature = tempC)
+                } else {
+                    Log.w(TAG, "Invalid TMP value: $valueStr")
+                    null
+                }
+            }
+            "PAS" -> {
+                // Secondary pressure sensor (treat same as PRS)
+                val pressurePa = valueStr.toIntOrNull()
+                if (pressurePa != null) {
+                    val pressureHpa = pressurePa / 100.0f
+                    Log.d(TAG, "BlueFlyVario PAS: $pressurePa Pa = $pressureHpa hPa")
+                    NmeaData(pressure = pressureHpa)
+                } else {
+                    null
+                }
+            }
+            else -> {
+                Log.v(TAG, "Ignoring BlueFlyVario command: $command")
+                null
             }
         }
     }
