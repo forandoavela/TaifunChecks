@@ -56,7 +56,7 @@ object IconsRepo {
 
         // Motor y Propulsión
         "motor" -> Icons.Filled.Factory
-        "helice" -> Icons.Filled.ToysFan
+        "helice" -> Icons.Filled.RotateRight
         "gases" -> Icons.Filled.WindPower
         "estrangulador" -> Icons.Filled.Compress
         "ignicion" -> Icons.Filled.Bolt
@@ -149,7 +149,7 @@ object IconsRepo {
 
         // Motor y Propulsión
         IconOption("motor", "Motor", Icons.Filled.Factory, "Motor"),
-        IconOption("helice", "Hélice", Icons.Filled.ToysFan, "Motor"),
+        IconOption("helice", "Hélice", Icons.Filled.RotateRight, "Motor"),
         IconOption("gases", "Gases", Icons.Filled.WindPower, "Motor"),
         IconOption("estrangulador", "Estrangulador", Icons.Filled.Compress, "Motor"),
         IconOption("ignicion", "Ignición", Icons.Filled.Bolt, "Motor"),
