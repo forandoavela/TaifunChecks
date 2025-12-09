@@ -47,7 +47,7 @@ object IconsRepo {
         "profundidad" -> Icons.Filled.SwapVert
         "aleron" -> Icons.Filled.FlipCameraAndroid
         "trim" -> Icons.Filled.LinearScale
-        "palanca" -> Icons.Filled.Tune
+        "palanca" -> Icons.Filled.SportsEsports
 
         // Superficies
         "flaps" -> Icons.Filled.Layers
@@ -55,9 +55,9 @@ object IconsRepo {
         "alas" -> Icons.Filled.FlightTakeoff
 
         // Motor y Propulsión
-        "motor" -> Icons.Filled.PrecisionManufacturing
-        "helice" -> Icons.Outlined.ModeFanOff
-        "gases" -> Icons.Filled.Speed
+        "motor" -> Icons.Filled.Factory
+        "helice" -> Icons.Filled.ModeFan
+        "gases" -> Icons.Filled.WindPower
         "estrangulador" -> Icons.Filled.Compress
         "ignicion" -> Icons.Filled.Bolt
         "refrigeracion" -> Icons.Filled.AcUnit
@@ -65,7 +65,7 @@ object IconsRepo {
         // Combustible y Fluidos
         "combustible" -> Icons.Filled.LocalGasStation
         "aceite" -> Icons.Filled.OilBarrel
-        "bomba" -> Icons.Filled.Waves
+        "bomba" -> Icons.Filled.WaterDrop
 
         // Tren de Aterrizaje
         "tren" -> Icons.Filled.Adjust
@@ -140,7 +140,7 @@ object IconsRepo {
         IconOption("profundidad", "Profundidad", Icons.Filled.SwapVert, "Controles"),
         IconOption("aleron", "Alerón", Icons.Filled.FlipCameraAndroid, "Controles"),
         IconOption("trim", "Trim", Icons.Filled.LinearScale, "Controles"),
-        IconOption("palanca", "Palanca", Icons.Filled.Tune, "Controles"),
+        IconOption("palanca", "Palanca", Icons.Filled.SportsEsports, "Controles"),
 
         // Superficies
         IconOption("flaps", "Flaps", Icons.Filled.Layers, "Superficies"),
@@ -148,9 +148,9 @@ object IconsRepo {
         IconOption("alas", "Alas", Icons.Filled.FlightTakeoff, "Superficies"),
 
         // Motor y Propulsión
-        IconOption("motor", "Motor", Icons.Filled.PrecisionManufacturing, "Motor"),
-        IconOption("helice", "Hélice", Icons.Outlined.ModeFanOff, "Motor"),
-        IconOption("gases", "Gases", Icons.Filled.Speed, "Motor"),
+        IconOption("motor", "Motor", Icons.Filled.Factory, "Motor"),
+        IconOption("helice", "Hélice", Icons.Filled.ModeFan, "Motor"),
+        IconOption("gases", "Gases", Icons.Filled.WindPower, "Motor"),
         IconOption("estrangulador", "Estrangulador", Icons.Filled.Compress, "Motor"),
         IconOption("ignicion", "Ignición", Icons.Filled.Bolt, "Motor"),
         IconOption("refrigeracion", "Refrigeración", Icons.Filled.AcUnit, "Motor"),
@@ -158,7 +158,7 @@ object IconsRepo {
         // Combustible y Fluidos
         IconOption("combustible", "Combustible", Icons.Filled.LocalGasStation, "Fluidos"),
         IconOption("aceite", "Aceite", Icons.Filled.OilBarrel, "Fluidos"),
-        IconOption("bomba", "Bomba", Icons.Filled.Waves, "Fluidos"),
+        IconOption("bomba", "Bomba", Icons.Filled.WaterDrop, "Fluidos"),
 
         // Tren de Aterrizaje
         IconOption("tren", "Tren", Icons.Filled.Adjust, "Tren"),
