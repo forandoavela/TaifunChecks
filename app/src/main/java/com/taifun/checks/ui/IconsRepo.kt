@@ -6,6 +6,11 @@ import androidx.compose.material.icons.outlined.*
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Fan
+import compose.icons.fontawesomeicons.solid.Gamepad
+import compose.icons.fontawesomeicons.solid.PumpSoap
+import compose.icons.fontawesomeicons.solid.Tire
+import compose.icons.TablerIcons
+import compose.icons.tablericons.Engine
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,7 +55,7 @@ object IconsRepo {
         "profundidad" -> Icons.Filled.SwapVert
         "aleron" -> Icons.Filled.FlipCameraAndroid
         "trim" -> Icons.Filled.LinearScale
-        "palanca" -> Icons.Filled.SportsEsports
+        "palanca" -> FontAwesomeIcons.Solid.Gamepad
 
         // Superficies
         "flaps" -> Icons.Filled.Layers
@@ -58,7 +63,7 @@ object IconsRepo {
         "alas" -> Icons.Filled.FlightTakeoff
 
         // Motor y Propulsión
-        "motor" -> Icons.Filled.Factory
+        "motor" -> TablerIcons.Engine
         "helice" -> FontAwesomeIcons.Solid.Fan
         "gases" -> Icons.Filled.WindPower
         "estrangulador" -> Icons.Filled.Compress
@@ -68,10 +73,10 @@ object IconsRepo {
         // Combustible y Fluidos
         "combustible" -> Icons.Filled.LocalGasStation
         "aceite" -> Icons.Filled.OilBarrel
-        "bomba" -> Icons.Filled.WaterDrop
+        "bomba" -> FontAwesomeIcons.Solid.PumpSoap
 
         // Tren de Aterrizaje
-        "tren" -> Icons.Filled.Adjust
+        "tren" -> FontAwesomeIcons.Solid.Tire
         "freno" -> Icons.Filled.StopCircle
 
         // Eléctrico
@@ -143,7 +148,7 @@ object IconsRepo {
         IconOption("profundidad", "Profundidad", Icons.Filled.SwapVert, "Controles"),
         IconOption("aleron", "Alerón", Icons.Filled.FlipCameraAndroid, "Controles"),
         IconOption("trim", "Trim", Icons.Filled.LinearScale, "Controles"),
-        IconOption("palanca", "Palanca", Icons.Filled.SportsEsports, "Controles"),
+        IconOption("palanca", "Palanca", FontAwesomeIcons.Solid.Gamepad, "Controles"),
 
         // Superficies
         IconOption("flaps", "Flaps", Icons.Filled.Layers, "Superficies"),
@@ -151,7 +156,7 @@ object IconsRepo {
         IconOption("alas", "Alas", Icons.Filled.FlightTakeoff, "Superficies"),
 
         // Motor y Propulsión
-        IconOption("motor", "Motor", Icons.Filled.Factory, "Motor"),
+        IconOption("motor", "Motor", TablerIcons.Engine, "Motor"),
         IconOption("helice", "Hélice", FontAwesomeIcons.Solid.Fan, "Motor"),
         IconOption("gases", "Gases", Icons.Filled.WindPower, "Motor"),
         IconOption("estrangulador", "Estrangulador", Icons.Filled.Compress, "Motor"),
@@ -161,10 +166,10 @@ object IconsRepo {
         // Combustible y Fluidos
         IconOption("combustible", "Combustible", Icons.Filled.LocalGasStation, "Fluidos"),
         IconOption("aceite", "Aceite", Icons.Filled.OilBarrel, "Fluidos"),
-        IconOption("bomba", "Bomba", Icons.Filled.WaterDrop, "Fluidos"),
+        IconOption("bomba", "Bomba", FontAwesomeIcons.Solid.PumpSoap, "Fluidos"),
 
         // Tren de Aterrizaje
-        IconOption("tren", "Tren", Icons.Filled.Adjust, "Tren"),
+        IconOption("tren", "Tren", FontAwesomeIcons.Solid.Tire, "Tren"),
         IconOption("freno", "Freno", Icons.Filled.StopCircle, "Tren"),
 
         // Eléctrico
