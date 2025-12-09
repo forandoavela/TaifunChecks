@@ -178,7 +178,6 @@ dependencies {
 
     // Compose Icons - Font Awesome (para iconos de aviación)
     implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
-    implementation("br.com.devsrsouza.compose.icons:tabler-icons:1.1.1")
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")

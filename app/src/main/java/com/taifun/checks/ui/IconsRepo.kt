@@ -8,9 +8,7 @@ import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Fan
 import compose.icons.fontawesomeicons.solid.Gamepad
 import compose.icons.fontawesomeicons.solid.PumpSoap
-import compose.icons.fontawesomeicons.solid.Tire
-import compose.icons.TablerIcons
-import compose.icons.tablericons.Engine
+import compose.icons.fontawesomeicons.solid.Cog
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -63,7 +61,7 @@ object IconsRepo {
         "alas" -> Icons.Filled.FlightTakeoff
 
         // Motor y Propulsión
-        "motor" -> TablerIcons.Engine
+        "motor" -> FontAwesomeIcons.Solid.Cog
         "helice" -> FontAwesomeIcons.Solid.Fan
         "gases" -> Icons.Filled.WindPower
         "estrangulador" -> Icons.Filled.Compress
@@ -76,7 +74,7 @@ object IconsRepo {
         "bomba" -> FontAwesomeIcons.Solid.PumpSoap
 
         // Tren de Aterrizaje
-        "tren" -> FontAwesomeIcons.Solid.Tire
+        "tren" -> Icons.Filled.TripOrigin
         "freno" -> Icons.Filled.StopCircle
 
         // Eléctrico
@@ -156,7 +154,7 @@ object IconsRepo {
         IconOption("alas", "Alas", Icons.Filled.FlightTakeoff, "Superficies"),
 
         // Motor y Propulsión
-        IconOption("motor", "Motor", TablerIcons.Engine, "Motor"),
+        IconOption("motor", "Motor", FontAwesomeIcons.Solid.Cog, "Motor"),
         IconOption("helice", "Hélice", FontAwesomeIcons.Solid.Fan, "Motor"),
         IconOption("gases", "Gases", Icons.Filled.WindPower, "Motor"),
         IconOption("estrangulador", "Estrangulador", Icons.Filled.Compress, "Motor"),
@@ -169,7 +167,7 @@ object IconsRepo {
         IconOption("bomba", "Bomba", FontAwesomeIcons.Solid.PumpSoap, "Fluidos"),
 
         // Tren de Aterrizaje
-        IconOption("tren", "Tren", FontAwesomeIcons.Solid.Tire, "Tren"),
+        IconOption("tren", "Tren", Icons.Filled.TripOrigin, "Tren"),
         IconOption("freno", "Freno", Icons.Filled.StopCircle, "Tren"),
 
         // Eléctrico
