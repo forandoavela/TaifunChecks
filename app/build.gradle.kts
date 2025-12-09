@@ -176,6 +176,9 @@ dependencies {
     // SnakeYAML (parser YAML)
     implementation("org.yaml:snakeyaml:2.2")
 
+    // Compose Icons - Font Awesome (para iconos de aviación)
+    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
+
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

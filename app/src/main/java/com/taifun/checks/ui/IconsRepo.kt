@@ -3,6 +3,9 @@ package com.taifun.checks.ui
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import compose.icons.FontAwesomeIcons
+import compose.icons.fontawesomeicons.Solid
+import compose.icons.fontawesomeicons.solid.Fan
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,7 +59,7 @@ object IconsRepo {
 
         // Motor y Propulsión
         "motor" -> Icons.Filled.Factory
-        "helice" -> Icons.Filled.RotateRight
+        "helice" -> FontAwesomeIcons.Solid.Fan
         "gases" -> Icons.Filled.WindPower
         "estrangulador" -> Icons.Filled.Compress
         "ignicion" -> Icons.Filled.Bolt
@@ -149,7 +152,7 @@ object IconsRepo {
 
         // Motor y Propulsión
         IconOption("motor", "Motor", Icons.Filled.Factory, "Motor"),
-        IconOption("helice", "Hélice", Icons.Filled.RotateRight, "Motor"),
+        IconOption("helice", "Hélice", FontAwesomeIcons.Solid.Fan, "Motor"),
         IconOption("gases", "Gases", Icons.Filled.WindPower, "Motor"),
         IconOption("estrangulador", "Estrangulador", Icons.Filled.Compress, "Motor"),
         IconOption("ignicion", "Ignición", Icons.Filled.Bolt, "Motor"),
