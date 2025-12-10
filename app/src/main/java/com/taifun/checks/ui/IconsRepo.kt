@@ -9,6 +9,7 @@ import compose.icons.fontawesomeicons.solid.Fan
 import compose.icons.fontawesomeicons.solid.Gamepad
 import compose.icons.fontawesomeicons.solid.PumpSoap
 import compose.icons.fontawesomeicons.solid.Cog
+import compose.icons.fontawesomeicons.solid.MapPin
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,7 +54,7 @@ object IconsRepo {
         "profundidad" -> Icons.Filled.SwapVert
         "aleron" -> Icons.Filled.FlipCameraAndroid
         "trim" -> Icons.Filled.LinearScale
-        "palanca" -> FontAwesomeIcons.Solid.Gamepad
+        "palanca" -> FontAwesomeIcons.Solid.MapPin
 
         // Superficies
         "flaps" -> Icons.Filled.Layers
@@ -146,7 +147,7 @@ object IconsRepo {
         IconOption("profundidad", "Profundidad", Icons.Filled.SwapVert, "Controles"),
         IconOption("aleron", "Alerón", Icons.Filled.FlipCameraAndroid, "Controles"),
         IconOption("trim", "Trim", Icons.Filled.LinearScale, "Controles"),
-        IconOption("palanca", "Palanca", FontAwesomeIcons.Solid.Gamepad, "Controles"),
+        IconOption("palanca", "Palanca", FontAwesomeIcons.Solid.MapPin, "Controles"),
 
         // Superficies
         IconOption("flaps", "Flaps", Icons.Filled.Layers, "Superficies"),
