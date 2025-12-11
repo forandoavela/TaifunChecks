@@ -284,6 +284,10 @@
     <string name="entry_altitude_label">Altitude (m)</string>
     <string name="entry_icao_label">ICAO</string>
 
+    <!-- Log Entry -->
+    <string name="log_entry_saved">Log entry saved</string>
+    <string name="log_entry_error">Error saving log</string>
+
     <!-- Custom Log -->
     <string name="create_custom_log">Create Log</string>
     <string name="custom_log_title">Create Custom Log</string>

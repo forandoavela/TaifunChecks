@@ -523,17 +523,9 @@ private fun StepByStepMode(
             )
 
             if (success) {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_saved), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Error saving log" else "Error al guardar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_error), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1012,17 +1004,9 @@ private fun FullListMode(
             )
 
             if (success) {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_saved), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Error saving log" else "Error al guardar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_error), Toast.LENGTH_SHORT).show()
             }
         }
     }
