@@ -132,102 +132,112 @@ class SensorDataRepository(private val context: Context) {
         }
     }
 
+    // Lock para sincronizar acceso a locationListener
+    private val locationLock = Any()
+
     /**
      * Inicia el seguimiento de ubicación GPS
+     * Usa sincronización para evitar doble registro de listeners
      */
     fun startLocationTracking() {
-        // Check if LocationManager is available
-        if (locationManager == null) return
+        synchronized(locationLock) {
+            // Check if LocationManager is available
+            if (locationManager == null) return
 
-        if (!hasLocationPermission()) return
+            if (!hasLocationPermission()) return
 
-        // Si ya hay un listener, no crear otro
-        if (locationListener != null) return
+            // Si ya hay un listener, no crear otro
+            if (locationListener != null) return
 
-        // Only start if using internal GPS
-        if (_gpsSource.value != GpsSource.INTERNAL) return
+            // Only start if using internal GPS
+            if (_gpsSource.value != GpsSource.INTERNAL) return
 
-        // Check if GPS hardware is available
-        if (!hasGpsHardware()) return
+            // Check if GPS hardware is available
+            if (!hasGpsHardware()) return
 
-        try {
-            val listener = object : LocationListener {
-                override fun onLocationChanged(location: Location) {
-                    _altitude.value = location.altitude
-                    _latitude.value = location.latitude
-                    _longitude.value = location.longitude
-                    // Speed en Android está en m/s, convertir a km/h
-                    _speedKmh.value = if (location.hasSpeed()) {
-                        location.speed * 3.6f // m/s to km/h
-                    } else {
-                        null
+            try {
+                val listener = object : LocationListener {
+                    override fun onLocationChanged(location: Location) {
+                        // Solo actualizar si seguimos usando GPS interno
+                        if (_gpsSource.value == GpsSource.INTERNAL) {
+                            _altitude.value = location.altitude
+                            _latitude.value = location.latitude
+                            _longitude.value = location.longitude
+                            // Speed en Android está en m/s, convertir a km/h
+                            _speedKmh.value = if (location.hasSpeed()) {
+                                location.speed * 3.6f // m/s to km/h
+                            } else {
+                                null
+                            }
+                            // Accuracy in meters
+                            _accuracy.value = if (location.hasAccuracy()) {
+                                location.accuracy
+                            } else {
+                                null
+                            }
+                        }
                     }
-                    // Accuracy in meters
-                    _accuracy.value = if (location.hasAccuracy()) {
-                        location.accuracy
-                    } else {
-                        null
-                    }
+
+                    @Deprecated("Deprecated in API 29")
+                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+                    override fun onProviderEnabled(provider: String) {}
+                    override fun onProviderDisabled(provider: String) {}
                 }
 
-                @Deprecated("Deprecated in API 29")
-                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-                override fun onProviderEnabled(provider: String) {}
-                override fun onProviderDisabled(provider: String) {}
-            }
+                locationListener = listener
 
-            locationListener = listener
-
-            // Usar AMBOS proveedores simultáneamente para mayor fiabilidad
-            // GPS: más preciso pero más lento
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    1000L,  // 1 segundo (más rápido)
-                    0f,     // Sin distancia mínima para obtener datos más rápido
-                    listener
-                )
-            }
-
-            // Network: menos preciso pero más rápido
-            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    1000L,  // 1 segundo
-                    0f,     // Sin distancia mínima
-                    listener
-                )
-            }
-
-            // Obtener última ubicación conocida de ambos proveedores
-            val gpsLocation = try {
-                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            } catch (e: Exception) { null }
-
-            val networkLocation = try {
-                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-            } catch (e: Exception) { null }
-
-            // Usar la más reciente
-            val lastKnown = when {
-                gpsLocation != null && networkLocation != null -> {
-                    if (gpsLocation.time > networkLocation.time) gpsLocation else networkLocation
+                // Usar AMBOS proveedores simultáneamente para mayor fiabilidad
+                // GPS: más preciso pero más lento
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        1000L,  // 1 segundo (más rápido)
+                        0f,     // Sin distancia mínima para obtener datos más rápido
+                        listener
+                    )
                 }
-                gpsLocation != null -> gpsLocation
-                networkLocation != null -> networkLocation
-                else -> null
-            }
 
-            lastKnown?.let {
-                _altitude.value = it.altitude
-                _latitude.value = it.latitude
-                _longitude.value = it.longitude
-                _speedKmh.value = if (it.hasSpeed()) it.speed * 3.6f else null
-                _accuracy.value = if (it.hasAccuracy()) it.accuracy else null
-            }
+                // Network: menos preciso pero más rápido
+                if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        1000L,  // 1 segundo
+                        0f,     // Sin distancia mínima
+                        listener
+                    )
+                }
 
-        } catch (e: SecurityException) {
-            // Permiso denegado
+                // Obtener última ubicación conocida de ambos proveedores
+                val gpsLocation = try {
+                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                } catch (e: Exception) { null }
+
+                val networkLocation = try {
+                    locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                } catch (e: Exception) { null }
+
+                // Usar la más reciente
+                val lastKnown = when {
+                    gpsLocation != null && networkLocation != null -> {
+                        if (gpsLocation.time > networkLocation.time) gpsLocation else networkLocation
+                    }
+                    gpsLocation != null -> gpsLocation
+                    networkLocation != null -> networkLocation
+                    else -> null
+                }
+
+                lastKnown?.let {
+                    _altitude.value = it.altitude
+                    _latitude.value = it.latitude
+                    _longitude.value = it.longitude
+                    _speedKmh.value = if (it.hasSpeed()) it.speed * 3.6f else null
+                    _accuracy.value = if (it.hasAccuracy()) it.accuracy else null
+                }
+
+            } catch (e: SecurityException) {
+                // Permiso denegado - limpiar listener para permitir reintentos
+                locationListener = null
+            }
         }
     }
 
@@ -259,10 +269,12 @@ class SensorDataRepository(private val context: Context) {
      * Detiene el seguimiento de ubicación
      */
     fun stopLocationTracking() {
-        locationListener?.let {
-            locationManager?.removeUpdates(it)
+        synchronized(locationLock) {
+            locationListener?.let {
+                locationManager?.removeUpdates(it)
+            }
+            locationListener = null
         }
-        locationListener = null
     }
 
     /**

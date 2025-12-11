@@ -99,10 +99,10 @@ class SettingsRepository(private val ctx: Context) {
     }
 
     suspend fun setLanguage(language: String) {
-        // Escribir en DataStore para flows
+        // Escribir en SharedPreferences primero (síncrono con commit para garantizar consistencia)
+        syncPrefs.edit().putString("language", language).commit()
+        // Luego escribir en DataStore para flows
         ctx.settingsDataStore.edit { it[KEY_LANGUAGE] = language }
-        // También escribir en SharedPreferences para acceso síncrono
-        syncPrefs.edit().putString("language", language).apply()
     }
 
     suspend fun setHaptics(enabled: Boolean) {
@@ -114,10 +114,10 @@ class SettingsRepository(private val ctx: Context) {
     }
 
     suspend fun setFirstLaunchComplete() {
-        // Escribir en DataStore para flows
+        // Escribir en SharedPreferences primero (síncrono con commit para garantizar consistencia)
+        syncPrefs.edit().putBoolean("first_launch", false).commit()
+        // Luego escribir en DataStore para flows
         ctx.settingsDataStore.edit { it[KEY_FIRST_LAUNCH] = false }
-        // También escribir en SharedPreferences para acceso síncrono
-        syncPrefs.edit().putBoolean("first_launch", false).apply()
     }
 
     suspend fun setIcaoMaxDistanceKm(distanceKm: Float) {
