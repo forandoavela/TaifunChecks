@@ -421,7 +421,7 @@ fun LogViewerScreen(
                                 if (result.intent != null) {
                                     ctx.startActivity(android.content.Intent.createChooser(result.intent, ctx.getString(R.string.share_log)))
                                 } else {
-                                    Toast.makeText(ctx, "Error: ${result.errorMessage}", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(ctx, ctx.getString(R.string.error_generic, result.errorMessage ?: ""), Toast.LENGTH_LONG).show()
                                 }
                             }
                         },

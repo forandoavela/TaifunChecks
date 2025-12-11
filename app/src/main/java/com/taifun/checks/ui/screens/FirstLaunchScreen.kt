@@ -98,7 +98,7 @@ fun FirstLaunchScreen(
                         },
                         enabled = !isLoading
                     ) {
-                        Icon(Icons.Filled.Check, contentDescription = null)
+                        Icon(Icons.Filled.Check, contentDescription = stringResource(R.string.accessibility_check))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.first_launch_continue))
                     }
@@ -263,7 +263,7 @@ fun FirstLaunchScreen(
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Filled.Add, contentDescription = null)
+                                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.accessibility_add))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(stringResource(R.string.create_empty_checklist))
                             }
@@ -375,7 +375,7 @@ private fun LanguageOption(
             if (selected) {
                 Icon(
                     Icons.Filled.Check,
-                    contentDescription = null,
+                    contentDescription = stringResource(R.string.accessibility_check),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }

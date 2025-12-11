@@ -313,4 +313,29 @@
     <string name="checklist_completed_message">You have completed all steps in this checklist.</string>
     <string name="checklist_exit">Exit</string>
     <string name="checklist_back">Back</string>
+
+    <!-- Permission Messages -->
+    <string name="permission_granted_gps">Permissions granted. Waiting for GPS… Try again in a few seconds.</string>
+    <string name="permission_denied">Permission denied</string>
+
+    <!-- Error Messages -->
+    <string name="error_cannot_open_link">Cannot open link: %1$s</string>
+    <string name="error_app_not_installed">App not installed: %1$s</string>
+    <string name="error_cannot_open_app">Cannot open app: %1$s</string>
+    <string name="error_launching_app">Error launching app: %1$s</string>
+    <string name="error_sharing_file">Error sharing file: %1$s</string>
+    <string name="error_generic">Error: %1$s</string>
+
+    <!-- Accessibility - Additional -->
+    <string name="accessibility_bluetooth">Bluetooth</string>
+    <string name="accessibility_add">Add</string>
+    <string name="accessibility_check">Check</string>
+    <string name="accessibility_edit_item">Edit item</string>
+    <string name="accessibility_delete_item">Delete item</string>
+    <string name="accessibility_icon">Icon</string>
+    <string name="accessibility_loading">Loading</string>
+    <string name="accessibility_expand">Expand</string>
+    <string name="accessibility_collapse">Collapse</string>
+    <string name="accessibility_move_up">Move up</string>
+    <string name="accessibility_move_down">Move down</string>
 </resources>

@@ -500,7 +500,7 @@ private fun StepByStepMode(
     val locationPermission = rememberLocationPermissionHandler(
         onPermissionGranted = {
             sensorRepo.startLocationTracking()
-            Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
+            Toast.makeText(ctx, ctx.getString(R.string.permission_granted_gps), Toast.LENGTH_LONG).show()
         }
     )
 
@@ -571,7 +571,7 @@ private fun StepByStepMode(
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(p.link))
                         ctx.startActivity(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(ctx, "Cannot open link: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_link, e.message ?: ""), Toast.LENGTH_SHORT).show()
                     }
                 }
                 !p.app.isNullOrBlank() -> {
@@ -594,14 +594,14 @@ private fun StepByStepMode(
                                     launchIntent.setClassName(p.app, resolveInfo[0].activityInfo.name)
                                     ctx.startActivity(launchIntent)
                                 } else {
-                                    Toast.makeText(ctx, "App not installed: ${p.app}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(ctx, ctx.getString(R.string.error_app_not_installed, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e2: Exception) {
-                                Toast.makeText(ctx, "Cannot open app: ${p.app}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_app, p.app ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                     } catch (e: Exception) {
-                        Toast.makeText(ctx, "Error launching app: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(ctx, ctx.getString(R.string.error_launching_app, e.message ?: ""), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -984,7 +984,7 @@ private fun FullListMode(
     val locationPermission = rememberLocationPermissionHandler(
         onPermissionGranted = {
             sensorRepo.startLocationTracking()
-            Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
+            Toast.makeText(ctx, ctx.getString(R.string.permission_granted_gps), Toast.LENGTH_LONG).show()
         }
     )
 
@@ -1171,7 +1171,7 @@ private fun FullListMode(
                                 val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(p.link))
                                 ctx.startActivity(intent)
                             } catch (e: Exception) {
-                                android.widget.Toast.makeText(ctx, "Cannot open link: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_link, e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                         !p.app.isNullOrBlank() -> {
@@ -1194,14 +1194,14 @@ private fun FullListMode(
                                             launchIntent.setClassName(p.app, resolveInfo[0].activityInfo.name)
                                             ctx.startActivity(launchIntent)
                                         } else {
-                                            android.widget.Toast.makeText(ctx, "App not installed: ${p.app}", android.widget.Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(ctx, ctx.getString(R.string.error_app_not_installed, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                         }
                                     } catch (e2: Exception) {
-                                        android.widget.Toast.makeText(ctx, "Cannot open app: ${p.app}", android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_app, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } catch (e: Exception) {
-                                android.widget.Toast.makeText(ctx, "Error launching app: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_launching_app, e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

@@ -312,4 +312,29 @@
     <string name="checklist_completed_message">Has completado todos los pasos de este checklist.</string>
     <string name="checklist_exit">Salir</string>
     <string name="checklist_back">Volver</string>
+
+    <!-- Permission Messages -->
+    <string name="permission_granted_gps">Permisos otorgados. Esperando GPS… Pulse de nuevo en unos segundos.</string>
+    <string name="permission_denied">Permiso denegado</string>
+
+    <!-- Error Messages -->
+    <string name="error_cannot_open_link">No se puede abrir el enlace: %1$s</string>
+    <string name="error_app_not_installed">Aplicación no instalada: %1$s</string>
+    <string name="error_cannot_open_app">No se puede abrir la aplicación: %1$s</string>
+    <string name="error_launching_app">Error al iniciar aplicación: %1$s</string>
+    <string name="error_sharing_file">Error al compartir archivo: %1$s</string>
+    <string name="error_generic">Error: %1$s</string>
+
+    <!-- Accessibility - Additional -->
+    <string name="accessibility_bluetooth">Bluetooth</string>
+    <string name="accessibility_add">Añadir</string>
+    <string name="accessibility_check">Verificar</string>
+    <string name="accessibility_edit_item">Editar elemento</string>
+    <string name="accessibility_delete_item">Eliminar elemento</string>
+    <string name="accessibility_icon">Icono</string>
+    <string name="accessibility_loading">Cargando</string>
+    <string name="accessibility_expand">Expandir</string>
+    <string name="accessibility_collapse">Contraer</string>
+    <string name="accessibility_move_up">Mover arriba</string>
+    <string name="accessibility_move_down">Mover abajo</string>
 </resources>
