@@ -69,19 +69,8 @@ fun LogViewerScreen(
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
-    // Launcher para solicitar permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            // Permiso concedido, iniciar seguimiento y mostrar diálogo
-            sensorRepo.startLocationTracking()
-            showCustomLogDialog = true
-        } else {
-            // Permiso denegado, mostrar mensaje
-            Toast.makeText(ctx, ctx.getString(R.string.custom_log_no_permission), Toast.LENGTH_LONG).show()
-        }
-    }
+    // Nota: Los logs personalizados se pueden crear sin permisos de GPS
+    // Si no hay GPS, se guardan solo con hora y texto (sin coordenadas)
 
     // Launcher para importar CSV
     val importLauncher = rememberLauncherForActivityResult(

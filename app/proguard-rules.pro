@@ -24,6 +24,12 @@
 # Model/Domain classes - required for YAML serialization
 -keep class com.taifun.checks.domain.** { *; }
 
+# Data layer - NMEA parser and Bluetooth GPS required for external GPS devices
+-keep class com.taifun.checks.data.nmea.** { *; }
+-keepnames class com.taifun.checks.data.nmea.**
+-keep class com.taifun.checks.data.BluetoothGpsRepository { *; }
+-keep class com.taifun.checks.data.BluetoothGpsRepository$* { *; }
+
 # Jetpack Compose - required for UI
 -dontwarn androidx.compose.**
 -keep class androidx.compose.runtime.** { *; }

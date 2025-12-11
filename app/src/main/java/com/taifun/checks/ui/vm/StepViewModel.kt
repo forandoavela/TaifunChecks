@@ -7,12 +7,14 @@ import com.taifun.checks.data.ProgressRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel para gestionar el progreso de una checklist.
  * Persiste el estado completo usando ProgressRepository y DataStore.
  * Incluye manejo de errores con rollback para garantizar consistencia.
+ * Usa combine() para sincronizar todos los flows de estado en una sola coroutine.
  */
 class StepViewModel(
     private val progress: ProgressRepository,
@@ -43,43 +45,43 @@ class StepViewModel(
     val voiceControl: StateFlow<Boolean> = _voiceControl.asStateFlow()
 
     init {
-        // Cargar estado persistido con manejo de errores
+        // Cargar estado persistido usando combine() para sincronizar todos los flows
+        // Esto evita race conditions entre múltiples collectors independientes
         viewModelScope.launch {
             try {
-                progress.indexFlow(checklistId).collect { _index.value = it }
+                combine(
+                    progress.indexFlow(checklistId),
+                    progress.pageFlow(checklistId),
+                    progress.checkedFlow(checklistId),
+                    progress.fullListFlow(checklistId),
+                    progress.voiceControlFlow(checklistId)
+                ) { index, page, checked, fullList, voiceControl ->
+                    // Crear una tupla con todos los valores
+                    ProgressState(index, page, checked, fullList, voiceControl)
+                }.collect { state ->
+                    // Actualizar todos los estados de forma atómica
+                    _index.value = state.index
+                    _page.value = state.page
+                    _checked.value = state.checked
+                    _fullList.value = state.fullList
+                    _voiceControl.value = state.voiceControl
+                }
             } catch (e: Exception) {
-                Log.e(TAG, "Error cargando índice persistido", e)
-            }
-        }
-        viewModelScope.launch {
-            try {
-                progress.pageFlow(checklistId).collect { _page.value = it }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error cargando página persistida", e)
-            }
-        }
-        viewModelScope.launch {
-            try {
-                progress.checkedFlow(checklistId).collect { _checked.value = it }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error cargando items marcados", e)
-            }
-        }
-        viewModelScope.launch {
-            try {
-                progress.fullListFlow(checklistId).collect { _fullList.value = it }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error cargando preferencia de modo", e)
-            }
-        }
-        viewModelScope.launch {
-            try {
-                progress.voiceControlFlow(checklistId).collect { _voiceControl.value = it }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error cargando control de voz", e)
+                Log.e(TAG, "Error cargando estado persistido", e)
             }
         }
     }
+
+    /**
+     * Clase de datos para agrupar el estado del progreso
+     */
+    private data class ProgressState(
+        val index: Int,
+        val page: Int,
+        val checked: Set<Int>,
+        val fullList: Boolean?,
+        val voiceControl: Boolean
+    )
 
     // Step-by-step methods con manejo de errores
     fun nextStep(maxIndex: Int) {

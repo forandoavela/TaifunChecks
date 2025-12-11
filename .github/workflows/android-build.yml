@@ -81,6 +81,26 @@ jobs:
           path: app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
 
+      - name: Generate SHA256 checksums
+        run: |
+          mkdir -p checksums
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            sha256sum app/build/outputs/apk/release/app-release.apk > checksums/app-release.apk.sha256
+            echo "APK_SHA256=$(cat checksums/app-release.apk.sha256 | awk '{print $1}')" >> $GITHUB_ENV
+          fi
+          if [ -f app/build/outputs/bundle/release/app-release.aab ]; then
+            sha256sum app/build/outputs/bundle/release/app-release.aab > checksums/app-release.aab.sha256
+            echo "AAB_SHA256=$(cat checksums/app-release.aab.sha256 | awk '{print $1}')" >> $GITHUB_ENV
+          fi
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: checksums
+          path: checksums/
+          retention-days: 30
+
       - name: Build summary
         run: |
           echo "### Build Results :rocket:" >> $GITHUB_STEP_SUMMARY
@@ -99,6 +119,15 @@ jobs:
           echo "📦 **Artifacts available:**" >> $GITHUB_STEP_SUMMARY
           echo "- Release APK for direct installation" >> $GITHUB_STEP_SUMMARY
           echo "- Release AAB for Google Play Store upload" >> $GITHUB_STEP_SUMMARY
+          echo "- SHA256 checksums for verification" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔒 **SHA256 Checksums:**" >> $GITHUB_STEP_SUMMARY
+          if [ -n "$APK_SHA256" ]; then
+            echo "- APK: \`$APK_SHA256\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ -n "$AAB_SHA256" ]; then
+            echo "- AAB: \`$AAB_SHA256\`" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ "${{ secrets.KEYSTORE_PASSWORD }}" != "" ]; then
             echo "🔐 Release builds are **signed** and ready for distribution" >> $GITHUB_STEP_SUMMARY

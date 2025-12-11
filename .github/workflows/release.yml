@@ -70,6 +70,22 @@ jobs:
             cp app/build/outputs/bundle/release/app-release.aab release-artifacts/FlightChecks-${{ steps.version.outputs.VERSION }}-release.aab
           fi
 
+      - name: Generate SHA256 checksums
+        id: checksums
+        run: |
+          cd release-artifacts
+          # Generate checksums for all files
+          sha256sum * > SHA256SUMS.txt
+          # Extract individual checksums for the release body
+          if [ -f FlightChecks-${{ steps.version.outputs.VERSION }}-release.apk ]; then
+            APK_SHA=$(sha256sum FlightChecks-${{ steps.version.outputs.VERSION }}-release.apk | awk '{print $1}')
+            echo "APK_SHA256=$APK_SHA" >> $GITHUB_OUTPUT
+          fi
+          if [ -f FlightChecks-${{ steps.version.outputs.VERSION }}-release.aab ]; then
+            AAB_SHA=$(sha256sum FlightChecks-${{ steps.version.outputs.VERSION }}-release.aab | awk '{print $1}')
+            echo "AAB_SHA256=$AAB_SHA" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -93,18 +109,26 @@ jobs:
             - Persistent checklist progress
             - Real-time YAML validation
 
+            ### 🔒 SHA256 Checksums
+            Verify your download:
+            - **APK**: `${{ steps.checksums.outputs.APK_SHA256 }}`
+            - **AAB**: `${{ steps.checksums.outputs.AAB_SHA256 }}`
+
             ### 📝 Installation
 
             **For end users (Direct APK installation):**
             1. Download the release APK
-            2. Enable "Install from unknown sources" in Android settings
-            3. Install the APK
+            2. Verify the SHA256 checksum (optional but recommended)
+            3. Enable "Install from unknown sources" in Android settings
+            4. Install the APK
 
             **For Google Play Store:**
             1. Download the release AAB file
-            2. Upload to Google Play Console
-            3. The AAB is signed and ready for distribution
-          files: release-artifacts/*
+            2. Verify the SHA256 checksum (optional but recommended)
+            3. Upload to Google Play Console
+            4. The AAB is signed and ready for distribution
+          files: |
+            release-artifacts/*
           draft: false
           prerelease: false
         env:

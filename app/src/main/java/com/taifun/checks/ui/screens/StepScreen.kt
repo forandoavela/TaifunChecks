@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import com.taifun.checks.ui.components.GpsWaitingDialog
 import com.taifun.checks.ui.components.isGpsAccurateForLogging
+import com.taifun.checks.ui.components.rememberLocationPermissionHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,14 +93,10 @@ fun StepScreen(
     val longitude by sensorRepo.longitude.collectAsState()
     val speedKmh by sensorRepo.speedKmh.collectAsState()
 
-    // Permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions.values.any { it }) {
-            sensorRepo.startLocationTracking()
-        }
-    }
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = { sensorRepo.startLocationTracking() }
+    )
 
     // Observar idioma de configuración
     val currentLanguage by settingsRepo.languageFlow.collectAsState(initial = "auto")
@@ -155,12 +152,7 @@ fun StepScreen(
                 val needsBarometer = cl?.pasos?.any { it.qnh != null } == true
 
                 if (needsLocation) {
-                    locationPermissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        )
-                    )
+                    locationPermission.requestPermissions()
                 }
                 if (needsBarometer) {
                     sensorRepo.startPressureTracking()
@@ -207,7 +199,8 @@ fun StepScreen(
     }
 
     // Limpiar recursos al salir
-    DisposableEffect(Unit) {
+    // Usamos las dependencias reales para que si cambian, los recursos antiguos se limpien correctamente
+    DisposableEffect(speechRecognizer, sensorRepo) {
         onDispose {
             speechRecognizer?.destroy()
             sensorRepo.stopAll()
@@ -503,29 +496,17 @@ private fun StepByStepMode(
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
-    // Launcher para permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        // Si se otorgan permisos, iniciar tracking e intentar guardar log de nuevo
-        if (permissions.values.any { it }) {
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = {
             sensorRepo.startLocationTracking()
             Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
         }
-    }
+    )
 
     // Función para verificar permisos de ubicación
-    val hasLocationPermission = remember {
-        {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
+    val hasLocationPermission = remember(ctx) {
+        { com.taifun.checks.ui.components.hasLocationPermission(ctx) }
     }
 
     // Function to execute log save
@@ -791,12 +772,7 @@ private fun StepByStepMode(
                                     onClick = {
                                         // Verificar permisos primero
                                         if (!hasLocationPermission()) {
-                                            locationPermissionLauncher.launch(
-                                                arrayOf(
-                                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                                )
-                                            )
+                                            locationPermission.requestPermissions()
                                             return@Button
                                         }
 
@@ -890,12 +866,7 @@ private fun StepByStepMode(
                             onClick = {
                                 // Verificar permisos primero
                                 if (!hasLocationPermission()) {
-                                    locationPermissionLauncher.launch(
-                                        arrayOf(
-                                            Manifest.permission.ACCESS_FINE_LOCATION,
-                                            Manifest.permission.ACCESS_COARSE_LOCATION
-                                        )
-                                    )
+                                    locationPermission.requestPermissions()
                                     return@Button
                                 }
 
@@ -1009,29 +980,17 @@ private fun FullListMode(
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Launcher para permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        // Si se otorgan permisos, iniciar tracking e informar al usuario
-        if (permissions.values.any { it }) {
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = {
             sensorRepo.startLocationTracking()
             Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
         }
-    }
+    )
 
     // Función para verificar permisos de ubicación
-    val hasLocationPermission = remember {
-        {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
+    val hasLocationPermission = remember(ctx) {
+        { com.taifun.checks.ui.components.hasLocationPermission(ctx) }
     }
 
     // GPS accuracy for logging
@@ -1346,12 +1305,7 @@ private fun FullListMode(
 
                                     // Verificar permisos primero
                                     if (!hasLocationPermission()) {
-                                        locationPermissionLauncher.launch(
-                                            arrayOf(
-                                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                                Manifest.permission.ACCESS_COARSE_LOCATION
-                                            )
-                                        )
+                                        locationPermission.requestPermissions()
                                         return@Button
                                     }
 
