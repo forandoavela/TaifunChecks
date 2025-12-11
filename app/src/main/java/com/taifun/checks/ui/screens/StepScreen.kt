@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -360,7 +361,7 @@ fun StepScreen(
                         }
                     ) {
                         Icon(
-                            IconsRepo.Microfono,
+                            Icons.Filled.Mic,
                             contentDescription = stringResource(R.string.voice_control),
                             tint = if (isListening) MaterialTheme.colorScheme.error
                                    else if (voiceControlEnabled) MaterialTheme.colorScheme.primary

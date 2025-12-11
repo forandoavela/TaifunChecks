@@ -17,39 +17,24 @@ android {
         //   w = versión principal (cambios muy importantes) - cambiar manualmente
         //   x = grandes funcionalidades - cambiar manualmente
         //   yy = grandes grupos de mejoras y correcciones - cambiar manualmente
-        //   zz = cambios menores de corrección de errores (auto-incrementado con commits desde último tag)
+        //   zz = commits desde baseCommitCount (auto-incrementado)
         //
-        // IMPORTANTE: Cuando cambies w, x, o yy, crea un git tag (ej: v1.0.02) para reiniciar zz a 0
+        // IMPORTANTE: Cuando cambies w, x, o yy, actualiza baseCommitCount al número de commit actual
 
         val majorVersion = 1      // w - versión principal
         val minorVersion = 0      // x - grandes funcionalidades
-        val patchVersion = 6      // yy - grupos de mejoras (00-99)
+        val patchVersion = 8      // yy - grupos de mejoras (00-99)
+        val baseCommitCount = 105 // Número de commit en el que se actualizó yy (para que zz = 0)
 
-        // Intentar obtener el número de commits desde el último tag para zz (auto-incrementado)
+        // Calcular zz como: commits actuales - baseCommitCount
         val buildVersion = try {
-            // Primero intentar obtener el último tag
-            val tagProcess = Runtime.getRuntime().exec("git describe --tags --abbrev=0")
-            val lastTag = tagProcess.inputStream.bufferedReader().readText().trim()
-            tagProcess.waitFor()
-
-            val count = if (lastTag.isNotEmpty() && tagProcess.exitValue() == 0) {
-                // Contar commits desde el último tag
-                val countProcess = Runtime.getRuntime().exec("git rev-list --count ${lastTag}..HEAD")
-                val output = countProcess.inputStream.bufferedReader().readText().trim()
-                countProcess.waitFor()
-                val commitsSinceTag = output.toIntOrNull() ?: 0
-                println("✓ Commits since tag $lastTag: $commitsSinceTag")
-                commitsSinceTag
-            } else {
-                // Si no hay tags, contar todos los commits
-                val countProcess = Runtime.getRuntime().exec("git rev-list --count HEAD")
-                val output = countProcess.inputStream.bufferedReader().readText().trim()
-                countProcess.waitFor()
-                val totalCommits = output.toIntOrNull() ?: 0
-                println("⚠ No tags found, using total commit count: $totalCommits")
-                totalCommits
-            }
-            count
+            val countProcess = Runtime.getRuntime().exec("git rev-list --count HEAD")
+            val output = countProcess.inputStream.bufferedReader().readText().trim()
+            countProcess.waitFor()
+            val currentCommits = output.toIntOrNull() ?: baseCommitCount
+            val zz = (currentCommits - baseCommitCount).coerceAtLeast(0)
+            println("✓ Commits: $currentCommits, Base: $baseCommitCount, ZZ: $zz")
+            zz
         } catch (e: Exception) {
             println("⚠ Git not available: ${e.message}, using fallback version 0")
             0  // Fallback si git no está disponible
@@ -175,6 +160,9 @@ dependencies {
 
     // SnakeYAML (parser YAML)
     implementation("org.yaml:snakeyaml:2.2")
+
+    // Compose Icons - Font Awesome (para iconos de aviación)
+    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
