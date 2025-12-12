@@ -129,17 +129,28 @@ class LogRepository(
             val utcTime = dateFormat.format(Date())
 
             // Detectar aeródromo solo si tenemos coordenadas válidas
+            // Formato: "ICAO: nombre (tipo)" según idioma seleccionado
             val icaoCode = if (latitude != null && longitude != null && altitudeMeters != null) {
                 val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
                 val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
 
-                aerodromeRepository.findNearestAerodrome(
+                val aerodrome = aerodromeRepository.findNearestAerodrome(
                     latitude = latitude,
                     longitude = longitude,
                     altitudeMeters = altitudeMeters,
                     maxDistanceKm = maxDistanceKm.toDouble(),
                     maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
                 )
+
+                // Formatear como "ICAO: nombre (tipo)"
+                aerodrome?.let { ad ->
+                    val type = if (language == "en") ad.typeEn else ad.typeEs
+                    if (ad.name.isNotBlank()) {
+                        "${ad.identifier}: ${ad.name} ($type)"
+                    } else {
+                        "${ad.identifier} ($type)"
+                    }
+                }
             } else {
                 null
             }
