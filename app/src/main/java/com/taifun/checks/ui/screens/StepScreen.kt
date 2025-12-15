@@ -493,6 +493,15 @@ private fun StepByStepMode(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    // Calculate fix age dynamically for UI updates
+    var fixAgeMs by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            fixAgeMs = sensorRepo.getFixAgeMs()
+            kotlinx.coroutines.delay(1000) // Update every second
+        }
+    }
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
@@ -535,6 +544,8 @@ private fun StepByStepMode(
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
             altitude = altitude,
+            hasValidAltitude = hasValidAltitude,
+            fixAgeMs = fixAgeMs,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -543,6 +554,9 @@ private fun StepByStepMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
+            },
+            onKeepSearching = {
+                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -770,7 +784,7 @@ private fun StepByStepMode(
 
                                         // Check if GPS is accurate enough
                                         val logText = paso.log ?: ""
-                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                             // GPS is good, save directly
                                             executeLogSave(logText)
                                         } else {
@@ -864,7 +878,7 @@ private fun StepByStepMode(
 
                                 // Check if GPS is accurate enough
                                 val logText = paso.log ?: ""
-                                if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                     // GPS is good, save directly
                                     executeLogSave(logText)
                                 } else {
@@ -987,6 +1001,15 @@ private fun FullListMode(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    // Calculate fix age dynamically for UI updates
+    var fixAgeMs by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            fixAgeMs = sensorRepo.getFixAgeMs()
+            kotlinx.coroutines.delay(1000) // Update every second
+        }
+    }
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
@@ -1016,6 +1039,8 @@ private fun FullListMode(
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
             altitude = altitude,
+            hasValidAltitude = hasValidAltitude,
+            fixAgeMs = fixAgeMs,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -1024,6 +1049,9 @@ private fun FullListMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
+            },
+            onKeepSearching = {
+                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -1295,7 +1323,7 @@ private fun FullListMode(
 
                                     // Check if GPS is accurate enough
                                     val logText = p.log ?: ""
-                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                         // GPS is good, save directly
                                         executeLogSave(logText)
                                     } else {

@@ -669,11 +669,16 @@ Columnas: Timestamp, Texto, Latitud, Longitud, Altitud (m), Código ICAO
                 title = if (isEnglish) "6c. GPS Accuracy & Completion" else "6c. Precisión GPS y Finalización",
                 content = if (isEnglish) """
 **GPS Accuracy for Logging**
-When creating log entries, the app waits for accurate GPS data:
-• **Internal GPS**: Required accuracy ≤50 meters + valid altitude
-• **Bluetooth/NMEA GPS**: Only altitude required (accuracy check skipped)
-• Progress indicator shown while waiting
-• Option to save with current data if GPS takes too long (30s timeout)
+When creating log entries, the app validates GPS data quality:
+• **Accuracy**: ≤50 meters (internal GPS) or any value (Bluetooth/NMEA)
+• **Altitude validity**: Must be actually measured, not default 0.0
+• **Fix freshness**: Data must be less than 60 seconds old
+• **Progress indicator** shown while waiting for valid data
+
+**Timeout Options** (after 30 seconds):
+• **Cancel**: Abort log entry
+• **Keep searching**: Continue waiting for valid GPS
+• **Save anyway**: Save with current data (even if invalid)
 
 This ensures your flight logs have accurate position data, especially useful for:
 • Tracking takeoff/landing locations
@@ -699,11 +704,16 @@ This applies to both modes:
 • Quick reset for repeated use
                 """.trimIndent() else """
 **Precisión GPS para Logging**
-Al crear entradas de log, la app espera datos GPS precisos:
-• **GPS Interno**: Precisión requerida ≤50 metros + altitud válida
-• **GPS Bluetooth/NMEA**: Solo altitud requerida (sin verificación de precisión)
-• Indicador de progreso mientras espera
-• Opción de guardar con datos actuales si GPS tarda (timeout 30s)
+Al crear entradas de log, la app valida la calidad de los datos GPS:
+• **Precisión**: ≤50 metros (GPS interno) o cualquier valor (Bluetooth/NMEA)
+• **Validez de altitud**: Debe ser realmente medida, no el valor por defecto 0.0
+• **Frescura del fix**: Datos deben tener menos de 60 segundos de antigüedad
+• **Indicador de progreso** mientras espera datos válidos
+
+**Opciones tras Timeout** (después de 30 segundos):
+• **Cancelar**: Abortar entrada de log
+• **Seguir buscando**: Continuar esperando GPS válido
+• **Guardar igualmente**: Guardar con datos actuales (aunque sean inválidos)
 
 Esto asegura que tus logs de vuelo tengan datos de posición precisos, útil para:
 • Rastrear ubicaciones de despegue/aterrizaje

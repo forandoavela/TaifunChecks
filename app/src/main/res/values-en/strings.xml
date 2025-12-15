@@ -303,13 +303,17 @@
 
     <!-- GPS Accuracy Dialog -->
     <string name="gps_waiting_title">Waiting for GPS</string>
+    <string name="gps_timeout_title">GPS unavailable</string>
     <string name="gps_waiting_message">Getting accurate position (≤50m)…</string>
     <string name="gps_accuracy_current">Current accuracy: %1$s</string>
     <string name="gps_accuracy_unknown">Current accuracy: unknown</string>
     <string name="gps_altitude_waiting">Waiting for GPS altitude…</string>
     <string name="gps_altitude_ok">Altitude: %.0f m</string>
+    <string name="gps_altitude_invalid">Altitude: not measured (invalid value)</string>
+    <string name="gps_fix_age">Fix age: %1$d s</string>
     <string name="gps_timeout">Could not get accurate position. Save with current data?</string>
     <string name="gps_save_anyway">Save anyway</string>
+    <string name="gps_keep_searching">Keep searching</string>
     <string name="gps_wait_more">Wait more</string>
 
     <!-- Checklist Completion Dialog -->

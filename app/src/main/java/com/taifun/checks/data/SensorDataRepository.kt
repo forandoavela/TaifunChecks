@@ -11,6 +11,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,6 +59,20 @@ class SensorDataRepository(private val context: Context) {
 
     private val _accuracy = MutableStateFlow<Float?>(null)
     val accuracy: StateFlow<Float?> = _accuracy.asStateFlow()
+
+    /**
+     * Timestamp del último fix GPS (nanosegundos desde boot del sistema)
+     * Se usa para calcular la antigüedad del fix y rechazar datos obsoletos
+     */
+    private val _lastFixElapsedRealtimeNanos = MutableStateFlow<Long?>(null)
+    val lastFixElapsedRealtimeNanos: StateFlow<Long?> = _lastFixElapsedRealtimeNanos.asStateFlow()
+
+    /**
+     * Indica si la altitud fue realmente medida por el GPS
+     * Android devuelve 0.0 cuando no tiene datos de altitud
+     */
+    private val _hasValidAltitude = MutableStateFlow(false)
+    val hasValidAltitude: StateFlow<Boolean> = _hasValidAltitude.asStateFlow()
 
     private val _pressure = MutableStateFlow<Float?>(null)
     val pressure: StateFlow<Float?> = _pressure.asStateFlow()
@@ -160,21 +175,7 @@ class SensorDataRepository(private val context: Context) {
                     override fun onLocationChanged(location: Location) {
                         // Solo actualizar si seguimos usando GPS interno
                         if (_gpsSource.value == GpsSource.INTERNAL) {
-                            _altitude.value = location.altitude
-                            _latitude.value = location.latitude
-                            _longitude.value = location.longitude
-                            // Speed en Android está en m/s, convertir a km/h
-                            _speedKmh.value = if (location.hasSpeed()) {
-                                location.speed * 3.6f // m/s to km/h
-                            } else {
-                                null
-                            }
-                            // Accuracy in meters
-                            _accuracy.value = if (location.hasAccuracy()) {
-                                location.accuracy
-                            } else {
-                                null
-                            }
+                            updateFromLocation(location)
                         }
                     }
 
@@ -208,6 +209,7 @@ class SensorDataRepository(private val context: Context) {
                 }
 
                 // Obtener última ubicación conocida de ambos proveedores
+                // Solo usar si es reciente (menos de MAX_FIX_AGE_MS)
                 val gpsLocation = try {
                     locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 } catch (e: Exception) { null }
@@ -216,22 +218,24 @@ class SensorDataRepository(private val context: Context) {
                     locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
                 } catch (e: Exception) { null }
 
-                // Usar la más reciente
+                // Usar la más reciente (si no es demasiado antigua)
                 val lastKnown = when {
                     gpsLocation != null && networkLocation != null -> {
-                        if (gpsLocation.time > networkLocation.time) gpsLocation else networkLocation
+                        if (gpsLocation.elapsedRealtimeNanos > networkLocation.elapsedRealtimeNanos) gpsLocation else networkLocation
                     }
                     gpsLocation != null -> gpsLocation
                     networkLocation != null -> networkLocation
                     else -> null
                 }
 
-                lastKnown?.let {
-                    _altitude.value = it.altitude
-                    _latitude.value = it.latitude
-                    _longitude.value = it.longitude
-                    _speedKmh.value = if (it.hasSpeed()) it.speed * 3.6f else null
-                    _accuracy.value = if (it.hasAccuracy()) it.accuracy else null
+                // Solo usar lastKnown si no es demasiado antiguo
+                lastKnown?.let { location ->
+                    val ageNanos = SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos
+                    val ageMs = ageNanos / 1_000_000
+                    if (ageMs <= MAX_FIX_AGE_MS) {
+                        updateFromLocation(location)
+                    }
+                    // Si es muy antiguo, no actualizar - esperar un fix fresco
                 }
 
             } catch (e: SecurityException) {
@@ -294,6 +298,53 @@ class SensorDataRepository(private val context: Context) {
     }
 
     /**
+     * Actualiza los StateFlows con datos de una Location
+     * Valida antigüedad del fix y si la altitud fue realmente medida
+     */
+    private fun updateFromLocation(location: Location) {
+        _latitude.value = location.latitude
+        _longitude.value = location.longitude
+        _lastFixElapsedRealtimeNanos.value = location.elapsedRealtimeNanos
+
+        // Speed en Android está en m/s, convertir a km/h
+        _speedKmh.value = if (location.hasSpeed()) {
+            location.speed * 3.6f // m/s to km/h
+        } else {
+            null
+        }
+
+        // Accuracy in meters
+        _accuracy.value = if (location.hasAccuracy()) {
+            location.accuracy
+        } else {
+            null
+        }
+
+        // Solo actualizar altitud si fue realmente medida
+        // Android devuelve 0.0 cuando hasAltitude() es false
+        if (location.hasAltitude()) {
+            _altitude.value = location.altitude
+            _hasValidAltitude.value = true
+        } else {
+            // No actualizar altitud - mantener valor anterior si lo hay
+            // pero marcar como no válida si no teníamos una previa
+            if (_altitude.value == null) {
+                _hasValidAltitude.value = false
+            }
+        }
+    }
+
+    /**
+     * Calcula la antigüedad del último fix GPS en milisegundos
+     * @return Antigüedad en ms, o null si no hay fix registrado
+     */
+    fun getFixAgeMs(): Long? {
+        val lastFix = _lastFixElapsedRealtimeNanos.value ?: return null
+        val currentNanos = SystemClock.elapsedRealtimeNanos()
+        return (currentNanos - lastFix) / 1_000_000
+    }
+
+    /**
      * Verifica si tiene permisos de ubicación
      */
     private fun hasLocationPermission(): Boolean {
@@ -305,6 +356,14 @@ class SensorDataRepository(private val context: Context) {
             context,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    companion object {
+        /**
+         * Máxima antigüedad permitida para un fix GPS (60 segundos)
+         * Fixes más antiguos se consideran obsoletos y no se usan
+         */
+        const val MAX_FIX_AGE_MS = 60_000L
     }
 
     /**
