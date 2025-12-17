@@ -9,10 +9,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.ui.rememberHapticFeedback
@@ -73,6 +78,55 @@ fun HelpScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
+
+            // Safety Warning (FIRST - most important)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = if (isEnglish) "⚠️ SAFETY WARNING" else "⚠️ AVISO DE SEGURIDAD",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = if (isEnglish) """
+This app assists with aviation procedures but should NEVER be the sole reference for flight operations.
+
+Always:
+• Follow official aircraft manuals
+• Maintain proper pilot certification
+• Use in accordance with aviation regulations
+• Verify all items against official documentation
+
+The developers assume NO liability for use in actual flight operations.
+                        """.trimIndent() else """
+Esta app asiste con procedimientos de aviación pero NUNCA debe ser la única referencia para operaciones de vuelo.
+
+Siempre:
+• Sigue los manuales oficiales de la aeronave
+• Mantén la certificación de piloto apropiada
+• Usa de acuerdo con regulaciones de aviación
+• Verifica todos los elementos contra documentación oficial
+
+Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo reales.
+                        """.trimIndent(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
 
             // 1. Quick Start
             HelpCard(
@@ -1172,55 +1226,6 @@ checklists:
                 """.trimIndent()
             )
 
-            // Safety Warning
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
-                        shape = MaterialTheme.shapes.medium
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = if (isEnglish) "⚠️ SAFETY WARNING" else "⚠️ AVISO DE SEGURIDAD",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = if (isEnglish) """
-This app assists with aviation procedures but should NEVER be the sole reference for flight operations.
-
-Always:
-• Follow official aircraft manuals
-• Maintain proper pilot certification
-• Use in accordance with aviation regulations
-• Verify all items against official documentation
-
-The developers assume NO liability for use in actual flight operations.
-                        """.trimIndent() else """
-Esta app asiste con procedimientos de aviación pero NUNCA debe ser la única referencia para operaciones de vuelo.
-
-Siempre:
-• Sigue los manuales oficiales de la aeronave
-• Mantén la certificación de piloto apropiada
-• Usa de acuerdo con regulaciones de aviación
-• Verifica todos los elementos contra documentación oficial
-
-Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo reales.
-                        """.trimIndent(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                }
-            }
-
             // Version Info
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -1237,14 +1242,101 @@ Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo re
     }
 }
 
+/**
+ * Parses markdown-like content and returns an AnnotatedString
+ * Supports: **bold**, ```code blocks```
+ */
+@Composable
+private fun parseFormattedContent(
+    content: String,
+    primaryColor: Color,
+    codeBackgroundColor: Color
+): AnnotatedString {
+    return buildAnnotatedString {
+        var remaining = content
+
+        while (remaining.isNotEmpty()) {
+            // Check for code block (```)
+            val codeBlockStart = remaining.indexOf("```")
+            val boldStart = remaining.indexOf("**")
+
+            // Determine which comes first
+            val nextSpecial = when {
+                codeBlockStart >= 0 && boldStart >= 0 -> minOf(codeBlockStart, boldStart)
+                codeBlockStart >= 0 -> codeBlockStart
+                boldStart >= 0 -> boldStart
+                else -> -1
+            }
+
+            if (nextSpecial == -1) {
+                // No more special formatting, append rest as plain text
+                append(remaining)
+                break
+            }
+
+            // Append text before the special marker
+            if (nextSpecial > 0) {
+                append(remaining.substring(0, nextSpecial))
+            }
+
+            remaining = remaining.substring(nextSpecial)
+
+            when {
+                remaining.startsWith("```") -> {
+                    // Find end of code block
+                    val endIndex = remaining.indexOf("```", 3)
+                    if (endIndex > 3) {
+                        // Extract code content (skip the opening ```)
+                        var codeContent = remaining.substring(3, endIndex)
+                        // Remove language identifier if present (e.g., ```yaml)
+                        val firstNewline = codeContent.indexOf('\n')
+                        if (firstNewline > 0 && !codeContent.substring(0, firstNewline).contains(' ')) {
+                            codeContent = codeContent.substring(firstNewline + 1)
+                        }
+                        withStyle(SpanStyle(
+                            fontFamily = FontFamily.Monospace,
+                            background = codeBackgroundColor
+                        )) {
+                            append(codeContent.trim())
+                        }
+                        remaining = remaining.substring(endIndex + 3)
+                    } else {
+                        // No closing ```, treat as plain text
+                        append("```")
+                        remaining = remaining.substring(3)
+                    }
+                }
+                remaining.startsWith("**") -> {
+                    // Find end of bold
+                    val endIndex = remaining.indexOf("**", 2)
+                    if (endIndex > 2) {
+                        val boldText = remaining.substring(2, endIndex)
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = primaryColor)) {
+                            append(boldText)
+                        }
+                        remaining = remaining.substring(endIndex + 2)
+                    } else {
+                        // No closing **, treat as plain text
+                        append("**")
+                        remaining = remaining.substring(2)
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun HelpCard(title: String, content: String) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val codeBackgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
                 shape = MaterialTheme.shapes.medium
             ),
         colors = CardDefaults.cardColors(
@@ -1255,13 +1347,14 @@ private fun HelpCard(title: String, content: String) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = content,
+                text = parseFormattedContent(content, primaryColor, codeBackgroundColor),
                 style = MaterialTheme.typography.bodyMedium,
-                fontFamily = if (content.contains("```")) FontFamily.Monospace else FontFamily.Default
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )
         }
     }
