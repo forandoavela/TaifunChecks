@@ -129,17 +129,28 @@ class LogRepository(
             val utcTime = dateFormat.format(Date())
 
             // Detectar aeródromo solo si tenemos coordenadas válidas
+            // Formato: "ICAO: nombre (tipo)" según idioma seleccionado
             val icaoCode = if (latitude != null && longitude != null && altitudeMeters != null) {
                 val maxDistanceKm = settingsRepository.icaoMaxDistanceKmFlow.first()
                 val maxAltitudeDiffM = settingsRepository.icaoMaxAltitudeDiffMFlow.first()
 
-                aerodromeRepository.findNearestAerodrome(
+                val aerodrome = aerodromeRepository.findNearestAerodrome(
                     latitude = latitude,
                     longitude = longitude,
                     altitudeMeters = altitudeMeters,
                     maxDistanceKm = maxDistanceKm.toDouble(),
                     maxAltitudeDifferenceM = maxAltitudeDiffM.toDouble()
                 )
+
+                // Formatear como "ICAO: nombre (tipo)"
+                aerodrome?.let { ad ->
+                    val type = if (language == "en") ad.typeEn else ad.typeEs
+                    if (ad.name.isNotBlank()) {
+                        "${ad.identifier}: ${ad.name} ($type)"
+                    } else {
+                        "${ad.identifier} ($type)"
+                    }
+                }
             } else {
                 null
             }
@@ -255,6 +266,7 @@ class LogRepository(
 
     /**
      * Elimina una entrada específica del log por su índice (0-based)
+     * Usa escritura atómica para evitar pérdida de datos
      * @param index Índice de la entrada a eliminar
      * @return true si se eliminó correctamente
      */
@@ -266,37 +278,55 @@ class LogRepository(
             // Crear nueva lista sin la entrada eliminada
             val newEntries = entries.filterIndexed { i, _ -> i != index }
 
-            // Reescribir el archivo
+            // Usar escritura atómica: escribir a archivo temporal y luego renombrar
             val file = getLogFile()
-            file.delete()
+            val tempFile = File(file.parentFile, "flight_log.csv.tmp")
 
-            if (newEntries.isNotEmpty()) {
-                // Recrear con headers
-                ensureLogFileExists()
-
-                // Escribir todas las entradas excepto la eliminada
-                FileWriter(file, true).use { writer ->
-                    newEntries.forEach { entry ->
-                        val line = buildString {
-                            append(entry.utcTime)
-                            append(";")
-                            append(String.format(Locale.US, "%.6f", entry.latitude))
-                            append(";")
-                            append(String.format(Locale.US, "%.6f", entry.longitude))
-                            append(";")
-                            append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
-                            append(";")
-                            append(entry.icaoCode ?: "")
-                            append(";")
-                            append(entry.logText.replace(";", ","))
-                        }
-                        writer.write(line)
+            try {
+                if (newEntries.isNotEmpty()) {
+                    // Escribir headers al archivo temporal
+                    val headers = "Hora UTC;Latitud;Longitud;Altitud (m);OACI;Texto"
+                    FileWriter(tempFile, false).use { writer ->
+                        writer.write(headers)
                         writer.write("\n")
-                    }
-                }
-            }
 
-            true
+                        // Escribir todas las entradas excepto la eliminada
+                        newEntries.forEach { entry ->
+                            val line = buildString {
+                                append(entry.utcTime)
+                                append(";")
+                                append(String.format(Locale.US, "%.6f", entry.latitude))
+                                append(";")
+                                append(String.format(Locale.US, "%.6f", entry.longitude))
+                                append(";")
+                                append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                                append(";")
+                                append(entry.icaoCode ?: "")
+                                append(";")
+                                append(entry.logText.replace(";", ",").replace("\n", " ").replace("\r", ""))
+                            }
+                            writer.write(line)
+                            writer.write("\n")
+                        }
+                    }
+
+                    // Operación atómica: renombrar archivo temporal al archivo final
+                    if (!tempFile.renameTo(file)) {
+                        // Fallback si renameTo falla (puede pasar entre filesystems)
+                        tempFile.copyTo(file, overwrite = true)
+                        tempFile.delete()
+                    }
+                } else {
+                    // Si no quedan entradas, simplemente eliminar el archivo
+                    file.delete()
+                }
+
+                true
+            } catch (e: Exception) {
+                // Limpiar archivo temporal si existe
+                tempFile.delete()
+                throw e
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -445,6 +475,7 @@ class LogRepository(
 
     /**
      * Edita una entrada específica del log
+     * Usa escritura atómica para evitar pérdida de datos
      * @param index Índice de la entrada a editar (0-based)
      * @param newEntry Nueva entrada con los datos actualizados
      * @return true si se editó correctamente
@@ -457,35 +488,50 @@ class LogRepository(
             // Actualizar la entrada
             entries[index] = newEntry
 
-            // Reescribir el archivo
+            // Usar escritura atómica: escribir a archivo temporal y luego renombrar
             val file = getLogFile()
-            file.delete()
+            val tempFile = File(file.parentFile, "flight_log.csv.tmp")
 
-            // Recrear con headers
-            ensureLogFileExists()
-
-            // Escribir todas las entradas
-            FileWriter(file, true).use { writer ->
-                entries.forEach { entry ->
-                    val line = buildString {
-                        append(entry.utcTime)
-                        append(";")
-                        append(String.format(Locale.US, "%.6f", entry.latitude))
-                        append(";")
-                        append(String.format(Locale.US, "%.6f", entry.longitude))
-                        append(";")
-                        append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
-                        append(";")
-                        append(entry.icaoCode ?: "")
-                        append(";")
-                        append(entry.logText.replace(";", ","))
-                    }
-                    writer.write(line)
+            try {
+                // Escribir headers al archivo temporal
+                val headers = "Hora UTC;Latitud;Longitud;Altitud (m);OACI;Texto"
+                FileWriter(tempFile, false).use { writer ->
+                    writer.write(headers)
                     writer.write("\n")
-                }
-            }
 
-            true
+                    // Escribir todas las entradas
+                    entries.forEach { entry ->
+                        val line = buildString {
+                            append(entry.utcTime)
+                            append(";")
+                            append(String.format(Locale.US, "%.6f", entry.latitude))
+                            append(";")
+                            append(String.format(Locale.US, "%.6f", entry.longitude))
+                            append(";")
+                            append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                            append(";")
+                            append(entry.icaoCode ?: "")
+                            append(";")
+                            append(entry.logText.replace(";", ",").replace("\n", " ").replace("\r", ""))
+                        }
+                        writer.write(line)
+                        writer.write("\n")
+                    }
+                }
+
+                // Operación atómica: renombrar archivo temporal al archivo final
+                if (!tempFile.renameTo(file)) {
+                    // Fallback si renameTo falla (puede pasar entre filesystems)
+                    tempFile.copyTo(file, overwrite = true)
+                    tempFile.delete()
+                }
+
+                true
+            } catch (e: Exception) {
+                // Limpiar archivo temporal si existe
+                tempFile.delete()
+                throw e
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             false

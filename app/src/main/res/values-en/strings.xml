@@ -284,6 +284,10 @@
     <string name="entry_altitude_label">Altitude (m)</string>
     <string name="entry_icao_label">ICAO</string>
 
+    <!-- Log Entry -->
+    <string name="log_entry_saved">Log entry saved</string>
+    <string name="log_entry_error">Error saving log</string>
+
     <!-- Custom Log -->
     <string name="create_custom_log">Create Log</string>
     <string name="custom_log_title">Create Custom Log</string>
@@ -299,13 +303,17 @@
 
     <!-- GPS Accuracy Dialog -->
     <string name="gps_waiting_title">Waiting for GPS</string>
+    <string name="gps_timeout_title">GPS unavailable</string>
     <string name="gps_waiting_message">Getting accurate position (≤50m)…</string>
     <string name="gps_accuracy_current">Current accuracy: %1$s</string>
     <string name="gps_accuracy_unknown">Current accuracy: unknown</string>
     <string name="gps_altitude_waiting">Waiting for GPS altitude…</string>
     <string name="gps_altitude_ok">Altitude: %.0f m</string>
+    <string name="gps_altitude_invalid">Altitude: not measured (invalid value)</string>
+    <string name="gps_fix_age">Fix age: %1$d s</string>
     <string name="gps_timeout">Could not get accurate position. Save with current data?</string>
     <string name="gps_save_anyway">Save anyway</string>
+    <string name="gps_keep_searching">Keep searching</string>
     <string name="gps_wait_more">Wait more</string>
 
     <!-- Checklist Completion Dialog -->
@@ -313,4 +321,29 @@
     <string name="checklist_completed_message">You have completed all steps in this checklist.</string>
     <string name="checklist_exit">Exit</string>
     <string name="checklist_back">Back</string>
+
+    <!-- Permission Messages -->
+    <string name="permission_granted_gps">Permissions granted. Waiting for GPS… Try again in a few seconds.</string>
+    <string name="permission_denied">Permission denied</string>
+
+    <!-- Error Messages -->
+    <string name="error_cannot_open_link">Cannot open link: %1$s</string>
+    <string name="error_app_not_installed">App not installed: %1$s</string>
+    <string name="error_cannot_open_app">Cannot open app: %1$s</string>
+    <string name="error_launching_app">Error launching app: %1$s</string>
+    <string name="error_sharing_file">Error sharing file: %1$s</string>
+    <string name="error_generic">Error: %1$s</string>
+
+    <!-- Accessibility - Additional -->
+    <string name="accessibility_bluetooth">Bluetooth</string>
+    <string name="accessibility_add">Add</string>
+    <string name="accessibility_check">Check</string>
+    <string name="accessibility_edit_item">Edit item</string>
+    <string name="accessibility_delete_item">Delete item</string>
+    <string name="accessibility_icon">Icon</string>
+    <string name="accessibility_loading">Loading</string>
+    <string name="accessibility_expand">Expand</string>
+    <string name="accessibility_collapse">Collapse</string>
+    <string name="accessibility_move_up">Move up</string>
+    <string name="accessibility_move_down">Move down</string>
 </resources>

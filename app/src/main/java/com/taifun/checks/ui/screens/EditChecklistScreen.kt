@@ -220,7 +220,7 @@ fun EditChecklistScreen(
                                             style = MaterialTheme.typography.bodyLarge
                                         )
                                     }
-                                    Icon(Icons.Default.Edit, contentDescription = null)
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                                 }
                             }
 
@@ -250,7 +250,7 @@ fun EditChecklistScreen(
                                             style = MaterialTheme.typography.bodyLarge
                                         )
                                     }
-                                    Icon(Icons.Default.Edit, contentDescription = null)
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                                 }
                             }
 
@@ -303,7 +303,7 @@ fun EditChecklistScreen(
                                                     )
                                             )
                                         }
-                                        Icon(Icons.Default.Edit, contentDescription = null)
+                                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                                     }
                                 }
                             }
@@ -389,7 +389,7 @@ fun EditChecklistScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.KeyboardArrowUp,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(R.string.accessibility_move_up),
                                         tint = if (index > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                     )
                                 }
@@ -408,7 +408,7 @@ fun EditChecklistScreen(
                                 ) {
                                     Icon(
                                         Icons.Default.KeyboardArrowDown,
-                                        contentDescription = null,
+                                        contentDescription = stringResource(R.string.accessibility_move_down),
                                         tint = if (index < pasos.size - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                                     )
                                 }
@@ -437,7 +437,7 @@ fun EditChecklistScreen(
                                 editingStepIndex = index
                                 showEditStepDialog = true
                             }) {
-                                Icon(Icons.Default.Edit, contentDescription = null)
+                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                             }
 
                             // Botón eliminar
@@ -448,7 +448,7 @@ fun EditChecklistScreen(
                             }) {
                                 Icon(
                                     Icons.Default.Delete,
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.delete),
                                     tint = MaterialTheme.colorScheme.error
                                 )
                             }

@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import com.taifun.checks.ui.components.GpsWaitingDialog
 import com.taifun.checks.ui.components.isGpsAccurateForLogging
+import com.taifun.checks.ui.components.rememberLocationPermissionHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,14 +93,10 @@ fun StepScreen(
     val longitude by sensorRepo.longitude.collectAsState()
     val speedKmh by sensorRepo.speedKmh.collectAsState()
 
-    // Permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions.values.any { it }) {
-            sensorRepo.startLocationTracking()
-        }
-    }
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = { sensorRepo.startLocationTracking() }
+    )
 
     // Observar idioma de configuración
     val currentLanguage by settingsRepo.languageFlow.collectAsState(initial = "auto")
@@ -155,12 +152,7 @@ fun StepScreen(
                 val needsBarometer = cl?.pasos?.any { it.qnh != null } == true
 
                 if (needsLocation) {
-                    locationPermissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        )
-                    )
+                    locationPermission.requestPermissions()
                 }
                 if (needsBarometer) {
                     sensorRepo.startPressureTracking()
@@ -207,7 +199,8 @@ fun StepScreen(
     }
 
     // Limpiar recursos al salir
-    DisposableEffect(Unit) {
+    // Usamos las dependencias reales para que si cambian, los recursos antiguos se limpien correctamente
+    DisposableEffect(speechRecognizer, sensorRepo) {
         onDispose {
             speechRecognizer?.destroy()
             sensorRepo.stopAll()
@@ -500,32 +493,29 @@ private fun StepByStepMode(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    // Calculate fix age dynamically for UI updates
+    var fixAgeMs by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            fixAgeMs = sensorRepo.getFixAgeMs()
+            kotlinx.coroutines.delay(1000) // Update every second
+        }
+    }
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
-    // Launcher para permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        // Si se otorgan permisos, iniciar tracking e intentar guardar log de nuevo
-        if (permissions.values.any { it }) {
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = {
             sensorRepo.startLocationTracking()
-            Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
+            Toast.makeText(ctx, ctx.getString(R.string.permission_granted_gps), Toast.LENGTH_LONG).show()
         }
-    }
+    )
 
     // Función para verificar permisos de ubicación
-    val hasLocationPermission = remember {
-        {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
+    val hasLocationPermission = remember(ctx) {
+        { com.taifun.checks.ui.components.hasLocationPermission(ctx) }
     }
 
     // Function to execute log save
@@ -542,17 +532,9 @@ private fun StepByStepMode(
             )
 
             if (success) {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_saved), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Error saving log" else "Error al guardar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_error), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -562,6 +544,8 @@ private fun StepByStepMode(
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
             altitude = altitude,
+            hasValidAltitude = hasValidAltitude,
+            fixAgeMs = fixAgeMs,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -570,6 +554,9 @@ private fun StepByStepMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
+            },
+            onKeepSearching = {
+                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -590,7 +577,7 @@ private fun StepByStepMode(
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(p.link))
                         ctx.startActivity(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(ctx, "Cannot open link: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_link, e.message ?: ""), Toast.LENGTH_SHORT).show()
                     }
                 }
                 !p.app.isNullOrBlank() -> {
@@ -613,14 +600,14 @@ private fun StepByStepMode(
                                     launchIntent.setClassName(p.app, resolveInfo[0].activityInfo.name)
                                     ctx.startActivity(launchIntent)
                                 } else {
-                                    Toast.makeText(ctx, "App not installed: ${p.app}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(ctx, ctx.getString(R.string.error_app_not_installed, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e2: Exception) {
-                                Toast.makeText(ctx, "Cannot open app: ${p.app}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_app, p.app ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                     } catch (e: Exception) {
-                        Toast.makeText(ctx, "Error launching app: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(ctx, ctx.getString(R.string.error_launching_app, e.message ?: ""), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -791,18 +778,13 @@ private fun StepByStepMode(
                                     onClick = {
                                         // Verificar permisos primero
                                         if (!hasLocationPermission()) {
-                                            locationPermissionLauncher.launch(
-                                                arrayOf(
-                                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                                )
-                                            )
+                                            locationPermission.requestPermissions()
                                             return@Button
                                         }
 
                                         // Check if GPS is accurate enough
                                         val logText = paso.log ?: ""
-                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                             // GPS is good, save directly
                                             executeLogSave(logText)
                                         } else {
@@ -890,18 +872,13 @@ private fun StepByStepMode(
                             onClick = {
                                 // Verificar permisos primero
                                 if (!hasLocationPermission()) {
-                                    locationPermissionLauncher.launch(
-                                        arrayOf(
-                                            Manifest.permission.ACCESS_FINE_LOCATION,
-                                            Manifest.permission.ACCESS_COARSE_LOCATION
-                                        )
-                                    )
+                                    locationPermission.requestPermissions()
                                     return@Button
                                 }
 
                                 // Check if GPS is accurate enough
                                 val logText = paso.log ?: ""
-                                if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                     // GPS is good, save directly
                                     executeLogSave(logText)
                                 } else {
@@ -1009,33 +986,30 @@ private fun FullListMode(
     val ctx = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Launcher para permisos de ubicación
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        // Si se otorgan permisos, iniciar tracking e informar al usuario
-        if (permissions.values.any { it }) {
+    // Permisos de ubicación usando componente reutilizable
+    val locationPermission = rememberLocationPermissionHandler(
+        onPermissionGranted = {
             sensorRepo.startLocationTracking()
-            Toast.makeText(ctx, "Permisos otorgados. Esperando GPS... Pulse de nuevo en unos segundos.", Toast.LENGTH_LONG).show()
+            Toast.makeText(ctx, ctx.getString(R.string.permission_granted_gps), Toast.LENGTH_LONG).show()
         }
-    }
+    )
 
     // Función para verificar permisos de ubicación
-    val hasLocationPermission = remember {
-        {
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                ctx,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-        }
+    val hasLocationPermission = remember(ctx) {
+        { com.taifun.checks.ui.components.hasLocationPermission(ctx) }
     }
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    // Calculate fix age dynamically for UI updates
+    var fixAgeMs by remember { mutableStateOf<Long?>(null) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            fixAgeMs = sensorRepo.getFixAgeMs()
+            kotlinx.coroutines.delay(1000) // Update every second
+        }
+    }
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
@@ -1053,17 +1027,9 @@ private fun FullListMode(
             )
 
             if (success) {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Log entry saved" else "Entrada guardada",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_saved), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(
-                    ctx,
-                    if (lang == "en") "Error saving log" else "Error al guardar",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(ctx, ctx.getString(R.string.log_entry_error), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -1073,6 +1039,8 @@ private fun FullListMode(
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
             altitude = altitude,
+            hasValidAltitude = hasValidAltitude,
+            fixAgeMs = fixAgeMs,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -1081,6 +1049,9 @@ private fun FullListMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
+            },
+            onKeepSearching = {
+                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -1212,7 +1183,7 @@ private fun FullListMode(
                                 val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(p.link))
                                 ctx.startActivity(intent)
                             } catch (e: Exception) {
-                                android.widget.Toast.makeText(ctx, "Cannot open link: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_link, e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                         !p.app.isNullOrBlank() -> {
@@ -1235,14 +1206,14 @@ private fun FullListMode(
                                             launchIntent.setClassName(p.app, resolveInfo[0].activityInfo.name)
                                             ctx.startActivity(launchIntent)
                                         } else {
-                                            android.widget.Toast.makeText(ctx, "App not installed: ${p.app}", android.widget.Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(ctx, ctx.getString(R.string.error_app_not_installed, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                         }
                                     } catch (e2: Exception) {
-                                        android.widget.Toast.makeText(ctx, "Cannot open app: ${p.app}", android.widget.Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(ctx, ctx.getString(R.string.error_cannot_open_app, p.app ?: ""), Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } catch (e: Exception) {
-                                android.widget.Toast.makeText(ctx, "Error launching app: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_launching_app, e.message ?: ""), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -1346,18 +1317,13 @@ private fun FullListMode(
 
                                     // Verificar permisos primero
                                     if (!hasLocationPermission()) {
-                                        locationPermissionLauncher.launch(
-                                            arrayOf(
-                                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                                Manifest.permission.ACCESS_COARSE_LOCATION
-                                            )
-                                        )
+                                        locationPermission.requestPermissions()
                                         return@Button
                                     }
 
                                     // Check if GPS is accurate enough
                                     val logText = p.log ?: ""
-                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
                                         // GPS is good, save directly
                                         executeLogSave(logText)
                                     } else {

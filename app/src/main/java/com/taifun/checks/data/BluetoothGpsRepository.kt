@@ -15,6 +15,8 @@ import com.taifun.checks.data.nmea.NmeaParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -59,7 +61,7 @@ class BluetoothGpsRepository(private val context: Context) {
 
     private var bluetoothSocket: BluetoothSocket? = null
     private var readJob: Job? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     /**
      * Check if Bluetooth is available and enabled on this device
@@ -170,9 +172,10 @@ class BluetoothGpsRepository(private val context: Context) {
     private fun startReading(socket: BluetoothSocket) {
         readJob?.cancel()
         readJob = coroutineScope.launch {
+            var reader: BufferedReader? = null
             try {
                 val inputStream = socket.inputStream
-                val reader = BufferedReader(InputStreamReader(inputStream))
+                reader = BufferedReader(InputStreamReader(inputStream))
 
                 Log.d(TAG, "Started reading NMEA data")
                 var accumulatedData = NmeaParser.NmeaData()
@@ -227,6 +230,12 @@ class BluetoothGpsRepository(private val context: Context) {
             } catch (e: Exception) {
                 Log.e(TAG, "Error in read loop", e)
             } finally {
+                // Cerrar el BufferedReader para evitar memory leak
+                try {
+                    reader?.close()
+                } catch (e: IOException) {
+                    Log.w(TAG, "Error closing reader", e)
+                }
                 if (_isConnected.value) {
                     _connectionStatus.value = "Connection lost"
                     _isConnected.value = false
@@ -288,8 +297,11 @@ class BluetoothGpsRepository(private val context: Context) {
 
     /**
      * Clean up resources
+     * Must be called when the repository is no longer needed to prevent memory leaks
      */
     fun cleanup() {
         disconnect()
+        // Cancelar el scope para liberar recursos de coroutines
+        coroutineScope.cancel()
     }
 }

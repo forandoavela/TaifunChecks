@@ -201,7 +201,7 @@ fun ChecklistManagerScreen(
                 ) {
                     Icon(
                         Icons.Filled.Info,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.manager_empty),
                         modifier = Modifier.size(64.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -217,7 +217,7 @@ fun ChecklistManagerScreen(
                             haptic.performHapticFeedback()
                             showCreateDialog = true
                         }) {
-                            Icon(Icons.Filled.Edit, contentDescription = null)
+                            Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.create_new))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.create_new))
                         }
@@ -225,7 +225,7 @@ fun ChecklistManagerScreen(
                             haptic.performHapticFeedback()
                             importLauncher.launch(arrayOf("application/x-yaml", "text/yaml", "text/plain", "*/*"))
                         }) {
-                            Icon(Icons.Filled.Add, contentDescription = null)
+                            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.manager_import))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.manager_import))
                         }
@@ -276,10 +276,10 @@ fun ChecklistManagerScreen(
                                     }
                                     ctx.startActivity(Intent.createChooser(shareIntent, null))
                                 } else {
-                                    Toast.makeText(ctx, "File not found", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(ctx, ctx.getString(R.string.error_file_not_found), Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
-                                Toast.makeText(ctx, "Error sharing file: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(ctx, ctx.getString(R.string.error_sharing_file, e.message ?: ""), Toast.LENGTH_LONG).show()
                             }
                         },
                         onDelete = {
@@ -493,7 +493,7 @@ private fun ChecklistFileCard(
                     ) {
                         Icon(
                             Icons.Filled.Check,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.manager_select),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))

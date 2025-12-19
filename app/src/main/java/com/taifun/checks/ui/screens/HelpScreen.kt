@@ -9,10 +9,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.ui.rememberHapticFeedback
@@ -73,6 +78,55 @@ fun HelpScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
+
+            // Safety Warning (FIRST - most important)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = if (isEnglish) "⚠️ SAFETY WARNING" else "⚠️ AVISO DE SEGURIDAD",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = if (isEnglish) """
+This app assists with aviation procedures but should NEVER be the sole reference for flight operations.
+
+Always:
+• Follow official aircraft manuals
+• Maintain proper pilot certification
+• Use in accordance with aviation regulations
+• Verify all items against official documentation
+
+The developers assume NO liability for use in actual flight operations.
+                        """.trimIndent() else """
+Esta app asiste con procedimientos de aviación pero NUNCA debe ser la única referencia para operaciones de vuelo.
+
+Siempre:
+• Sigue los manuales oficiales de la aeronave
+• Mantén la certificación de piloto apropiada
+• Usa de acuerdo con regulaciones de aviación
+• Verifica todos los elementos contra documentación oficial
+
+Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo reales.
+                        """.trimIndent(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
 
             // 1. Quick Start
             HelpCard(
@@ -669,11 +723,16 @@ Columnas: Timestamp, Texto, Latitud, Longitud, Altitud (m), Código ICAO
                 title = if (isEnglish) "6c. GPS Accuracy & Completion" else "6c. Precisión GPS y Finalización",
                 content = if (isEnglish) """
 **GPS Accuracy for Logging**
-When creating log entries, the app waits for accurate GPS data:
-• **Internal GPS**: Required accuracy ≤50 meters + valid altitude
-• **Bluetooth/NMEA GPS**: Only altitude required (accuracy check skipped)
-• Progress indicator shown while waiting
-• Option to save with current data if GPS takes too long (30s timeout)
+When creating log entries, the app validates GPS data quality:
+• **Accuracy**: ≤50 meters (internal GPS) or any value (Bluetooth/NMEA)
+• **Altitude validity**: Must be actually measured, not default 0.0
+• **Fix freshness**: Data must be less than 60 seconds old
+• **Progress indicator** shown while waiting for valid data
+
+**Timeout Options** (after 30 seconds):
+• **Cancel**: Abort log entry
+• **Keep searching**: Continue waiting for valid GPS
+• **Save anyway**: Save with current data (even if invalid)
 
 This ensures your flight logs have accurate position data, especially useful for:
 • Tracking takeoff/landing locations
@@ -699,11 +758,16 @@ This applies to both modes:
 • Quick reset for repeated use
                 """.trimIndent() else """
 **Precisión GPS para Logging**
-Al crear entradas de log, la app espera datos GPS precisos:
-• **GPS Interno**: Precisión requerida ≤50 metros + altitud válida
-• **GPS Bluetooth/NMEA**: Solo altitud requerida (sin verificación de precisión)
-• Indicador de progreso mientras espera
-• Opción de guardar con datos actuales si GPS tarda (timeout 30s)
+Al crear entradas de log, la app valida la calidad de los datos GPS:
+• **Precisión**: ≤50 metros (GPS interno) o cualquier valor (Bluetooth/NMEA)
+• **Validez de altitud**: Debe ser realmente medida, no el valor por defecto 0.0
+• **Frescura del fix**: Datos deben tener menos de 60 segundos de antigüedad
+• **Indicador de progreso** mientras espera datos válidos
+
+**Opciones tras Timeout** (después de 30 segundos):
+• **Cancelar**: Abortar entrada de log
+• **Seguir buscando**: Continuar esperando GPS válido
+• **Guardar igualmente**: Guardar con datos actuales (aunque sean inválidos)
 
 Esto asegura que tus logs de vuelo tengan datos de posición precisos, útil para:
 • Rastrear ubicaciones de despegue/aterrizaje
@@ -1162,55 +1226,6 @@ checklists:
                 """.trimIndent()
             )
 
-            // Safety Warning
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f),
-                        shape = MaterialTheme.shapes.medium
-                    ),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = if (isEnglish) "⚠️ SAFETY WARNING" else "⚠️ AVISO DE SEGURIDAD",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = if (isEnglish) """
-This app assists with aviation procedures but should NEVER be the sole reference for flight operations.
-
-Always:
-• Follow official aircraft manuals
-• Maintain proper pilot certification
-• Use in accordance with aviation regulations
-• Verify all items against official documentation
-
-The developers assume NO liability for use in actual flight operations.
-                        """.trimIndent() else """
-Esta app asiste con procedimientos de aviación pero NUNCA debe ser la única referencia para operaciones de vuelo.
-
-Siempre:
-• Sigue los manuales oficiales de la aeronave
-• Mantén la certificación de piloto apropiada
-• Usa de acuerdo con regulaciones de aviación
-• Verifica todos los elementos contra documentación oficial
-
-Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo reales.
-                        """.trimIndent(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                }
-            }
-
             // Version Info
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -1227,14 +1242,101 @@ Los desarrolladores NO asumen responsabilidad por uso en operaciones de vuelo re
     }
 }
 
+/**
+ * Parses markdown-like content and returns an AnnotatedString
+ * Supports: **bold**, ```code blocks```
+ */
+@Composable
+private fun parseFormattedContent(
+    content: String,
+    primaryColor: Color,
+    codeBackgroundColor: Color
+): AnnotatedString {
+    return buildAnnotatedString {
+        var remaining = content
+
+        while (remaining.isNotEmpty()) {
+            // Check for code block (```)
+            val codeBlockStart = remaining.indexOf("```")
+            val boldStart = remaining.indexOf("**")
+
+            // Determine which comes first
+            val nextSpecial = when {
+                codeBlockStart >= 0 && boldStart >= 0 -> minOf(codeBlockStart, boldStart)
+                codeBlockStart >= 0 -> codeBlockStart
+                boldStart >= 0 -> boldStart
+                else -> -1
+            }
+
+            if (nextSpecial == -1) {
+                // No more special formatting, append rest as plain text
+                append(remaining)
+                break
+            }
+
+            // Append text before the special marker
+            if (nextSpecial > 0) {
+                append(remaining.substring(0, nextSpecial))
+            }
+
+            remaining = remaining.substring(nextSpecial)
+
+            when {
+                remaining.startsWith("```") -> {
+                    // Find end of code block
+                    val endIndex = remaining.indexOf("```", 3)
+                    if (endIndex > 3) {
+                        // Extract code content (skip the opening ```)
+                        var codeContent = remaining.substring(3, endIndex)
+                        // Remove language identifier if present (e.g., ```yaml)
+                        val firstNewline = codeContent.indexOf('\n')
+                        if (firstNewline > 0 && !codeContent.substring(0, firstNewline).contains(' ')) {
+                            codeContent = codeContent.substring(firstNewline + 1)
+                        }
+                        withStyle(SpanStyle(
+                            fontFamily = FontFamily.Monospace,
+                            background = codeBackgroundColor
+                        )) {
+                            append(codeContent.trim())
+                        }
+                        remaining = remaining.substring(endIndex + 3)
+                    } else {
+                        // No closing ```, treat as plain text
+                        append("```")
+                        remaining = remaining.substring(3)
+                    }
+                }
+                remaining.startsWith("**") -> {
+                    // Find end of bold
+                    val endIndex = remaining.indexOf("**", 2)
+                    if (endIndex > 2) {
+                        val boldText = remaining.substring(2, endIndex)
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = primaryColor)) {
+                            append(boldText)
+                        }
+                        remaining = remaining.substring(endIndex + 2)
+                    } else {
+                        // No closing **, treat as plain text
+                        append("**")
+                        remaining = remaining.substring(2)
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun HelpCard(title: String, content: String) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val codeBackgroundColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
                 shape = MaterialTheme.shapes.medium
             ),
         colors = CardDefaults.cardColors(
@@ -1245,13 +1347,14 @@ private fun HelpCard(title: String, content: String) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = content,
+                text = parseFormattedContent(content, primaryColor, codeBackgroundColor),
                 style = MaterialTheme.typography.bodyMedium,
-                fontFamily = if (content.contains("```")) FontFamily.Monospace else FontFamily.Default
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
             )
         }
     }

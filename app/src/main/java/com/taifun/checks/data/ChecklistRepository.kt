@@ -8,7 +8,10 @@ import android.util.Log
 import com.taifun.checks.data.yaml.YamlIO
 import com.taifun.checks.data.yaml.YamlParseException
 import com.taifun.checks.domain.Catalogo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
@@ -16,6 +19,9 @@ import java.io.IOException
 class ChecklistRepository(private val context: Context) {
 
     private val defaultFileName = "Taifun17E_ES.yaml"
+
+    // Scope para operaciones de inicialización en background
+    private val initScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     /**
      * Obtiene el directorio para almacenar archivos YAML
@@ -51,10 +57,17 @@ class ChecklistRepository(private val context: Context) {
     private val KEY_LAST_VERSION_CODE = "last_version_code"
 
     init {
-        // Migración: Borrar archivo antiguo si existe
-        migrateOldFiles()
-        // Inicializar archivos por defecto desde assets
-        initializeDefaultChecklists()
+        // Ejecutar inicialización en background para no bloquear el main thread
+        initScope.launch {
+            try {
+                // Migración: Borrar archivo antiguo si existe
+                migrateOldFiles()
+                // Inicializar archivos por defecto desde assets
+                initializeDefaultChecklists()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error durante inicialización en background", e)
+            }
+        }
     }
 
     /**

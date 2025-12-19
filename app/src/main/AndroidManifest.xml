@@ -30,10 +30,12 @@
 
     <application
         android:label="Taifun Checks"
+        android:description="@string/app_description"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/Theme.TaifunChecks"
         android:supportsRtl="false"
+        android:allowBackup="true"
         android:localeConfig="@xml/locales_config">
 
         <activity

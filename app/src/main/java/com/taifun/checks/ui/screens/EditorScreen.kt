@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.taifun.checks.AppConfig
 import com.taifun.checks.R
 import com.taifun.checks.data.ChecklistRepository
 import com.taifun.checks.data.SettingsRepository
@@ -61,7 +62,7 @@ fun EditorScreen(onBack: () -> Unit) {
     LaunchedEffect(text) {
         validationJob?.cancel()
         validationJob = scope.launch {
-            delay(500) // debounce de 500ms
+            delay(AppConfig.DEBOUNCE_DELAY_MS)
             validationError = try {
                 YamlIO.parseCatalog(text)
                 null // sin errores

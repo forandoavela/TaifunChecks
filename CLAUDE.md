@@ -840,6 +840,19 @@ If implementing tests for Bluetooth GPS:
    - Altitude and QNH calculations used for navigation
    - Sensor errors must be handled gracefully
    - Always show units clearly (meters vs feet)
+   - **GPS Data Validation** (v1.0.06+):
+     - `hasValidAltitude`: Checks if altitude was actually measured (not default 0.0)
+     - `lastFixElapsedRealtimeNanos`: Tracks fix timestamp to detect stale data
+     - `getFixAgeMs()`: Returns age of last fix in milliseconds
+     - `MAX_FIX_AGE_MS = 60000`: Fixes older than 60 seconds are rejected
+     - Uses Android's `location.hasAltitude()` to validate altitude measurements
+     - Uses `location.elapsedRealtimeNanos` for monotonic time tracking
+
+5. **GpsWaitingDialog.kt** (GPS accuracy validation)
+   - `isGpsAccurateForLogging()`: Validates GPS data before logging
+   - Requirements: accuracy ≤ 50m, valid altitude, fix age ≤ 60s
+   - Three options on timeout: "Cancel", "Keep searching", "Save anyway"
+   - Shows real-time fix age and altitude validity status
 
 ### Data Loss Prevention
 
@@ -1043,6 +1056,7 @@ When explaining code to developers:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-12-15 | 1.5 | Added GPS fix age validation, altitude validity check, "keep searching" option |
 | 2025-12-08 | 1.4 | Added GPS accuracy logging, checklist completion dialog, independent variometer docs |
 | 2025-11-30 | 1.2 | Added Bluetooth GPS support documentation |
 | 2025-11-19 | 1.1 | Updated versioning system to w.x.yy.zz format |
