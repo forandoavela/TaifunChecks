@@ -307,6 +307,8 @@
     <string name="gps_waiting_message">Getting accurate position (≤50m)…</string>
     <string name="gps_accuracy_current">Current accuracy: %1$s</string>
     <string name="gps_accuracy_unknown">Current accuracy: unknown</string>
+    <string name="gps_vertical_accuracy_current">Vertical accuracy: %1$s</string>
+    <string name="gps_vertical_accuracy_unknown">Vertical accuracy: unknown</string>
     <string name="gps_altitude_waiting">Waiting for GPS altitude…</string>
     <string name="gps_altitude_ok">Altitude: %.0f m</string>
     <string name="gps_altitude_invalid">Altitude: not measured (invalid value)</string>

@@ -10,48 +10,41 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.taifun.checks.R
 import com.taifun.checks.data.SensorDataRepository
-import kotlinx.coroutines.delay
 import java.util.Locale
 
 /**
- * Required GPS accuracy for logging (in meters)
+ * Required GPS horizontal accuracy for logging (in meters)
  */
 const val GPS_REQUIRED_ACCURACY_M = 50f
 
 /**
- * Timeout for waiting for GPS fix (in milliseconds)
- */
-const val GPS_WAIT_TIMEOUT_MS = 30_000L
-
-/**
- * Dialog that waits for accurate GPS fix before allowing log save
+ * Dialog that waits for accurate GPS fix before allowing log save.
+ * Continues searching indefinitely until user takes action or GPS becomes accurate.
  *
- * @param accuracy Current GPS accuracy in meters (null if unknown)
+ * @param accuracy Current GPS horizontal accuracy in meters (null if unknown)
+ * @param verticalAccuracy Current GPS vertical accuracy in meters (null if unknown/API < 26)
  * @param altitude Current GPS altitude in meters (null if no fix)
  * @param hasValidAltitude Whether the altitude was actually measured by GPS (not just 0.0 default)
  * @param fixAgeMs Age of the last GPS fix in milliseconds (null if no fix)
+ * @param requiredVerticalAccuracy Required vertical accuracy in meters (from ICAO altitude diff setting)
  * @param onDismiss Called when user cancels
  * @param onSaveAnyway Called when user chooses to save with current (inaccurate) data
- * @param onKeepSearching Called when user wants to continue waiting for GPS
  * @param onGpsReady Called when GPS meets accuracy requirements
  */
 @Composable
 fun GpsWaitingDialog(
     accuracy: Float?,
+    verticalAccuracy: Float? = null,
     altitude: Double?,
     hasValidAltitude: Boolean = true,
     fixAgeMs: Long? = null,
+    requiredVerticalAccuracy: Float? = null,
     onDismiss: () -> Unit,
     onSaveAnyway: () -> Unit,
-    onKeepSearching: () -> Unit = {},
     onGpsReady: () -> Unit
 ) {
     // Check if GPS is good enough using enhanced validation
-    val isGpsGood = isGpsAccurateForLogging(accuracy, altitude, hasValidAltitude, fixAgeMs)
-
-    // Track if we've timed out - use key to allow reset
-    var timeoutKey by remember { mutableStateOf(0) }
-    var hasTimedOut by remember { mutableStateOf(false) }
+    val isGpsGood = isGpsAccurateForLogging(accuracy, verticalAccuracy, altitude, hasValidAltitude, fixAgeMs, requiredVerticalAccuracy)
 
     // Auto-close when GPS is good
     LaunchedEffect(isGpsGood) {
@@ -60,28 +53,21 @@ fun GpsWaitingDialog(
         }
     }
 
-    // Timeout after GPS_WAIT_TIMEOUT_MS - reset when timeoutKey changes
-    LaunchedEffect(timeoutKey) {
-        hasTimedOut = false
-        delay(GPS_WAIT_TIMEOUT_MS)
-        if (!isGpsGood) {
-            hasTimedOut = true
-        }
-    }
-
     // Calculate fix age for display
     val fixAgeSeconds = fixAgeMs?.let { it / 1000 }
     val isFixStale = fixAgeMs != null && fixAgeMs > SensorDataRepository.MAX_FIX_AGE_MS
 
+    // Check if vertical accuracy meets requirements
+    val isVerticalAccuracyGood = when {
+        requiredVerticalAccuracy == null -> true // No requirement
+        verticalAccuracy == null -> true // Not available, skip check
+        else -> verticalAccuracy <= requiredVerticalAccuracy
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(
-                text = if (hasTimedOut)
-                    stringResource(R.string.gps_timeout_title)
-                else
-                    stringResource(R.string.gps_waiting_title)
-            )
+            Text(text = stringResource(R.string.gps_waiting_title))
         },
         text = {
             Column(
@@ -89,27 +75,18 @@ fun GpsWaitingDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (!hasTimedOut) {
-                    // Show progress indicator while waiting
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp)
-                    )
+                // Show progress indicator while waiting
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp)
+                )
 
-                    Text(
-                        text = stringResource(R.string.gps_waiting_message),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                } else {
-                    // Show timeout message
-                    Text(
-                        text = stringResource(R.string.gps_timeout),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.gps_waiting_message),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-                // Show current accuracy
+                // Show current horizontal accuracy
                 Text(
                     text = if (accuracy != null) {
                         stringResource(R.string.gps_accuracy_current, String.format(Locale.US, "%.0f m", accuracy))
@@ -123,6 +100,23 @@ fun GpsWaitingDialog(
                         else -> MaterialTheme.colorScheme.error
                     }
                 )
+
+                // Show vertical accuracy if available and required
+                if (requiredVerticalAccuracy != null) {
+                    Text(
+                        text = if (verticalAccuracy != null) {
+                            stringResource(R.string.gps_vertical_accuracy_current, String.format(Locale.US, "%.0f m", verticalAccuracy))
+                        } else {
+                            stringResource(R.string.gps_vertical_accuracy_unknown)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = when {
+                            verticalAccuracy != null && isVerticalAccuracyGood -> MaterialTheme.colorScheme.primary
+                            verticalAccuracy == null -> MaterialTheme.colorScheme.onSurfaceVariant
+                            else -> MaterialTheme.colorScheme.error
+                        }
+                    )
+                }
 
                 // Show altitude status (with validity check)
                 Text(
@@ -156,20 +150,9 @@ fun GpsWaitingDialog(
             }
         },
         confirmButton = {
-            if (hasTimedOut) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Keep searching button
-                    TextButton(onClick = {
-                        timeoutKey++ // Reset timeout
-                        onKeepSearching()
-                    }) {
-                        Text(stringResource(R.string.gps_keep_searching))
-                    }
-                    // Save anyway button
-                    TextButton(onClick = onSaveAnyway) {
-                        Text(stringResource(R.string.gps_save_anyway))
-                    }
-                }
+            // Always show save anyway button
+            TextButton(onClick = onSaveAnyway) {
+                Text(stringResource(R.string.gps_save_anyway))
             }
         },
         dismissButton = {
@@ -186,20 +169,25 @@ fun GpsWaitingDialog(
  * Requirements:
  * 1. Must have valid altitude (actually measured, not default 0.0)
  * 2. Fix must be recent (within MAX_FIX_AGE_MS, default 60 seconds)
- * 3. For internal GPS: accuracy <= 50m
+ * 3. For internal GPS: horizontal accuracy <= 50m
  * 4. For Bluetooth/NMEA GPS: if accuracy not available, skip accuracy check
+ * 5. If vertical accuracy is available and required, it must be <= requiredVerticalAccuracy
  *
- * @param accuracy GPS accuracy in meters (null for NMEA GPS without accuracy data)
+ * @param accuracy GPS horizontal accuracy in meters (null for NMEA GPS without accuracy data)
+ * @param verticalAccuracy GPS vertical accuracy in meters (null if unknown/API < 26)
  * @param altitude GPS altitude in meters
  * @param hasValidAltitude Whether altitude was actually measured (not default 0.0)
  * @param fixAgeMs Age of the GPS fix in milliseconds (null if unknown)
+ * @param requiredVerticalAccuracy Required vertical accuracy in meters (null to skip check)
  * @return true if GPS data is accurate enough for logging
  */
 fun isGpsAccurateForLogging(
     accuracy: Float?,
+    verticalAccuracy: Float? = null,
     altitude: Double?,
     hasValidAltitude: Boolean = true,
-    fixAgeMs: Long? = null
+    fixAgeMs: Long? = null,
+    requiredVerticalAccuracy: Float? = null
 ): Boolean {
     // Must have altitude in all cases
     if (altitude == null) return false
@@ -210,9 +198,14 @@ fun isGpsAccurateForLogging(
     // Fix must not be too old (if we have age info)
     if (fixAgeMs != null && fixAgeMs > SensorDataRepository.MAX_FIX_AGE_MS) return false
 
+    // Check horizontal accuracy if available
     // If accuracy is null (e.g., Bluetooth/NMEA GPS without accuracy data), skip accuracy check
-    if (accuracy == null) return true
+    if (accuracy != null && accuracy > GPS_REQUIRED_ACCURACY_M) return false
 
-    // Otherwise require accuracy <= 50m
-    return accuracy <= GPS_REQUIRED_ACCURACY_M
+    // Check vertical accuracy if both available and required
+    if (requiredVerticalAccuracy != null && verticalAccuracy != null) {
+        if (verticalAccuracy > requiredVerticalAccuracy) return false
+    }
+
+    return true
 }
