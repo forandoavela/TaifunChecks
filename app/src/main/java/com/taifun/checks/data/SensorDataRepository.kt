@@ -61,6 +61,13 @@ class SensorDataRepository(private val context: Context) {
     val accuracy: StateFlow<Float?> = _accuracy.asStateFlow()
 
     /**
+     * Precisión vertical del GPS en metros (disponible desde API 26)
+     * Indica la precisión de la medición de altitud
+     */
+    private val _verticalAccuracy = MutableStateFlow<Float?>(null)
+    val verticalAccuracy: StateFlow<Float?> = _verticalAccuracy.asStateFlow()
+
+    /**
      * Timestamp del último fix GPS (nanosegundos desde boot del sistema)
      * Se usa para calcular la antigüedad del fix y rechazar datos obsoletos
      */
@@ -316,6 +323,14 @@ class SensorDataRepository(private val context: Context) {
         // Accuracy in meters
         _accuracy.value = if (location.hasAccuracy()) {
             location.accuracy
+        } else {
+            null
+        }
+
+        // Vertical accuracy in meters (API 26+)
+        _verticalAccuracy.value = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O &&
+            location.hasVerticalAccuracy()) {
+            location.verticalAccuracyMeters
         } else {
             null
         }

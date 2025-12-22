@@ -407,6 +407,7 @@ fun StepScreen(
                     longitude = longitude,
                     speedKmh = speedKmh,
                     sensorRepo = sensorRepo,
+                    settingsRepo = settingsRepo,
                     logRepo = logRepo,
                     language = currentLanguage,
                     modifier = Modifier.padding(pad)
@@ -432,6 +433,7 @@ fun StepScreen(
                     longitude = longitude,
                     speedKmh = speedKmh,
                     sensorRepo = sensorRepo,
+                    settingsRepo = settingsRepo,
                     logRepo = logRepo,
                     language = currentLanguage,
                     haptic = haptic,
@@ -484,6 +486,7 @@ private fun StepByStepMode(
     longitude: Double?,
     speedKmh: Float?,
     sensorRepo: SensorDataRepository,
+    settingsRepo: SettingsRepository,
     logRepo: LogRepository,
     language: String,
     modifier: Modifier = Modifier
@@ -493,7 +496,9 @@ private fun StepByStepMode(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val gpsVerticalAccuracy by sensorRepo.verticalAccuracy.collectAsState()
     val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    val icaoMaxAltitudeDiffM by settingsRepo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
     // Calculate fix age dynamically for UI updates
     var fixAgeMs by remember { mutableStateOf<Long?>(null) }
     LaunchedEffect(Unit) {
@@ -543,9 +548,11 @@ private fun StepByStepMode(
     if (showGpsWaitingDialog && pendingLogText != null) {
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
+            verticalAccuracy = gpsVerticalAccuracy,
             altitude = altitude,
             hasValidAltitude = hasValidAltitude,
             fixAgeMs = fixAgeMs,
+            requiredVerticalAccuracy = icaoMaxAltitudeDiffM,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -554,9 +561,6 @@ private fun StepByStepMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
-            },
-            onKeepSearching = {
-                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -784,7 +788,7 @@ private fun StepByStepMode(
 
                                         // Check if GPS is accurate enough
                                         val logText = paso.log ?: ""
-                                        if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
+                                        if (isGpsAccurateForLogging(gpsAccuracy, gpsVerticalAccuracy, altitude, hasValidAltitude, fixAgeMs, icaoMaxAltitudeDiffM)) {
                                             // GPS is good, save directly
                                             executeLogSave(logText)
                                         } else {
@@ -878,7 +882,7 @@ private fun StepByStepMode(
 
                                 // Check if GPS is accurate enough
                                 val logText = paso.log ?: ""
-                                if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
+                                if (isGpsAccurateForLogging(gpsAccuracy, gpsVerticalAccuracy, altitude, hasValidAltitude, fixAgeMs, icaoMaxAltitudeDiffM)) {
                                     // GPS is good, save directly
                                     executeLogSave(logText)
                                 } else {
@@ -978,6 +982,7 @@ private fun FullListMode(
     longitude: Double?,
     speedKmh: Float?,
     sensorRepo: SensorDataRepository,
+    settingsRepo: SettingsRepository,
     logRepo: LogRepository,
     language: String,
     haptic: com.taifun.checks.ui.HapticFeedbackHelper,
@@ -1001,7 +1006,9 @@ private fun FullListMode(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val gpsVerticalAccuracy by sensorRepo.verticalAccuracy.collectAsState()
     val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    val icaoMaxAltitudeDiffM by settingsRepo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
     // Calculate fix age dynamically for UI updates
     var fixAgeMs by remember { mutableStateOf<Long?>(null) }
     LaunchedEffect(Unit) {
@@ -1038,9 +1045,11 @@ private fun FullListMode(
     if (showGpsWaitingDialog && pendingLogText != null) {
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
+            verticalAccuracy = gpsVerticalAccuracy,
             altitude = altitude,
             hasValidAltitude = hasValidAltitude,
             fixAgeMs = fixAgeMs,
+            requiredVerticalAccuracy = icaoMaxAltitudeDiffM,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -1049,9 +1058,6 @@ private fun FullListMode(
                 pendingLogText?.let { executeLogSave(it) }
                 showGpsWaitingDialog = false
                 pendingLogText = null
-            },
-            onKeepSearching = {
-                // Just reset timeout - dialog handles this internally
             },
             onGpsReady = {
                 pendingLogText?.let { executeLogSave(it) }
@@ -1323,7 +1329,7 @@ private fun FullListMode(
 
                                     // Check if GPS is accurate enough
                                     val logText = p.log ?: ""
-                                    if (isGpsAccurateForLogging(gpsAccuracy, altitude, hasValidAltitude, fixAgeMs)) {
+                                    if (isGpsAccurateForLogging(gpsAccuracy, gpsVerticalAccuracy, altitude, hasValidAltitude, fixAgeMs, icaoMaxAltitudeDiffM)) {
                                         // GPS is good, save directly
                                         executeLogSave(logText)
                                     } else {

@@ -66,6 +66,10 @@ fun LogViewerScreen(
 
     // GPS accuracy for logging
     val gpsAccuracy by sensorRepo.accuracy.collectAsState()
+    val gpsVerticalAccuracy by sensorRepo.verticalAccuracy.collectAsState()
+    val altitude by sensorRepo.altitude.collectAsState()
+    val hasValidAltitude by sensorRepo.hasValidAltitude.collectAsState()
+    val icaoMaxAltitudeDiffM by settingsRepo.icaoMaxAltitudeDiffMFlow.collectAsState(initial = 50.0f)
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
@@ -283,8 +287,14 @@ fun LogViewerScreen(
             onDismiss = { showCustomLogDialog = false },
             onSave = { logText ->
                 // logText already has default text if user left it empty
-                // Check if GPS is accurate enough
-                if (isGpsAccurateForLogging(gpsAccuracy, altitude)) {
+                // Check if GPS is accurate enough (including vertical accuracy)
+                if (isGpsAccurateForLogging(
+                    accuracy = gpsAccuracy,
+                    verticalAccuracy = gpsVerticalAccuracy,
+                    altitude = altitude,
+                    hasValidAltitude = hasValidAltitude,
+                    requiredVerticalAccuracy = icaoMaxAltitudeDiffM
+                )) {
                     // GPS is good, save directly
                     executeLogSave(logText)
                 } else {
@@ -303,12 +313,25 @@ fun LogViewerScreen(
         val language by settingsRepo.languageFlow.collectAsState(initial = "auto")
         val latitude by sensorRepo.latitude.collectAsState()
         val longitude by sensorRepo.longitude.collectAsState()
-        val altitude by sensorRepo.altitude.collectAsState()
+        val dialogAltitude by sensorRepo.altitude.collectAsState()
         val speedKmh by sensorRepo.speedKmh.collectAsState()
+
+        // Track fix age for GPS validation
+        var fixAgeMs by remember { mutableStateOf<Long?>(null) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                fixAgeMs = sensorRepo.getFixAgeMs()
+                kotlinx.coroutines.delay(1000)
+            }
+        }
 
         GpsWaitingDialog(
             accuracy = gpsAccuracy,
-            altitude = altitude,
+            verticalAccuracy = gpsVerticalAccuracy,
+            altitude = dialogAltitude,
+            hasValidAltitude = hasValidAltitude,
+            fixAgeMs = fixAgeMs,
+            requiredVerticalAccuracy = icaoMaxAltitudeDiffM,
             onDismiss = {
                 showGpsWaitingDialog = false
                 pendingLogText = null
@@ -319,7 +342,7 @@ fun LogViewerScreen(
                         val success = logRepo.addLogEntry(
                             latitude = latitude,
                             longitude = longitude,
-                            altitudeMeters = altitude,
+                            altitudeMeters = dialogAltitude,
                             speedKmh = speedKmh,
                             logText = logText,
                             language = if (language == "en") "en" else "es"
@@ -342,7 +365,7 @@ fun LogViewerScreen(
                         val success = logRepo.addLogEntry(
                             latitude = latitude,
                             longitude = longitude,
-                            altitudeMeters = altitude,
+                            altitudeMeters = dialogAltitude,
                             speedKmh = speedKmh,
                             logText = logText,
                             language = if (language == "en") "en" else "es"
