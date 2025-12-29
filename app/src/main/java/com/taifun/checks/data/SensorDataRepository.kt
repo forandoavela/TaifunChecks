@@ -126,6 +126,17 @@ class SensorDataRepository(private val context: Context) {
             _longitude.value = longitude
             _altitude.value = altitude
             _speedKmh.value = speedKmh
+
+            // Update validity flag: altitude is valid if it's non-null
+            // NMEA GPS provides altitude from GGA sentences when it has a valid fix
+            // If the GPS has no altitude data, the NMEA field is empty (parsed as null)
+            _hasValidAltitude.value = altitude != null
+
+            // Update fix timestamp when we receive valid GPS data (lat/lon present)
+            // This allows getFixAgeMs() to work correctly for NMEA GPS
+            if (latitude != null && longitude != null) {
+                _lastFixElapsedRealtimeNanos.value = SystemClock.elapsedRealtimeNanos()
+            }
         }
     }
 
