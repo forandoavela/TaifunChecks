@@ -23,6 +23,7 @@ import com.taifun.checks.ui.theme.TaifunTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -186,14 +187,10 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (isActive) {
                     // Read current settings
-                    val gpsSource = settingsRepo.gpsSourceFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.gpsSourceFlow.first()
-                    val autoConnect = settingsRepo.btGpsAutoConnectFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btGpsAutoConnectFlow.first()
-                    val deviceAddress = settingsRepo.btGpsDeviceAddressFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btGpsDeviceAddressFlow.first()
-                    val intervalSec = settingsRepo.btGpsReconnectIntervalSecFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btGpsReconnectIntervalSecFlow.first()
+                    val gpsSource = settingsRepo.gpsSourceFlow.first()
+                    val autoConnect = settingsRepo.btGpsAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btGpsDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btGpsReconnectIntervalSecFlow.first()
                     val isConnected = bluetoothGpsRepo.isConnected.value
 
                     // Only reconnect if:
@@ -201,7 +198,7 @@ class MainActivity : ComponentActivity() {
                     // 2. Auto-connect is enabled
                     // 3. Device is configured
                     // 4. Currently disconnected
-                    if (gpsSource == "BLUETOOTH" && autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                    if (gpsSource == "BLUETOOTH" && autoConnect && deviceAddress.isNotEmpty() && !isConnected) {
                         try {
                             bluetoothGpsRepo.connect(deviceAddress)
                         } catch (e: Exception) {
@@ -210,7 +207,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Wait for the configured interval before next check
-                    delay(intervalSec * 1000L)
+                    delay(intervalSec.toLong() * 1000L)
                 }
             }
         }
@@ -225,19 +222,16 @@ class MainActivity : ComponentActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 while (isActive) {
                     // Read current settings
-                    val autoConnect = settingsRepo.btVarioAutoConnectFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btVarioAutoConnectFlow.first()
-                    val deviceAddress = settingsRepo.btVarioDeviceAddressFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btVarioDeviceAddressFlow.first()
-                    val intervalSec = settingsRepo.btVarioReconnectIntervalSecFlow.replayCache.firstOrNull()
-                        ?: settingsRepo.btVarioReconnectIntervalSecFlow.first()
+                    val autoConnect = settingsRepo.btVarioAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btVarioDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btVarioReconnectIntervalSecFlow.first()
                     val isConnected = bluetoothVarioRepo.isConnected.value
 
                     // Only reconnect if:
                     // 1. Auto-connect is enabled
                     // 2. Device is configured
                     // 3. Currently disconnected
-                    if (autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                    if (autoConnect && deviceAddress.isNotEmpty() && !isConnected) {
                         try {
                             bluetoothVarioRepo.connect(deviceAddress)
                         } catch (e: Exception) {
@@ -246,7 +240,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // Wait for the configured interval before next check
-                    delay(intervalSec * 1000L)
+                    delay(intervalSec.toLong() * 1000L)
                 }
             }
         }
