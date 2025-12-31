@@ -198,7 +198,7 @@ class MainActivity : ComponentActivity() {
                     // 2. Auto-connect is enabled
                     // 3. Device is configured
                     // 4. Currently disconnected
-                    if (gpsSource == "BLUETOOTH" && autoConnect && deviceAddress.isNotEmpty() && !isConnected) {
+                    if (gpsSource == "BLUETOOTH" && autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
                         try {
                             bluetoothGpsRepo.connect(deviceAddress)
                         } catch (e: Exception) {
@@ -231,7 +231,7 @@ class MainActivity : ComponentActivity() {
                     // 1. Auto-connect is enabled
                     // 2. Device is configured
                     // 3. Currently disconnected
-                    if (autoConnect && deviceAddress.isNotEmpty() && !isConnected) {
+                    if (autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
                         try {
                             bluetoothVarioRepo.connect(deviceAddress)
                         } catch (e: Exception) {
