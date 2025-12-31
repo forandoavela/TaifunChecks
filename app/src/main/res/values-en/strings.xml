@@ -119,6 +119,11 @@
     <string name="bt_vario_auto_connect">Auto-connect variometer</string>
     <string name="bt_vario_auto_connect_desc">Connect variometer on startup</string>
 
+    <!-- Bluetooth reconnection interval -->
+    <string name="bt_reconnect_interval">Reconnection interval</string>
+    <string name="bt_reconnect_interval_desc">Time in seconds between automatic reconnection attempts for Bluetooth GPS and variometer</string>
+    <string name="bt_reconnect_interval_format">%d seconds</string>
+
     <string name="help_button">Help</string>
     <string name="app_info_section">App Information</string>
     <string name="app_version">Version 1.0</string>

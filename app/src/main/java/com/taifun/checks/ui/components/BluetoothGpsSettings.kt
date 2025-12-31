@@ -401,6 +401,85 @@ fun BluetoothGpsSettings(
             }
         }
 
+        // Bluetooth reconnection interval setting
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val reconnectInterval by settingsRepo.btReconnectIntervalSecFlow.collectAsState(initial = 30)
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                    shape = MaterialTheme.shapes.medium
+                ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.bt_reconnect_interval),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Text(
+                    text = stringResource(R.string.bt_reconnect_interval_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Current value display
+                Text(
+                    text = stringResource(R.string.bt_reconnect_interval_format, reconnectInterval),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                // Slider for selecting interval (10, 15, 20, 30, 45, 60 seconds)
+                val intervalOptions = listOf(10, 15, 20, 30, 45, 60)
+                val sliderPosition = intervalOptions.indexOf(reconnectInterval).toFloat()
+                    .coerceIn(0f, (intervalOptions.size - 1).toFloat())
+
+                Slider(
+                    value = sliderPosition,
+                    onValueChange = { newPosition ->
+                        val newInterval = intervalOptions[newPosition.toInt().coerceIn(0, intervalOptions.size - 1)]
+                        scope.launch {
+                            settingsRepo.setBtReconnectIntervalSec(newInterval)
+                        }
+                    },
+                    valueRange = 0f..(intervalOptions.size - 1).toFloat(),
+                    steps = intervalOptions.size - 2, // Steps between min and max
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Show all interval options as labels
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    intervalOptions.forEach { interval ->
+                        Text(
+                            text = "${interval}s",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (interval == reconnectInterval) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
         // Variometer Card (independent device)
         Spacer(modifier = Modifier.height(8.dp))
 

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +43,9 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_BT_VARIO_DEVICE_ADDRESS = stringPreferencesKey("bt_vario_device_address")
     private val KEY_BT_VARIO_AUTO_CONNECT = booleanPreferencesKey("bt_vario_auto_connect")
 
+    // Bluetooth auto-reconnect interval (seconds)
+    private val KEY_BT_RECONNECT_INTERVAL_SEC = intPreferencesKey("bt_reconnect_interval_sec")
+
     // Voice control (persistent across app)
     private val KEY_VOICE_CONTROL = booleanPreferencesKey("voice_control_enabled")
 
@@ -68,6 +72,9 @@ class SettingsRepository(private val ctx: Context) {
     val btVarioDeviceNameFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_NAME] }
     val btVarioDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_ADDRESS] }
     val btVarioAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_AUTO_CONNECT] ?: false }
+
+    // Bluetooth auto-reconnect interval flow (default: 30 seconds)
+    val btReconnectIntervalSecFlow: Flow<Int> = ctx.settingsDataStore.data.map { it[KEY_BT_RECONNECT_INTERVAL_SEC] ?: 30 }
 
     // Voice control flow (persistent across all checklists)
     val voiceControlFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_VOICE_CONTROL] ?: false }
@@ -154,6 +161,11 @@ class SettingsRepository(private val ctx: Context) {
 
     suspend fun setBtVarioAutoConnect(enabled: Boolean) {
         ctx.settingsDataStore.edit { it[KEY_BT_VARIO_AUTO_CONNECT] = enabled }
+    }
+
+    // Bluetooth auto-reconnect interval setter
+    suspend fun setBtReconnectIntervalSec(intervalSec: Int) {
+        ctx.settingsDataStore.edit { it[KEY_BT_RECONNECT_INTERVAL_SEC] = intervalSec }
     }
 
     // Voice control setter (persistent across all checklists)

@@ -20,8 +20,10 @@ import com.taifun.checks.data.SettingsRepository
 import com.taifun.checks.ui.navigation.AppNavHost
 import com.taifun.checks.ui.navigation.Routes
 import com.taifun.checks.ui.theme.TaifunTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -67,6 +69,10 @@ class MainActivity : ComponentActivity() {
         // Auto-conectar GPS y Variometer Bluetooth si están configurados
         setupBluetoothGpsAutoConnect()
         setupBluetoothVarioAutoConnect()
+
+        // Reconexión periódica para GPS y Variometer Bluetooth
+        setupPeriodicBluetoothGpsReconnect()
+        setupPeriodicBluetoothVarioReconnect()
     }
 
     private fun setupBluetoothGpsAutoConnect() {
@@ -171,6 +177,78 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Periodic reconnection for Bluetooth GPS
+     * Checks every X seconds (configurable) if GPS should be connected but isn't, and retries connection
+     */
+    private fun setupPeriodicBluetoothGpsReconnect() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observe settings
+                combine(
+                    settingsRepo.gpsSourceFlow,
+                    settingsRepo.btGpsAutoConnectFlow,
+                    settingsRepo.btGpsDeviceAddressFlow,
+                    settingsRepo.btReconnectIntervalSecFlow,
+                    bluetoothGpsRepo.isConnected
+                ) { gpsSource, autoConnect, deviceAddress, intervalSec, isConnected ->
+                    Quintuple(gpsSource, autoConnect, deviceAddress, intervalSec, isConnected)
+                }.collect { (gpsSource, autoConnect, deviceAddress, intervalSec, isConnected) ->
+                    // Only reconnect if:
+                    // 1. GPS source is Bluetooth
+                    // 2. Auto-connect is enabled
+                    // 3. Device is configured
+                    // 4. Currently disconnected
+                    if (gpsSource == "BLUETOOTH" && autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                        try {
+                            bluetoothGpsRepo.connect(deviceAddress)
+                        } catch (e: Exception) {
+                            // Silenciar errores de reconexión
+                        }
+                    }
+
+                    // Wait for the configured interval before next check
+                    delay(intervalSec * 1000L)
+                }
+            }
+        }
+    }
+
+    /**
+     * Periodic reconnection for Bluetooth Variometer
+     * Checks every X seconds (configurable) if Vario should be connected but isn't, and retries connection
+     */
+    private fun setupPeriodicBluetoothVarioReconnect() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Observe settings
+                combine(
+                    settingsRepo.btVarioAutoConnectFlow,
+                    settingsRepo.btVarioDeviceAddressFlow,
+                    settingsRepo.btReconnectIntervalSecFlow,
+                    bluetoothVarioRepo.isConnected
+                ) { autoConnect, deviceAddress, intervalSec, isConnected ->
+                    Quadruple(autoConnect, deviceAddress, intervalSec, isConnected)
+                }.collect { (autoConnect, deviceAddress, intervalSec, isConnected) ->
+                    // Only reconnect if:
+                    // 1. Auto-connect is enabled
+                    // 2. Device is configured
+                    // 3. Currently disconnected
+                    if (autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                        try {
+                            bluetoothVarioRepo.connect(deviceAddress)
+                        } catch (e: Exception) {
+                            // Silenciar errores de reconexión
+                        }
+                    }
+
+                    // Wait for the configured interval before next check
+                    delay(intervalSec * 1000L)
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // Desconectar Bluetooth GPS y Variometer al destruir la actividad
@@ -260,4 +338,8 @@ class MainActivity : ComponentActivity() {
             context
         }
     }
+
+    // Helper data classes for combining multiple flows
+    private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+    private data class Quintuple<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E)
 }
