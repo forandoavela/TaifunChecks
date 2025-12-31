@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
                     settingsRepo.gpsSourceFlow,
                     settingsRepo.btGpsAutoConnectFlow,
                     settingsRepo.btGpsDeviceAddressFlow,
-                    settingsRepo.btReconnectIntervalSecFlow,
+                    settingsRepo.btGpsReconnectIntervalSecFlow,
                     bluetoothGpsRepo.isConnected
                 ) { gpsSource, autoConnect, deviceAddress, intervalSec, isConnected ->
                     Quintuple(gpsSource, autoConnect, deviceAddress, intervalSec, isConnected)
@@ -225,7 +225,7 @@ class MainActivity : ComponentActivity() {
                 combine(
                     settingsRepo.btVarioAutoConnectFlow,
                     settingsRepo.btVarioDeviceAddressFlow,
-                    settingsRepo.btReconnectIntervalSecFlow,
+                    settingsRepo.btVarioReconnectIntervalSecFlow,
                     bluetoothVarioRepo.isConnected
                 ) { autoConnect, deviceAddress, intervalSec, isConnected ->
                     Quadruple(autoConnect, deviceAddress, intervalSec, isConnected)

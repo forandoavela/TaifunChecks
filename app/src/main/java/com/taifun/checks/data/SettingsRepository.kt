@@ -43,8 +43,9 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_BT_VARIO_DEVICE_ADDRESS = stringPreferencesKey("bt_vario_device_address")
     private val KEY_BT_VARIO_AUTO_CONNECT = booleanPreferencesKey("bt_vario_auto_connect")
 
-    // Bluetooth auto-reconnect interval (seconds)
-    private val KEY_BT_RECONNECT_INTERVAL_SEC = intPreferencesKey("bt_reconnect_interval_sec")
+    // Bluetooth auto-reconnect intervals (seconds) - separate for GPS and Variometer
+    private val KEY_BT_GPS_RECONNECT_INTERVAL_SEC = intPreferencesKey("bt_gps_reconnect_interval_sec")
+    private val KEY_BT_VARIO_RECONNECT_INTERVAL_SEC = intPreferencesKey("bt_vario_reconnect_interval_sec")
 
     // Voice control (persistent across app)
     private val KEY_VOICE_CONTROL = booleanPreferencesKey("voice_control_enabled")
@@ -73,8 +74,9 @@ class SettingsRepository(private val ctx: Context) {
     val btVarioDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_ADDRESS] }
     val btVarioAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_AUTO_CONNECT] ?: false }
 
-    // Bluetooth auto-reconnect interval flow (default: 30 seconds)
-    val btReconnectIntervalSecFlow: Flow<Int> = ctx.settingsDataStore.data.map { it[KEY_BT_RECONNECT_INTERVAL_SEC] ?: 30 }
+    // Bluetooth auto-reconnect interval flows (default: 30 seconds) - separate for GPS and Variometer
+    val btGpsReconnectIntervalSecFlow: Flow<Int> = ctx.settingsDataStore.data.map { it[KEY_BT_GPS_RECONNECT_INTERVAL_SEC] ?: 30 }
+    val btVarioReconnectIntervalSecFlow: Flow<Int> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_RECONNECT_INTERVAL_SEC] ?: 30 }
 
     // Voice control flow (persistent across all checklists)
     val voiceControlFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_VOICE_CONTROL] ?: false }
@@ -163,9 +165,13 @@ class SettingsRepository(private val ctx: Context) {
         ctx.settingsDataStore.edit { it[KEY_BT_VARIO_AUTO_CONNECT] = enabled }
     }
 
-    // Bluetooth auto-reconnect interval setter
-    suspend fun setBtReconnectIntervalSec(intervalSec: Int) {
-        ctx.settingsDataStore.edit { it[KEY_BT_RECONNECT_INTERVAL_SEC] = intervalSec }
+    // Bluetooth auto-reconnect interval setters - separate for GPS and Variometer
+    suspend fun setBtGpsReconnectIntervalSec(intervalSec: Int) {
+        ctx.settingsDataStore.edit { it[KEY_BT_GPS_RECONNECT_INTERVAL_SEC] = intervalSec }
+    }
+
+    suspend fun setBtVarioReconnectIntervalSec(intervalSec: Int) {
+        ctx.settingsDataStore.edit { it[KEY_BT_VARIO_RECONNECT_INTERVAL_SEC] = intervalSec }
     }
 
     // Voice control setter (persistent across all checklists)
