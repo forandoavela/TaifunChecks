@@ -184,16 +184,18 @@ class MainActivity : ComponentActivity() {
     private fun setupPeriodicBluetoothGpsReconnect() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe settings
-                combine(
-                    settingsRepo.gpsSourceFlow,
-                    settingsRepo.btGpsAutoConnectFlow,
-                    settingsRepo.btGpsDeviceAddressFlow,
-                    settingsRepo.btGpsReconnectIntervalSecFlow,
-                    bluetoothGpsRepo.isConnected
-                ) { gpsSource, autoConnect, deviceAddress, intervalSec, isConnected ->
-                    Quintuple(gpsSource, autoConnect, deviceAddress, intervalSec, isConnected)
-                }.collect { (gpsSource, autoConnect, deviceAddress, intervalSec, isConnected) ->
+                while (isActive) {
+                    // Read current settings
+                    val gpsSource = settingsRepo.gpsSourceFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.gpsSourceFlow.first()
+                    val autoConnect = settingsRepo.btGpsAutoConnectFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btGpsAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btGpsDeviceAddressFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btGpsDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btGpsReconnectIntervalSecFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btGpsReconnectIntervalSecFlow.first()
+                    val isConnected = bluetoothGpsRepo.isConnected.value
+
                     // Only reconnect if:
                     // 1. GPS source is Bluetooth
                     // 2. Auto-connect is enabled
@@ -221,15 +223,16 @@ class MainActivity : ComponentActivity() {
     private fun setupPeriodicBluetoothVarioReconnect() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe settings
-                combine(
-                    settingsRepo.btVarioAutoConnectFlow,
-                    settingsRepo.btVarioDeviceAddressFlow,
-                    settingsRepo.btVarioReconnectIntervalSecFlow,
-                    bluetoothVarioRepo.isConnected
-                ) { autoConnect, deviceAddress, intervalSec, isConnected ->
-                    Quadruple(autoConnect, deviceAddress, intervalSec, isConnected)
-                }.collect { (autoConnect, deviceAddress, intervalSec, isConnected) ->
+                while (isActive) {
+                    // Read current settings
+                    val autoConnect = settingsRepo.btVarioAutoConnectFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btVarioAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btVarioDeviceAddressFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btVarioDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btVarioReconnectIntervalSecFlow.replayCache.firstOrNull()
+                        ?: settingsRepo.btVarioReconnectIntervalSecFlow.first()
+                    val isConnected = bluetoothVarioRepo.isConnected.value
+
                     // Only reconnect if:
                     // 1. Auto-connect is enabled
                     // 2. Device is configured
@@ -338,8 +341,4 @@ class MainActivity : ComponentActivity() {
             context
         }
     }
-
-    // Helper data classes for combining multiple flows
-    private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
-    private data class Quintuple<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E)
 }
