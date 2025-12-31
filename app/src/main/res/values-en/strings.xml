@@ -88,6 +88,14 @@
     <string name="gps_not_available">GPS not available on this device</string>
     <string name="gps_source_bluetooth">Bluetooth GPS (NMEA)</string>
     <string name="gps_source_bluetooth_desc">Use external GPS device via Bluetooth</string>
+
+    <!-- Barometer source selection -->
+    <string name="barometer_source_label">Pressure data source</string>
+    <string name="barometer_source_internal">Internal barometer</string>
+    <string name="barometer_not_available">Barometer not available on this device</string>
+    <string name="barometer_source_bluetooth">Bluetooth barometer</string>
+    <string name="barometer_source_bluetooth_desc">Use external variometer via Bluetooth</string>
+
     <string name="bt_gps_status">Connection status</string>
     <string name="bt_gps_disconnected">Disconnected (%s)</string>
     <string name="bt_gps_no_device">No device configured</string>

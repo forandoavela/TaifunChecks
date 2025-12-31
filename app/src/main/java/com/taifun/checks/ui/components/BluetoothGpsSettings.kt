@@ -53,6 +53,8 @@ fun BluetoothGpsSettings(
     val btDeviceAddress by settingsRepo.btGpsDeviceAddressFlow.collectAsState(initial = null)
     val btAutoConnect by settingsRepo.btGpsAutoConnectFlow.collectAsState(initial = false)
 
+    val barometerSource by settingsRepo.barometerSourceFlow.collectAsState(initial = "INTERNAL")
+
     // Variometer settings
     val btVarioDeviceName by settingsRepo.btVarioDeviceNameFlow.collectAsState(initial = null)
     val btVarioDeviceAddress by settingsRepo.btVarioDeviceAddressFlow.collectAsState(initial = null)
@@ -482,14 +484,76 @@ fun BluetoothGpsSettings(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Description
+                // Barometer Source selection
                 Text(
-                    text = stringResource(R.string.vario_section_desc),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = stringResource(R.string.barometer_source_label),
+                    style = MaterialTheme.typography.bodyLarge
                 )
 
-                HorizontalDivider()
+                // Internal Barometer option
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                        Text(
+                            stringResource(R.string.barometer_source_internal),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        // Show message if device has no barometer hardware
+                        if (!sensorDataRepo.hasBarometer()) {
+                            Text(
+                                stringResource(R.string.barometer_not_available),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                    RadioButton(
+                        selected = barometerSource == "INTERNAL",
+                        enabled = sensorDataRepo.hasBarometer(), // Disable if no barometer hardware
+                        onClick = {
+                            haptic.performHapticFeedback()
+                            scope.launch {
+                                settingsRepo.setBarometerSource("INTERNAL")
+                                bluetoothVarioRepo.disconnect()
+                            }
+                        }
+                    )
+                }
+
+                // Bluetooth Barometer option
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                        Text(
+                            stringResource(R.string.barometer_source_bluetooth),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            stringResource(R.string.barometer_source_bluetooth_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    RadioButton(
+                        selected = barometerSource == "BLUETOOTH",
+                        onClick = {
+                            haptic.performHapticFeedback()
+                            scope.launch {
+                                settingsRepo.setBarometerSource("BLUETOOTH")
+                            }
+                        }
+                    )
+                }
+
+                // Bluetooth configuration (only show if Bluetooth source is selected)
+                if (barometerSource == "BLUETOOTH") {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 // Connection status
                 Row(
@@ -706,9 +770,10 @@ fun BluetoothGpsSettings(
                         }
                     }
                 }
+                } // End of if (barometerSource == "BLUETOOTH")
 
                 // Debug section: Show raw NMEA sentences
-                if (isVarioConnected && varioRawSentences.isNotEmpty()) {
+                if (barometerSource == "BLUETOOTH" && isVarioConnected && varioRawSentences.isNotEmpty()) {
                     HorizontalDivider()
 
                     // Toggle button to show/hide raw data

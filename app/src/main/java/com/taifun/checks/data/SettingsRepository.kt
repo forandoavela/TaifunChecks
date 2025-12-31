@@ -39,6 +39,7 @@ class SettingsRepository(private val ctx: Context) {
     private val KEY_BT_GPS_AUTO_CONNECT = booleanPreferencesKey("bt_gps_auto_connect")
 
     // Bluetooth Variometer settings (independent device)
+    private val KEY_BAROMETER_SOURCE = stringPreferencesKey("barometer_source")
     private val KEY_BT_VARIO_DEVICE_NAME = stringPreferencesKey("bt_vario_device_name")
     private val KEY_BT_VARIO_DEVICE_ADDRESS = stringPreferencesKey("bt_vario_device_address")
     private val KEY_BT_VARIO_AUTO_CONNECT = booleanPreferencesKey("bt_vario_auto_connect")
@@ -70,6 +71,7 @@ class SettingsRepository(private val ctx: Context) {
     val btGpsAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_GPS_AUTO_CONNECT] ?: false }
 
     // Bluetooth Variometer flows
+    val barometerSourceFlow: Flow<String> = ctx.settingsDataStore.data.map { it[KEY_BAROMETER_SOURCE] ?: "INTERNAL" }
     val btVarioDeviceNameFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_NAME] }
     val btVarioDeviceAddressFlow: Flow<String?> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_DEVICE_ADDRESS] }
     val btVarioAutoConnectFlow: Flow<Boolean> = ctx.settingsDataStore.data.map { it[KEY_BT_VARIO_AUTO_CONNECT] ?: false }
@@ -154,6 +156,10 @@ class SettingsRepository(private val ctx: Context) {
     }
 
     // Bluetooth Variometer setters
+    suspend fun setBarometerSource(source: String) {
+        ctx.settingsDataStore.edit { it[KEY_BAROMETER_SOURCE] = source }
+    }
+
     suspend fun setBtVarioDevice(name: String?, address: String?) {
         ctx.settingsDataStore.edit { prefs ->
             if (name != null) prefs[KEY_BT_VARIO_DEVICE_NAME] = name else prefs.remove(KEY_BT_VARIO_DEVICE_NAME)
