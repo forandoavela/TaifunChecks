@@ -340,6 +340,8 @@
     <!-- Permission Messages -->
     <string name="permission_granted_gps">Permissions granted. Waiting for GPS… Try again in a few seconds.</string>
     <string name="permission_denied">Permission denied</string>
+    <string name="location_permission_granted">Location permissions granted</string>
+    <string name="location_permission_denied_logs">No location permissions. Logs will be saved without GPS coordinates.</string>
 
     <!-- Error Messages -->
     <string name="error_cannot_open_link">Cannot open link: %1$s</string>
