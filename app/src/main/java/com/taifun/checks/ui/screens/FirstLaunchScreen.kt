@@ -1,11 +1,17 @@
 package com.taifun.checks.ui.screens
 
+import android.provider.OpenableColumns
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -72,6 +78,41 @@ fun FirstLaunchScreen(
         reloadChecklists()
     }
 
+    // Import launcher for loading YAML from file
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                // Extract original filename from URI
+                val originalFilename = ctx.contentResolver.query(it, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex != -1 && cursor.moveToFirst()) {
+                        cursor.getString(nameIndex)
+                    } else {
+                        null
+                    }
+                }
+
+                checklistRepo.importFromUri(it, originalFilename).fold(
+                    onSuccess = { (filename, _) ->
+                        Toast.makeText(
+                            ctx,
+                            ctx.getString(R.string.manager_imported) + ": $filename",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // Set as selected checklist and reload
+                        selectedChecklist = filename
+                        reloadChecklists()
+                    },
+                    onFailure = { error ->
+                        Toast.makeText(ctx, error.message, Toast.LENGTH_LONG).show()
+                    }
+                )
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
             Surface(
@@ -120,6 +161,7 @@ fun FirstLaunchScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad)
+                    .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -266,6 +308,18 @@ fun FirstLaunchScreen(
                                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.accessibility_add))
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(stringResource(R.string.create_empty_checklist))
+                            }
+
+                            OutlinedButton(
+                                onClick = {
+                                    haptic.performHapticFeedback()
+                                    importLauncher.launch(arrayOf("application/x-yaml", "text/yaml", "text/plain", "*/*"))
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.Upload, contentDescription = stringResource(R.string.manager_import))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.manager_import))
                             }
                         }
                     }

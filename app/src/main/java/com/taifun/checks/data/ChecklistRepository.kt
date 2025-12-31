@@ -56,17 +56,15 @@ class ChecklistRepository(private val context: Context) {
     private val prefs = context.getSharedPreferences("checklist_prefs", Context.MODE_PRIVATE)
     private val KEY_LAST_VERSION_CODE = "last_version_code"
 
-    init {
-        // Ejecutar inicialización en background para no bloquear el main thread
-        initScope.launch {
-            try {
-                // Migración: Borrar archivo antiguo si existe
-                migrateOldFiles()
-                // Inicializar archivos por defecto desde assets
-                initializeDefaultChecklists()
-            } catch (e: Exception) {
-                Log.e(TAG, "Error durante inicialización en background", e)
-            }
+    // Job para rastrear la inicialización
+    private val initJob = initScope.launch {
+        try {
+            // Migración: Borrar archivo antiguo si existe
+            migrateOldFiles()
+            // Inicializar archivos por defecto desde assets
+            initializeDefaultChecklists()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error durante inicialización en background", e)
         }
     }
 
@@ -142,7 +140,20 @@ class ChecklistRepository(private val context: Context) {
             }
 
             // Obtener todos los archivos .yaml de assets automáticamente
-            val defaultFiles = context.assets.list("")?.filter { it.endsWith(".yaml") } ?: emptyList()
+            // Usar listado explícito como fallback por si assets.list("") falla
+            val defaultFiles = try {
+                context.assets.list("")?.filter { it.endsWith(".yaml") }?.takeIf { it.isNotEmpty() }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error listando assets con list(\"\"), usando lista explícita", e)
+                null
+            } ?: listOf(
+                "Taifun17E_ES.yaml",
+                "Taifun17E_EN.yaml",
+                "Grob_G109B_ES.yaml",
+                "Grob_G109B_EN.yaml",
+                "SF-28A_ES.yaml",
+                "SF-28A_EN.yaml"
+            )
 
             Log.i(TAG, "Detectados ${defaultFiles.size} archivos YAML en assets: $defaultFiles")
 
@@ -197,6 +208,10 @@ class ChecklistRepository(private val context: Context) {
      */
     suspend fun listChecklistFiles(): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
+            // Esperar a que la inicialización termine antes de listar archivos
+            // Esto asegura que los archivos por defecto estén copiados desde assets
+            initJob.join()
+
             val files = getStorageDir().listFiles()?.filter { it.extension == "yaml" }
                 ?.map { it.name }
                 ?.sorted()
@@ -217,6 +232,10 @@ class ChecklistRepository(private val context: Context) {
      */
     suspend fun load(filename: String = defaultFileName): Result<Catalogo> = withContext(Dispatchers.IO) {
         try {
+            // Esperar a que la inicialización termine antes de cargar archivos
+            // Esto asegura que los archivos por defecto estén disponibles
+            initJob.join()
+
             val f = storeFile(filename)
             val catalogo = when {
                 f.exists() -> {

@@ -20,8 +20,11 @@ import com.taifun.checks.data.SettingsRepository
 import com.taifun.checks.ui.navigation.AppNavHost
 import com.taifun.checks.ui.navigation.Routes
 import com.taifun.checks.ui.theme.TaifunTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -67,6 +70,10 @@ class MainActivity : ComponentActivity() {
         // Auto-conectar GPS y Variometer Bluetooth si están configurados
         setupBluetoothGpsAutoConnect()
         setupBluetoothVarioAutoConnect()
+
+        // Reconexión periódica para GPS y Variometer Bluetooth
+        setupPeriodicBluetoothGpsReconnect()
+        setupPeriodicBluetoothVarioReconnect()
     }
 
     private fun setupBluetoothGpsAutoConnect() {
@@ -166,6 +173,74 @@ class MainActivity : ComponentActivity() {
                         pressure = nmeaData.pressure,
                         baroAltitude = nmeaData.baroAltitude
                     )
+                }
+            }
+        }
+    }
+
+    /**
+     * Periodic reconnection for Bluetooth GPS
+     * Checks every X seconds (configurable) if GPS should be connected but isn't, and retries connection
+     */
+    private fun setupPeriodicBluetoothGpsReconnect() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    // Read current settings
+                    val gpsSource = settingsRepo.gpsSourceFlow.first()
+                    val autoConnect = settingsRepo.btGpsAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btGpsDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btGpsReconnectIntervalSecFlow.first()
+                    val isConnected = bluetoothGpsRepo.isConnected.value
+
+                    // Only reconnect if:
+                    // 1. GPS source is Bluetooth
+                    // 2. Auto-connect is enabled
+                    // 3. Device is configured
+                    // 4. Currently disconnected
+                    if (gpsSource == "BLUETOOTH" && autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                        try {
+                            bluetoothGpsRepo.connect(deviceAddress)
+                        } catch (e: Exception) {
+                            // Silenciar errores de reconexión
+                        }
+                    }
+
+                    // Wait for the configured interval before next check
+                    delay(intervalSec.toLong() * 1000L)
+                }
+            }
+        }
+    }
+
+    /**
+     * Periodic reconnection for Bluetooth Variometer
+     * Checks every X seconds (configurable) if Vario should be connected but isn't, and retries connection
+     */
+    private fun setupPeriodicBluetoothVarioReconnect() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    // Read current settings
+                    val autoConnect = settingsRepo.btVarioAutoConnectFlow.first()
+                    val deviceAddress = settingsRepo.btVarioDeviceAddressFlow.first()
+                    val intervalSec = settingsRepo.btVarioReconnectIntervalSecFlow.first()
+                    val isConnected = bluetoothVarioRepo.isConnected.value
+
+                    // Only reconnect if:
+                    // 1. Auto-connect is enabled
+                    // 2. Device is configured
+                    // 3. Currently disconnected
+                    if (autoConnect && !deviceAddress.isNullOrEmpty() && !isConnected) {
+                        try {
+                            bluetoothVarioRepo.connect(deviceAddress)
+                        } catch (e: Exception) {
+                            // Silenciar errores de reconexión
+                        }
+                    }
+
+                    // Wait for the configured interval before next check
+                    delay(intervalSec.toLong() * 1000L)
                 }
             }
         }

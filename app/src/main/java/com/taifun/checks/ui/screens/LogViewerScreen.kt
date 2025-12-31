@@ -73,6 +73,34 @@ fun LogViewerScreen(
     var showGpsWaitingDialog by remember { mutableStateOf(false) }
     var pendingLogText by remember { mutableStateOf<String?>(null) }
 
+    // Check if location permission is granted
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                ctx,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                ctx,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    // Launcher para solicitar permisos de ubicación
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasLocationPermission = permissions.values.any { it }
+        if (hasLocationPermission) {
+            // Reiniciar tracking GPS después de obtener permisos
+            sensorRepo.startLocationTracking()
+            Toast.makeText(ctx, ctx.getString(R.string.location_permission_granted), Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(ctx, ctx.getString(R.string.location_permission_denied_logs), Toast.LENGTH_LONG).show()
+        }
+    }
+
     // Nota: Los logs personalizados se pueden crear sin permisos de GPS
     // Si no hay GPS, se guardan solo con hora y texto (sin coordenadas)
 
@@ -390,8 +418,17 @@ fun LogViewerScreen(
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback()
-                    // Permitir crear logs personalizados siempre
-                    // Si no hay GPS disponible, guardará solo hora y texto (coordenadas vacías)
+                    // Check location permission before creating log
+                    if (!hasLocationPermission) {
+                        // Request location permissions
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    }
+                    // Always show dialog - user can save without GPS if they want
                     showCustomLogDialog = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary

@@ -93,6 +93,9 @@ class SensorDataRepository(private val context: Context) {
     fun setGpsSource(source: GpsSource) {
         _gpsSource.value = source
 
+        // Clear GPS data when switching sources to avoid showing stale data from previous source
+        clearGpsData()
+
         // If switching to internal GPS, stop internal tracking and restart it
         // If switching to Bluetooth, stop internal tracking
         if (source == GpsSource.INTERNAL && locationListener == null) {
@@ -100,6 +103,21 @@ class SensorDataRepository(private val context: Context) {
         } else if (source == GpsSource.BLUETOOTH) {
             stopLocationTracking()
         }
+    }
+
+    /**
+     * Clear all GPS data (position, altitude, speed)
+     * Used when switching GPS sources or when external GPS disconnects
+     */
+    private fun clearGpsData() {
+        _latitude.value = null
+        _longitude.value = null
+        _altitude.value = null
+        _speedKmh.value = null
+        _accuracy.value = null
+        _verticalAccuracy.value = null
+        _hasValidAltitude.value = false
+        _lastFixElapsedRealtimeNanos.value = null
     }
 
     /**
@@ -136,6 +154,10 @@ class SensorDataRepository(private val context: Context) {
             // This allows getFixAgeMs() to work correctly for NMEA GPS
             if (latitude != null && longitude != null) {
                 _lastFixElapsedRealtimeNanos.value = SystemClock.elapsedRealtimeNanos()
+            } else if (latitude == null && longitude == null) {
+                // Clear timestamp when GPS data is completely invalid (disconnected or no fix)
+                // This prevents old fix timestamps from being considered valid
+                _lastFixElapsedRealtimeNanos.value = null
             }
         }
     }

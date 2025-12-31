@@ -88,6 +88,14 @@
     <string name="gps_not_available">GPS not available on this device</string>
     <string name="gps_source_bluetooth">Bluetooth GPS (NMEA)</string>
     <string name="gps_source_bluetooth_desc">Use external GPS device via Bluetooth</string>
+
+    <!-- Barometer source selection -->
+    <string name="barometer_source_label">Pressure data source</string>
+    <string name="barometer_source_internal">Internal barometer</string>
+    <string name="barometer_not_available">Barometer not available on this device</string>
+    <string name="barometer_source_bluetooth">Bluetooth barometer</string>
+    <string name="barometer_source_bluetooth_desc">Use external variometer via Bluetooth</string>
+
     <string name="bt_gps_status">Connection status</string>
     <string name="bt_gps_disconnected">Disconnected (%s)</string>
     <string name="bt_gps_no_device">No device configured</string>
@@ -118,6 +126,11 @@
     <string name="bt_vario_reconnect">Reconnect variometer</string>
     <string name="bt_vario_auto_connect">Auto-connect variometer</string>
     <string name="bt_vario_auto_connect_desc">Connect variometer on startup</string>
+
+    <!-- Bluetooth reconnection interval -->
+    <string name="bt_reconnect_interval">Reconnection interval</string>
+    <string name="bt_reconnect_interval_desc">Time in seconds between automatic reconnection attempts for Bluetooth GPS and variometer</string>
+    <string name="bt_reconnect_interval_format">%d seconds</string>
 
     <string name="help_button">Help</string>
     <string name="app_info_section">App Information</string>
@@ -327,6 +340,8 @@
     <!-- Permission Messages -->
     <string name="permission_granted_gps">Permissions granted. Waiting for GPS… Try again in a few seconds.</string>
     <string name="permission_denied">Permission denied</string>
+    <string name="location_permission_granted">Location permissions granted</string>
+    <string name="location_permission_denied_logs">No location permissions. Logs will be saved without GPS coordinates.</string>
 
     <!-- Error Messages -->
     <string name="error_cannot_open_link">Cannot open link: %1$s</string>
