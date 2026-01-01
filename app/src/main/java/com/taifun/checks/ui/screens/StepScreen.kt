@@ -1107,27 +1107,37 @@ private fun FullListMode(
             .toInt()
             .coerceAtLeast(3) // Mínimo 3 items por página
 
-        // Detectar cambios en itemsPerPage y ajustar la página para mantener la posición
-        // Usar remember (no Saveable) para evitar conflictos en cambios de configuración
-        var previousItemsPerPage by remember { mutableStateOf(itemsPerPage) }
-        LaunchedEffect(itemsPerPage) {
-            if (previousItemsPerPage != itemsPerPage && pasos.isNotEmpty()) {
-                // Calcular el índice absoluto del primer paso que estábamos viendo
-                // IMPORTANTE: usar previousItemsPerPage (el valor ANTERIOR)
-                val oldFirstStepIndex = page * previousItemsPerPage
-                // Calcular la nueva página que contiene ese paso usando el NUEVO itemsPerPage
-                val newPage = oldFirstStepIndex / itemsPerPage
-                val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
-                onPageChange(newPage.coerceAtMost(maxPage))
-                // Actualizar para la próxima vez
-                previousItemsPerPage = itemsPerPage
-            }
-        }
-
         val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
         val start = page * itemsPerPage
         val endExclusive = (start + itemsPerPage).coerceAtMost(pasos.size)
         val current = if (start < endExclusive) pasos.subList(start, endExclusive) else emptyList()
+
+        // Guardar el índice del primer paso visible usando rememberSaveable para persistir en rotaciones
+        var savedFirstStepIndex by rememberSaveable { mutableStateOf(0) }
+
+        // Actualizar el índice guardado cuando cambia la página manualmente
+        LaunchedEffect(page) {
+            savedFirstStepIndex = start
+        }
+
+        // Detectar cambios en las dimensiones del contenedor (rotación) y ajustar página
+        var previousHeight by rememberSaveable { mutableStateOf(containerHeight) }
+        var previousWidth by rememberSaveable { mutableStateOf(containerWidth) }
+
+        LaunchedEffect(containerHeight, containerWidth) {
+            val dimensionsChanged = (previousHeight != containerHeight || previousWidth != containerWidth)
+            if (dimensionsChanged && pasos.isNotEmpty() && savedFirstStepIndex >= 0) {
+                // Recalcular la página que contiene el paso guardado
+                val newPage = (savedFirstStepIndex.toFloat() / itemsPerPage).toInt()
+                val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
+                val targetPage = newPage.coerceAtMost(maxPage)
+                if (targetPage != page) {
+                    onPageChange(targetPage)
+                }
+            }
+            previousHeight = containerHeight
+            previousWidth = containerWidth
+        }
 
         // Auto-avanzar cuando todos están checkeados
         LaunchedEffect(checked) {
