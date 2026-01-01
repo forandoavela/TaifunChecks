@@ -1067,54 +1067,118 @@ private fun FullListMode(
         )
     }
 
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-
     val pasos = checklist?.pasos.orEmpty()
 
-    // Calcular items que caben dinámicamente
-    val listState = rememberLazyListState()
-    val screenHeight = configuration.screenHeightDp
-    val availableHeight = screenHeight - 56 - 32 - 24 - 16 - (if (showButtons) 80 else 0) // topbar, padding, text, spacing, buttons
-    val itemHeight = 80 // altura aproximada de cada card en dp
-    val itemsPerPage = (availableHeight / itemHeight).coerceAtLeast(5)
+    // Usar BoxWithConstraints para obtener dimensiones reales de la pantalla
+    BoxWithConstraints(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Calcular espacio disponible real basado en las dimensiones del contenedor
+        val containerHeight = maxHeight
+        val containerWidth = maxWidth
+        val isPortrait = containerHeight > containerWidth
 
-    val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
-    val start = page * itemsPerPage
-    val endExclusive = (start + itemsPerPage).coerceAtMost(pasos.size)
-    val current = if (start < endExclusive) pasos.subList(start, endExclusive) else emptyList()
+        // Calcular altura disponible para la lista considerando todos los elementos UI
+        val titleHeight = 24.dp // Altura del Text "Página X de Y"
+        val topPadding = 16.dp
+        val bottomPadding = 16.dp
+        val spacingBetweenElements = 12.dp
+        val buttonRowHeight = if (showButtons) 60.dp else 0.dp
 
-    // Auto-avanzar cuando todos están checkeados
-    LaunchedEffect(checked) {
-        val allCurrentChecked = current.indices.all { idx -> (start + idx) in checked }
-        if (allCurrentChecked && current.isNotEmpty()) {
-            delay(300)
-            if (page < totalPages - 1) {
-                onPageChange(page + 1)
-            } else {
-                onComplete()
+        val availableHeightForList = containerHeight -
+            titleHeight -
+            topPadding -
+            bottomPadding -
+            spacingBetweenElements -
+            buttonRowHeight -
+            spacingBetweenElements // spacing después del título
+
+        // Estimar altura de cada card considerando contenido variable
+        // Card base: padding (32dp) + texto (24dp) + checkbox row
+        // Datos opcionales: +40dp si existen
+        // Botón log: +56dp si existe
+        // Spacing entre cards: 12dp
+        val baseItemHeight = 72.dp // Card compacta sin extras
+        val estimatedItemHeight = 88.dp // Estimación conservadora con algunos extras
+        val itemSpacing = 12.dp
+
+        // Calcular cuántos items caben (usando estimación conservadora)
+        val itemsPerPage = ((availableHeightForList) / (estimatedItemHeight + itemSpacing))
+            .toInt()
+            .coerceAtLeast(3) // Mínimo 3 items por página
+
+        val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
+        val start = page * itemsPerPage
+        val endExclusive = (start + itemsPerPage).coerceAtMost(pasos.size)
+        val current = if (start < endExclusive) pasos.subList(start, endExclusive) else emptyList()
+
+        // Guardar el índice del primer paso visible usando rememberSaveable para persistir en rotaciones
+        var savedFirstStepIndex by rememberSaveable { mutableStateOf(0) }
+
+        // Actualizar el índice guardado cuando cambia la página
+        LaunchedEffect(page, itemsPerPage) {
+            savedFirstStepIndex = page * itemsPerPage
+        }
+
+        // Detectar cambios en las dimensiones del contenedor (rotación) y ajustar página
+        // Usar .value para convertir Dp a Float (serializable)
+        var previousHeight by remember { mutableStateOf(containerHeight.value) }
+        var previousWidth by remember { mutableStateOf(containerWidth.value) }
+
+        LaunchedEffect(containerHeight.value, containerWidth.value) {
+            val heightChanged = previousHeight != containerHeight.value
+            val widthChanged = previousWidth != containerWidth.value
+
+            if ((heightChanged || widthChanged) && pasos.isNotEmpty() && savedFirstStepIndex > 0) {
+                // Recalcular la página que contiene el paso guardado
+                val newPage = (savedFirstStepIndex.toFloat() / itemsPerPage).toInt()
+                val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
+                val targetPage = newPage.coerceAtMost(maxPage)
+
+                // Solo cambiar si es diferente para evitar bucles
+                if (targetPage != page) {
+                    onPageChange(targetPage)
+                }
+            }
+
+            previousHeight = containerHeight.value
+            previousWidth = containerWidth.value
+        }
+
+        // Auto-avanzar cuando todos están checkeados
+        LaunchedEffect(checked) {
+            val allCurrentChecked = current.indices.all { idx -> (start + idx) in checked }
+            if (allCurrentChecked && current.isNotEmpty()) {
+                delay(300)
+                if (page < totalPages - 1) {
+                    onPageChange(page + 1)
+                } else {
+                    onComplete()
+                }
             }
         }
-    }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.page_of, page + 1, totalPages),
-            style = MaterialTheme.typography.titleMedium
-        )
+        val listState = rememberLazyListState()
 
-        LazyColumn(
-            state = listState,
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Text(
+                text = stringResource(R.string.page_of, page + 1, totalPages),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.SpaceEvenly, // Distribuir uniformemente el espacio
+                userScrollEnabled = false // Deshabilitar scroll ya que todos los items deben caber
+            ) {
             itemsIndexed(current) { i, p ->
                 val absIndex = start + i
                 val isChecked = absIndex in checked
@@ -1384,6 +1448,7 @@ private fun FullListMode(
                     Text(stringResource(R.string.siguiente))
                 }
             }
+        }
         }
     }
 }
