@@ -1131,9 +1131,13 @@ private fun FullListMode(
         // Cuando cambia itemsPerPage (rotación), recalcular la página que contiene el paso guardado
         LaunchedEffect(itemsPerPage) {
             // Solo ajustar si itemsPerPage realmente cambió (no en carga inicial)
-            if (previousItemsPerPage != null && previousItemsPerPage != itemsPerPage && pasos.isNotEmpty()) {
-                // Calcular qué página debería mostrar el paso guardado con el nuevo itemsPerPage
-                val targetPage = (firstVisibleStepIndex / itemsPerPage).coerceIn(0, totalPages - 1)
+            if (previousItemsPerPage != null && previousItemsPerPage != itemsPerPage && pasos.isNotEmpty() && firstVisibleStepIndex >= 0) {
+                // Calcular qué página contiene el paso guardado
+                // Usar redondeo matemático en lugar de truncar para mantener mejor el contexto
+                // Ejemplo: paso 16 con 6 items/página: 16.0 / 6 = 2.67 → round = 3 → página 3 (pasos 18-23)
+                // Esto minimiza el desfase al rotar
+                val targetPage = kotlin.math.round(firstVisibleStepIndex.toFloat() / itemsPerPage).toInt()
+                    .coerceIn(0, totalPages - 1)
 
                 if (targetPage != page) {
                     // Marcar como ajuste por rotación para evitar actualizar firstVisibleStepIndex
