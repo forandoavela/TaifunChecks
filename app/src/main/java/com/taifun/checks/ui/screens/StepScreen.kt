@@ -1107,17 +1107,18 @@ private fun FullListMode(
             .toInt()
             .coerceAtLeast(3) // Mínimo 3 items por página
 
-        // Guardar el índice absoluto del primer paso visible de la página actual
-        val currentFirstStepIndex = page * itemsPerPage
-
         // Detectar cambios en itemsPerPage y ajustar la página para mantener la posición
         var previousItemsPerPage by rememberSaveable { mutableStateOf(itemsPerPage) }
         LaunchedEffect(itemsPerPage) {
             if (previousItemsPerPage != itemsPerPage && pasos.isNotEmpty()) {
-                // Calcular la nueva página que contiene el primer paso que estábamos viendo
-                val newPage = (currentFirstStepIndex / itemsPerPage).coerceIn(0, Int.MAX_VALUE)
+                // Calcular el índice absoluto del primer paso que estábamos viendo
+                // IMPORTANTE: usar previousItemsPerPage (el valor ANTERIOR)
+                val oldFirstStepIndex = page * previousItemsPerPage
+                // Calcular la nueva página que contiene ese paso usando el NUEVO itemsPerPage
+                val newPage = oldFirstStepIndex / itemsPerPage
                 val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
                 onPageChange(newPage.coerceAtMost(maxPage))
+                // Actualizar para la próxima vez
                 previousItemsPerPage = itemsPerPage
             }
         }
