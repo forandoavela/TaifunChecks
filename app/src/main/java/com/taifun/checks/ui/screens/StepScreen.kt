@@ -1115,28 +1115,34 @@ private fun FullListMode(
         // Guardar el índice del primer paso visible usando rememberSaveable para persistir en rotaciones
         var savedFirstStepIndex by rememberSaveable { mutableStateOf(0) }
 
-        // Actualizar el índice guardado cuando cambia la página manualmente
-        LaunchedEffect(page) {
-            savedFirstStepIndex = start
+        // Actualizar el índice guardado cuando cambia la página
+        LaunchedEffect(page, itemsPerPage) {
+            savedFirstStepIndex = page * itemsPerPage
         }
 
         // Detectar cambios en las dimensiones del contenedor (rotación) y ajustar página
-        var previousHeight by rememberSaveable { mutableStateOf(containerHeight) }
-        var previousWidth by rememberSaveable { mutableStateOf(containerWidth) }
+        // Usar .value para convertir Dp a Float (serializable)
+        var previousHeight by remember { mutableStateOf(containerHeight.value) }
+        var previousWidth by remember { mutableStateOf(containerWidth.value) }
 
-        LaunchedEffect(containerHeight, containerWidth) {
-            val dimensionsChanged = (previousHeight != containerHeight || previousWidth != containerWidth)
-            if (dimensionsChanged && pasos.isNotEmpty() && savedFirstStepIndex >= 0) {
+        LaunchedEffect(containerHeight.value, containerWidth.value) {
+            val heightChanged = previousHeight != containerHeight.value
+            val widthChanged = previousWidth != containerWidth.value
+
+            if ((heightChanged || widthChanged) && pasos.isNotEmpty() && savedFirstStepIndex > 0) {
                 // Recalcular la página que contiene el paso guardado
                 val newPage = (savedFirstStepIndex.toFloat() / itemsPerPage).toInt()
                 val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
                 val targetPage = newPage.coerceAtMost(maxPage)
+
+                // Solo cambiar si es diferente para evitar bucles
                 if (targetPage != page) {
                     onPageChange(targetPage)
                 }
             }
-            previousHeight = containerHeight
-            previousWidth = containerWidth
+
+            previousHeight = containerHeight.value
+            previousWidth = containerWidth.value
         }
 
         // Auto-avanzar cuando todos están checkeados
