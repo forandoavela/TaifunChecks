@@ -1105,7 +1105,7 @@ private fun FullListMode(
         // Calcular cuántos items caben (usando estimación conservadora)
         val itemsPerPage = ((availableHeightForList) / (estimatedItemHeight + itemSpacing))
             .toInt()
-            .coerceAtLeast(3) // Mínimo 3 items por página
+            .coerceAtLeast(1) // Mínimo 1 item por página (permite 1-2 items en apaisado)
 
         val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
 
