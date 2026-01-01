@@ -1108,42 +1108,40 @@ private fun FullListMode(
             .coerceAtLeast(3) // Mínimo 3 items por página
 
         val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
-        val start = page * itemsPerPage
-        val endExclusive = (start + itemsPerPage).coerceAtMost(pasos.size)
-        val current = if (start < endExclusive) pasos.subList(start, endExclusive) else emptyList()
 
-        // Guardar el índice del primer paso visible usando rememberSaveable para persistir en rotaciones
-        var savedFirstStepIndex by rememberSaveable { mutableStateOf(0) }
+        // Guardar el índice absoluto del primer paso visible (persiste en rotaciones)
+        var firstVisibleStepIndex by rememberSaveable { mutableStateOf(0) }
 
-        // Actualizar el índice guardado cuando cambia la página
-        LaunchedEffect(page, itemsPerPage) {
-            savedFirstStepIndex = page * itemsPerPage
+        // Bandera para distinguir cambios de página del usuario vs. ajustes por rotación
+        var isRotationAdjustment by remember { mutableStateOf(false) }
+
+        // Actualizar el índice guardado cuando el usuario cambia de página manualmente
+        LaunchedEffect(page) {
+            if (!isRotationAdjustment) {
+                // Cambio del usuario: guardar el nuevo índice del primer paso visible
+                firstVisibleStepIndex = page * itemsPerPage
+            }
+            // Resetear la bandera después del ajuste
+            isRotationAdjustment = false
         }
 
-        // Detectar cambios en las dimensiones del contenedor (rotación) y ajustar página
-        // Usar .value para convertir Dp a Float (serializable)
-        var previousHeight by remember { mutableStateOf(containerHeight.value) }
-        var previousWidth by remember { mutableStateOf(containerWidth.value) }
+        // Cuando cambia itemsPerPage (rotación), recalcular la página que contiene el paso guardado
+        LaunchedEffect(itemsPerPage) {
+            if (pasos.isNotEmpty()) {
+                // Calcular qué página debería mostrar el paso guardado con el nuevo itemsPerPage
+                val targetPage = (firstVisibleStepIndex / itemsPerPage).coerceIn(0, totalPages - 1)
 
-        LaunchedEffect(containerHeight.value, containerWidth.value) {
-            val heightChanged = previousHeight != containerHeight.value
-            val widthChanged = previousWidth != containerWidth.value
-
-            if ((heightChanged || widthChanged) && pasos.isNotEmpty() && savedFirstStepIndex > 0) {
-                // Recalcular la página que contiene el paso guardado
-                val newPage = (savedFirstStepIndex.toFloat() / itemsPerPage).toInt()
-                val maxPage = ((pasos.size - 1) / itemsPerPage).coerceAtLeast(0)
-                val targetPage = newPage.coerceAtMost(maxPage)
-
-                // Solo cambiar si es diferente para evitar bucles
                 if (targetPage != page) {
+                    // Marcar como ajuste por rotación para evitar actualizar firstVisibleStepIndex
+                    isRotationAdjustment = true
                     onPageChange(targetPage)
                 }
             }
-
-            previousHeight = containerHeight.value
-            previousWidth = containerWidth.value
         }
+
+        val start = page * itemsPerPage
+        val endExclusive = (start + itemsPerPage).coerceAtMost(pasos.size)
+        val current = if (start < endExclusive) pasos.subList(start, endExclusive) else emptyList()
 
         // Auto-avanzar cuando todos están checkeados
         LaunchedEffect(checked) {
