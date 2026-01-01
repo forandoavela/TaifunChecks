@@ -1118,11 +1118,18 @@ private fun FullListMode(
         // Guardar itemsPerPage anterior para detectar cambios reales (no inicialización)
         var previousItemsPerPage by remember { mutableStateOf<Int?>(null) }
 
+        // Guardar el último itemsPerPage usado para actualizar firstVisibleStepIndex
+        var lastItemsPerPageUsed by remember { mutableStateOf(itemsPerPage) }
+
         // Actualizar el índice guardado cuando el usuario cambia de página manualmente
         LaunchedEffect(page) {
-            if (!isRotationAdjustment) {
+            // Solo actualizar si:
+            // 1. No es un ajuste por rotación
+            // 2. itemsPerPage no cambió desde la última actualización (evita sobrescribir durante rotación)
+            if (!isRotationAdjustment && itemsPerPage == lastItemsPerPageUsed) {
                 // Cambio del usuario: guardar el nuevo índice del primer paso visible
                 firstVisibleStepIndex = page * itemsPerPage
+                lastItemsPerPageUsed = itemsPerPage
             }
             // Resetear la bandera después del ajuste
             isRotationAdjustment = false
@@ -1141,6 +1148,8 @@ private fun FullListMode(
                     isRotationAdjustment = true
                     onPageChange(targetPage)
                 }
+                // Actualizar lastItemsPerPageUsed después del ajuste
+                lastItemsPerPageUsed = itemsPerPage
             }
             // Actualizar el valor anterior
             previousItemsPerPage = itemsPerPage
