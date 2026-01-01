@@ -1099,13 +1099,13 @@ private fun FullListMode(
         // Botón log: +56dp si existe
         // Spacing entre cards: 12dp
         val baseItemHeight = 72.dp // Card compacta sin extras
-        val estimatedItemHeight = 88.dp // Estimación conservadora con algunos extras
         val itemSpacing = 12.dp
 
-        // Calcular cuántos items caben (usando estimación conservadora)
-        val itemsPerPage = ((availableHeightForList) / (estimatedItemHeight + itemSpacing))
+        // Calcular cuántos items caben usando altura base (no conservadora)
+        // Con Arrangement.SpaceEvenly, Compose distribuirá el espacio automáticamente
+        val itemsPerPage = ((availableHeightForList) / (baseItemHeight + itemSpacing))
             .toInt()
-            .coerceAtLeast(1) // Mínimo 1 item por página (permite 1-2 items en apaisado)
+            .coerceAtLeast(1) // Mínimo 1 item por página
 
         val totalPages = if (pasos.isEmpty()) 1 else ((pasos.size - 1) / itemsPerPage + 1)
 
