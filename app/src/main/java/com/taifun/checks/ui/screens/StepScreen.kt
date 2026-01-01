@@ -1084,22 +1084,24 @@ private fun FullListMode(
         val bottomPadding = 16.dp
         val spacingBetweenElements = 12.dp
         val buttonRowHeight = if (showButtons) 60.dp else 0.dp
+        val safetyMargin = 24.dp // Margen de seguridad para evitar que items queden ocultos
 
-        val availableHeightForList = containerHeight -
+        val availableHeightForList = (containerHeight -
             titleHeight -
             topPadding -
             bottomPadding -
             spacingBetweenElements -
             buttonRowHeight -
-            spacingBetweenElements // spacing después del título
+            spacingBetweenElements - // spacing después del título
+            safetyMargin).coerceAtLeast(80.dp) // Garantizar un mínimo
 
-        // Estimar altura de cada card considerando contenido variable
-        // Card base: padding (32dp) + texto (24dp) + checkbox row
-        val baseItemHeight = 72.dp // Card compacta sin extras
+        // Usar altura conservadora que considere pasos con más texto
+        // No todos los pasos son mínimos - muchos tienen texto adicional, datos opcionales, etc.
+        val averageItemHeight = 90.dp // Altura promedio considerando texto variable
 
-        // Calcular cuántos items caben usando solo la altura base
-        // NO incluimos itemSpacing porque Arrangement.SpaceEvenly lo distribuye automáticamente
-        val itemsPerPage = (availableHeightForList / baseItemHeight)
+        // Calcular cuántos items caben usando altura promedio conservadora
+        // Con Arrangement.SpaceEvenly, Compose distribuirá el espacio sobrante
+        val itemsPerPage = (availableHeightForList / averageItemHeight)
             .toInt()
             .coerceAtLeast(1) // Mínimo 1 item por página
 
