@@ -1108,7 +1108,8 @@ private fun FullListMode(
             .coerceAtLeast(3) // Mínimo 3 items por página
 
         // Detectar cambios en itemsPerPage y ajustar la página para mantener la posición
-        var previousItemsPerPage by rememberSaveable { mutableStateOf(itemsPerPage) }
+        // Usar remember (no Saveable) para evitar conflictos en cambios de configuración
+        var previousItemsPerPage by remember { mutableStateOf(itemsPerPage) }
         LaunchedEffect(itemsPerPage) {
             if (previousItemsPerPage != itemsPerPage && pasos.isNotEmpty()) {
                 // Calcular el índice absoluto del primer paso que estábamos viendo
@@ -1159,7 +1160,7 @@ private fun FullListMode(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.SpaceEvenly, // Distribuir uniformemente el espacio
                 userScrollEnabled = false // Deshabilitar scroll ya que todos los items deben caber
             ) {
             itemsIndexed(current) { i, p ->
