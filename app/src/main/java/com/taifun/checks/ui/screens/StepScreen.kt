@@ -1115,6 +1115,9 @@ private fun FullListMode(
         // Bandera para distinguir cambios de página del usuario vs. ajustes por rotación
         var isRotationAdjustment by remember { mutableStateOf(false) }
 
+        // Guardar itemsPerPage anterior para detectar cambios reales (no inicialización)
+        var previousItemsPerPage by remember { mutableStateOf<Int?>(null) }
+
         // Actualizar el índice guardado cuando el usuario cambia de página manualmente
         LaunchedEffect(page) {
             if (!isRotationAdjustment) {
@@ -1127,7 +1130,8 @@ private fun FullListMode(
 
         // Cuando cambia itemsPerPage (rotación), recalcular la página que contiene el paso guardado
         LaunchedEffect(itemsPerPage) {
-            if (pasos.isNotEmpty()) {
+            // Solo ajustar si itemsPerPage realmente cambió (no en carga inicial)
+            if (previousItemsPerPage != null && previousItemsPerPage != itemsPerPage && pasos.isNotEmpty()) {
                 // Calcular qué página debería mostrar el paso guardado con el nuevo itemsPerPage
                 val targetPage = (firstVisibleStepIndex / itemsPerPage).coerceIn(0, totalPages - 1)
 
@@ -1137,6 +1141,8 @@ private fun FullListMode(
                     onPageChange(targetPage)
                 }
             }
+            // Actualizar el valor anterior
+            previousItemsPerPage = itemsPerPage
         }
 
         val start = page * itemsPerPage
