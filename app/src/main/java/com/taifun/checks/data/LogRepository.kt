@@ -319,8 +319,13 @@ class LogRepository(
                     // Operación atómica: renombrar archivo temporal al archivo final
                     if (!tempFile.renameTo(file)) {
                         // Fallback si renameTo falla (puede pasar entre filesystems)
-                        tempFile.copyTo(file, overwrite = true)
-                        tempFile.delete()
+                        val copied = tempFile.copyTo(file, overwrite = true)
+                        // Verificar que la copia tuvo éxito antes de borrar temp
+                        if (copied.exists() && copied.length() > 0) {
+                            tempFile.delete()
+                        } else {
+                            throw java.io.IOException("File copy failed - target file empty or doesn't exist")
+                        }
                     }
                 } else {
                     // Si no quedan entradas, simplemente eliminar el archivo
@@ -534,8 +539,13 @@ class LogRepository(
                 // Operación atómica: renombrar archivo temporal al archivo final
                 if (!tempFile.renameTo(file)) {
                     // Fallback si renameTo falla (puede pasar entre filesystems)
-                    tempFile.copyTo(file, overwrite = true)
-                    tempFile.delete()
+                    val copied = tempFile.copyTo(file, overwrite = true)
+                    // Verificar que la copia tuvo éxito antes de borrar temp
+                    if (copied.exists() && copied.length() > 0) {
+                        tempFile.delete()
+                    } else {
+                        throw java.io.IOException("File copy failed - target file empty or doesn't exist")
+                    }
                 }
 
                 true

@@ -45,7 +45,15 @@ class ProgressRepository(private val context: Context) {
         context.dataStore.data.map { prefs ->
             val str = prefs[checkedKey(checklistId)] ?: ""
             if (str.isBlank()) emptySet()
-            else str.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+            else {
+                // Parse y validar, logging errores para debug
+                str.split(",").mapNotNull {
+                    it.toIntOrNull() ?: run {
+                        android.util.Log.w("ProgressRepository", "Valor inválido en progreso para $checklistId: '$it'")
+                        null
+                    }
+                }.toSet()
+            }
         }
 
     /** Guarda items checkeados. */

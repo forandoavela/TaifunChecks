@@ -154,8 +154,10 @@ class SensorDataRepository(private val context: Context) {
             // This allows getFixAgeMs() to work correctly for NMEA GPS
             if (latitude != null && longitude != null) {
                 _lastFixElapsedRealtimeNanos.value = SystemClock.elapsedRealtimeNanos()
-            } else if (latitude == null && longitude == null) {
-                // Clear timestamp when GPS data is completely invalid (disconnected or no fix)
+            } else {
+                // Clear timestamp when GPS data is invalid:
+                // - Both null (disconnected or no fix)
+                // - Only one null (partial/corrupted data)
                 // This prevents old fix timestamps from being considered valid
                 _lastFixElapsedRealtimeNanos.value = null
             }
@@ -428,14 +430,21 @@ class SensorDataRepository(private val context: Context) {
      * @return QNH en hPa
      */
     fun calculateQNH(pressureHPa: Float, altitudeMeters: Double): Double {
-        // Fórmula ICAO: P0 = P * (1 - (L * h) / (T0 + L * h))^(-g * M / (R * L))
+        // Fórmula ICAO estándar de atmósfera para calcular presión a nivel del mar
+        // Fórmula completa: P0 = P * (1 - (L * h) / (T0 + L * h))^(-g * M / (R * L))
         // Simplificada: QNH = P * (1 + h / 44330.77)^5.255
-        // Donde h es la altitud en metros
 
-        val exponent = 5.255
-        val constant = 44330.77
+        // Constantes derivadas de la atmósfera estándar ICAO:
+        // - 5.255 = -g * M / (R * L) donde:
+        //   g = 9.80665 m/s² (aceleración gravitacional estándar)
+        //   M = 0.0289644 kg/mol (masa molar aire)
+        //   R = 8.3144598 J/(mol·K) (constante gases ideales)
+        //   L = -0.0065 K/m (gradiente térmico troposfera)
+        // - 44330.77 m = constante escala presión-altitud ICAO
+        val ICAO_EXPONENT = 5.255
+        val ICAO_PRESSURE_SCALE_HEIGHT = 44330.77
 
-        return pressureHPa * (1.0 + altitudeMeters / constant).pow(exponent)
+        return pressureHPa * (1.0 + altitudeMeters / ICAO_PRESSURE_SCALE_HEIGHT).pow(ICAO_EXPONENT)
     }
 
     /**
