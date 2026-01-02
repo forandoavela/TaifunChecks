@@ -239,11 +239,8 @@ fun StepScreen(
     }
 
     // Voice recognition listener
-    // Usar coroutineScope del LaunchedEffect para estructurar coroutines
+    // Usar rememberCoroutineScope() para que el reconocimiento continúe a través de recomposiciones
     LaunchedEffect(voiceControlEnabled) {
-        // Capturar el scope del LaunchedEffect para usar en callbacks
-        val launchedScope = this
-
         if (voiceControlEnabled && speechRecognizer != null) {
             val recognitionListener = object : RecognitionListener {
                 override fun onReadyForSpeech(params: Bundle?) {
@@ -259,9 +256,9 @@ fun StepScreen(
 
                 override fun onError(error: Int) {
                     isListening = false
-                    // Reiniciar escucha usando scope estructurado
+                    // Reiniciar escucha usando coroutineScope (sobrevive recomposiciones)
                     if (voiceControlEnabled) {
-                        launchedScope.launch {
+                        coroutineScope.launch {
                             delay(500)
                             if (voiceControlEnabled) {
                                 startListening(speechRecognizer, ctx, currentLanguage)
@@ -285,9 +282,9 @@ fun StepScreen(
                             Regex("\\bnext\\b").containsMatchIn(lowerCommand) -> onNext()
                         }
                     }
-                    // Continuar escuchando usando scope estructurado
+                    // Continuar escuchando usando coroutineScope (sobrevive recomposiciones)
                     if (voiceControlEnabled) {
-                        launchedScope.launch {
+                        coroutineScope.launch {
                             delay(300)
                             if (voiceControlEnabled) {
                                 startListening(speechRecognizer, ctx, currentLanguage)
