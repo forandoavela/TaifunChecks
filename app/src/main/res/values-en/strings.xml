@@ -296,6 +296,8 @@
     <string name="entry_longitude_label">Longitude</string>
     <string name="entry_altitude_label">Altitude (m)</string>
     <string name="entry_icao_label">ICAO</string>
+    <string name="no_gps_data">No GPS data</string>
+    <string name="no_altitude_data">No altitude data</string>
 
     <!-- Log Entry -->
     <string name="log_entry_saved">Log entry saved</string>

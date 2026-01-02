@@ -374,11 +374,9 @@ class SensorDataRepository(private val context: Context) {
             _altitude.value = location.altitude
             _hasValidAltitude.value = true
         } else {
-            // No actualizar altitud - mantener valor anterior si lo hay
-            // pero marcar como no válida si no teníamos una previa
-            if (_altitude.value == null) {
-                _hasValidAltitude.value = false
-            }
+            // Limpiar altitud cuando se pierde el fix para evitar mostrar datos obsoletos
+            _altitude.value = null
+            _hasValidAltitude.value = false
         }
     }
 

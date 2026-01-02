@@ -112,12 +112,14 @@ object NmeaParser {
             "PRS" -> {
                 // Pressure in hexadecimal Pascals -> convert to hPa
                 val pressurePa = valueStr.toLongOrNull(16)
-                if (pressurePa != null) {
+                // Validar rango razonable: 50000-120000 Pa (500-1200 hPa)
+                // Previene overflow y valores absurdos
+                if (pressurePa != null && pressurePa in 50000..120000) {
                     val pressureHpa = pressurePa / 100.0f
                     Log.d(TAG, "BlueFlyVario PRS: 0x$valueStr = $pressurePa Pa = $pressureHpa hPa")
                     NmeaData(pressure = pressureHpa)
                 } else {
-                    Log.w(TAG, "Invalid PRS value (not hex): $valueStr")
+                    Log.w(TAG, "Invalid PRS value (not hex or out of range 500-1200 hPa): $valueStr")
                     null
                 }
             }

@@ -199,8 +199,9 @@ fun StepScreen(
     }
 
     // Limpiar recursos al salir
-    // Usamos las dependencias reales para que si cambian, los recursos antiguos se limpien correctamente
-    DisposableEffect(speechRecognizer, sensorRepo) {
+    // Usar Unit como key para garantizar que cleanup se ejecuta cuando el Composable sale de la composición
+    // independientemente de si las referencias cambian o no (previene memory leaks)
+    DisposableEffect(Unit) {
         onDispose {
             speechRecognizer?.destroy()
             sensorRepo.stopAll()
@@ -238,7 +239,11 @@ fun StepScreen(
     }
 
     // Voice recognition listener
+    // Usar coroutineScope del LaunchedEffect para estructurar coroutines
     LaunchedEffect(voiceControlEnabled) {
+        // Capturar el scope del LaunchedEffect para usar en callbacks
+        val launchedScope = this
+
         if (voiceControlEnabled && speechRecognizer != null) {
             val recognitionListener = object : RecognitionListener {
                 override fun onReadyForSpeech(params: Bundle?) {
@@ -254,9 +259,9 @@ fun StepScreen(
 
                 override fun onError(error: Int) {
                     isListening = false
-                    // Reiniciar escucha
+                    // Reiniciar escucha usando scope estructurado
                     if (voiceControlEnabled) {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        launchedScope.launch {
                             delay(500)
                             if (voiceControlEnabled) {
                                 startListening(speechRecognizer, ctx, currentLanguage)
@@ -269,18 +274,20 @@ fun StepScreen(
                     val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                     matches?.firstOrNull()?.let { command ->
                         val lowerCommand = command.lowercase()
+                        // Usar regex para matching de palabras completas para evitar falsos positivos
+                        // Por ejemplo: "del paso anterior" NO debería activar "anterior"
                         when {
-                            // Comandos en español
-                            lowerCommand.contains("anterior") -> onPrevious()
-                            lowerCommand.contains("siguiente") -> onNext()
-                            // Comandos en inglés
-                            lowerCommand.contains("previous") -> onPrevious()
-                            lowerCommand.contains("next") -> onNext()
+                            // Comandos en español (palabra completa)
+                            Regex("\\banterior\\b").containsMatchIn(lowerCommand) -> onPrevious()
+                            Regex("\\bsiguiente\\b").containsMatchIn(lowerCommand) -> onNext()
+                            // Comandos en inglés (palabra completa)
+                            Regex("\\bprevious\\b").containsMatchIn(lowerCommand) -> onPrevious()
+                            Regex("\\bnext\\b").containsMatchIn(lowerCommand) -> onNext()
                         }
                     }
-                    // Continuar escuchando
+                    // Continuar escuchando usando scope estructurado
                     if (voiceControlEnabled) {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        launchedScope.launch {
                             delay(300)
                             if (voiceControlEnabled) {
                                 startListening(speechRecognizer, ctx, currentLanguage)

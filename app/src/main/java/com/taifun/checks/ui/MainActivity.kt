@@ -248,14 +248,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Desconectar Bluetooth GPS y Variometer al destruir la actividad
-        lifecycleScope.launch {
-            try {
-                bluetoothGpsRepo.disconnect()
-                bluetoothVarioRepo.disconnect()
-            } catch (e: Exception) {
-                // Silenciar errores de desconexión
-            }
+        // Limpiar recursos de Bluetooth GPS y Variometer al destruir la actividad
+        // Importante: llamar cleanup() en lugar de disconnect() para cancelar coroutineScope
+        // y usar try-catch directo sin lifecycleScope.launch porque el lifecycle ya está terminando
+        try {
+            bluetoothGpsRepo.cleanup()
+            bluetoothVarioRepo.cleanup()
+        } catch (e: Exception) {
+            // Silenciar errores de limpieza
+            android.util.Log.e("MainActivity", "Error cleaning up Bluetooth repositories", e)
         }
     }
 

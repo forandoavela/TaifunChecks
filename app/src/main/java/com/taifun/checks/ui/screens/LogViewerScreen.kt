@@ -645,21 +645,39 @@ private fun LogEntryCard(
                 fontSize = 13.sp
             )
 
-            // Coordenadas
-            Text(
-                text = "📍 ${String.format(Locale.US, "%.6f", entry.latitude)}, ${String.format(Locale.US, "%.6f", entry.longitude)}",
-                style = MaterialTheme.typography.bodySmall,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            // Coordenadas (mostrar solo si están disponibles)
+            if (entry.latitude != null && entry.longitude != null) {
+                Text(
+                    text = "📍 ${String.format(Locale.US, "%.6f", entry.latitude)}, ${String.format(Locale.US, "%.6f", entry.longitude)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            } else {
+                Text(
+                    text = "📍 ${stringResource(R.string.no_gps_data)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                )
+            }
 
-            // Altitud
-            Text(
-                text = "✈️  ${String.format(Locale.US, "%.0f m", entry.altitudeMeters)}",
-                style = MaterialTheme.typography.bodySmall,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            // Altitud (mostrar solo si está disponible)
+            if (entry.altitudeMeters != null) {
+                Text(
+                    text = "✈️  ${String.format(Locale.US, "%.0f m", entry.altitudeMeters)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            } else {
+                Text(
+                    text = "✈️  ${stringResource(R.string.no_altitude_data)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                )
+            }
 
             // ICAO (si existe)
             if (!entry.icaoCode.isNullOrBlank()) {
@@ -683,9 +701,9 @@ private fun EditEntryDialog(
     haptic: com.taifun.checks.ui.HapticFeedbackHelper
 ) {
     var text by remember { mutableStateOf(entry.logText) }
-    var latitude by remember { mutableStateOf(entry.latitude.toString()) }
-    var longitude by remember { mutableStateOf(entry.longitude.toString()) }
-    var altitude by remember { mutableStateOf(entry.altitudeMeters.toString()) }
+    var latitude by remember { mutableStateOf(entry.latitude?.toString() ?: "") }
+    var longitude by remember { mutableStateOf(entry.longitude?.toString() ?: "") }
+    var altitude by remember { mutableStateOf(entry.altitudeMeters?.toString() ?: "") }
     var icao by remember { mutableStateOf(entry.icaoCode ?: "") }
 
     AlertDialog(
@@ -740,9 +758,9 @@ private fun EditEntryDialog(
                 try {
                     val newEntry = LogEntry(
                         utcTime = entry.utcTime,
-                        latitude = latitude.toDouble(),
-                        longitude = longitude.toDouble(),
-                        altitudeMeters = altitude.toDouble(),
+                        latitude = latitude.ifBlank { null }?.toDoubleOrNull(),
+                        longitude = longitude.ifBlank { null }?.toDoubleOrNull(),
+                        altitudeMeters = altitude.ifBlank { null }?.toDoubleOrNull(),
                         icaoCode = icao.ifBlank { null },
                         logText = text
                     )
