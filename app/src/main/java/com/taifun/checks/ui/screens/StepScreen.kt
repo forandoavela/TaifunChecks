@@ -472,6 +472,12 @@ private fun startListening(
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+        // Intentar desactivar el pitido del sistema
+        // Nota: El pitido es parte del servicio de Google, no siempre se puede desactivar completamente
+        putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+        // Reducir tiempos de silencio para hacer el reconocimiento más ágil
+        putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1500L)
+        putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1500L)
     }
     speechRecognizer.startListening(intent)
 }
