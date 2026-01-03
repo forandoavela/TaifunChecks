@@ -91,14 +91,16 @@ class ChecklistRepository(private val context: Context) {
             val oldDir = context.filesDir
             val newDir = getStorageDir()
 
-            if (oldDir.absolutePath != newDir.absolutePath) {
+            // Usar canonicalPath en lugar de absolutePath para comparación correcta
+            // (maneja symlinks y paths relativos correctamente)
+            if (oldDir.canonicalPath != newDir.canonicalPath) {
                 oldDir.listFiles()?.filter { it.extension == "yaml" }?.forEach { file ->
                     try {
                         val targetFile = File(newDir, file.name)
                         if (!targetFile.exists()) {
                             file.copyTo(targetFile, overwrite = false)
                             file.delete()
-                            Log.i(TAG, "Archivo ${file.name} migrado a ${newDir.absolutePath}")
+                            Log.i(TAG, "Archivo ${file.name} migrado a ${newDir.canonicalPath}")
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Error migrando archivo ${file.name}", e)
@@ -150,14 +152,18 @@ class ChecklistRepository(private val context: Context) {
             } catch (e: Exception) {
                 Log.w(TAG, "Error listando assets con list(\"\"), usando lista explícita", e)
                 null
-            } ?: listOf(
-                "Taifun17E_ES.yaml",
-                "Taifun17E_EN.yaml",
-                "Grob_G109B_ES.yaml",
-                "Grob_G109B_EN.yaml",
-                "SF-28A_ES.yaml",
-                "SF-28A_EN.yaml"
-            )
+            } ?: run {
+                // NOTA: Si se añaden nuevos archivos .yaml a assets, actualizar esta lista
+                Log.i(TAG, "Usando lista fallback hardcodeada de archivos YAML")
+                listOf(
+                    "Taifun17E_ES.yaml",
+                    "Taifun17E_EN.yaml",
+                    "Grob_G109B_ES.yaml",
+                    "Grob_G109B_EN.yaml",
+                    "SF-28A_ES.yaml",
+                    "SF-28A_EN.yaml"
+                )
+            }
 
             Log.i(TAG, "Detectados ${defaultFiles.size} archivos YAML en assets: $defaultFiles")
 
@@ -243,7 +249,8 @@ class ChecklistRepository(private val context: Context) {
             val f = storeFile(filename)
             val catalogo = when {
                 f.exists() -> {
-                    f.inputStream().use { YamlIO.parseCatalog(it) }
+                    // Pasar filename al parser para logging mejorado
+                    f.inputStream().use { YamlIO.parseCatalog(it, filename) }
                 }
                 else -> {
                     // Intentar cargar desde assets
@@ -252,30 +259,35 @@ class ChecklistRepository(private val context: Context) {
                     }.getOrNull()
 
                     if (seed != null) {
-                        val cat = seed.use { YamlIO.parseCatalog(it) }
+                        // Pasar filename al parser para logging mejorado
+                        val cat = seed.use { YamlIO.parseCatalog(it, filename) }
                         // Guardar en storage interno para futuros accesos
                         save(cat, filename).getOrElse {
                             Log.w(TAG, "No se pudo guardar archivo $filename desde assets")
                         }
                         cat
                     } else {
-                        Log.w(TAG, "Archivo $filename no encontrado ni en storage ni en assets")
-                        Catalogo(emptyList())
+                        Log.e(TAG, "Archivo $filename no encontrado ni en storage ni en assets")
+                        // Retornar error en lugar de catálogo vacío silencioso para mejor UX
+                        return@withContext Result.failure(
+                            RepositoryException.FileNotFound("Checklist file not found: $filename")
+                        )
                     }
                 }
             }
             Result.success(catalogo)
         } catch (e: IOException) {
-            Log.e(TAG, "Error de I/O cargando catálogo", e)
+            Log.e(TAG, "Error de I/O cargando catálogo desde '$filename'", e)
             Result.failure(RepositoryException.IOError("Error leyendo archivo: ${e.message}", e))
         } catch (e: SecurityException) {
-            Log.e(TAG, "Error de permisos cargando catálogo", e)
+            Log.e(TAG, "Error de permisos cargando catálogo desde '$filename'", e)
             Result.failure(RepositoryException.PermissionError("Sin permisos para leer archivo", e))
         } catch (e: YamlParseException) {
-            Log.e(TAG, "Error parseando YAML", e)
+            // Logging mejorado: el filename ya está incluido en el mensaje de YamlParseException
+            Log.e(TAG, "Error parseando YAML: ${e.message}", e)
             Result.failure(RepositoryException.ParseError(e.message ?: "Error parseando YAML", e))
         } catch (e: Exception) {
-            Log.e(TAG, "Error inesperado cargando catálogo", e)
+            Log.e(TAG, "Error inesperado cargando catálogo desde '$filename': ${e::class.simpleName}", e)
             Result.failure(RepositoryException.UnknownError("Error inesperado: ${e.message}", e))
         }
     }
@@ -342,14 +354,15 @@ class ChecklistRepository(private val context: Context) {
      */
     suspend fun importFromUri(uri: Uri, filename: String? = null): Result<Pair<String, Catalogo>> = withContext(Dispatchers.IO) {
         try {
+            // Generar nombre único si no se especifica (para logging mejorado)
+            val finalFilename = filename ?: generateUniqueFilename()
+
             val cat = context.contentResolver.openInputStream(uri)?.use { input ->
-                YamlIO.parseCatalog(input)
+                // Pasar filename al parser para logging mejorado
+                YamlIO.parseCatalog(input, finalFilename)
             } ?: return@withContext Result.failure(
                 RepositoryException.IOError("No se pudo abrir el archivo")
             )
-
-            // Generar nombre único si no se especifica
-            val finalFilename = filename ?: generateUniqueFilename()
 
             // Guardar el catálogo importado
             save(cat, finalFilename).onFailure { error ->
@@ -358,16 +371,17 @@ class ChecklistRepository(private val context: Context) {
 
             Result.success(Pair(finalFilename, cat))
         } catch (e: IOException) {
-            Log.e(TAG, "Error de I/O importando", e)
+            Log.e(TAG, "Error de I/O importando desde URI: $uri", e)
             Result.failure(RepositoryException.IOError("Error leyendo archivo: ${e.message}", e))
         } catch (e: SecurityException) {
-            Log.e(TAG, "Error de permisos importando", e)
+            Log.e(TAG, "Error de permisos importando desde URI: $uri", e)
             Result.failure(RepositoryException.PermissionError("Sin permisos para leer archivo", e))
         } catch (e: YamlParseException) {
-            Log.e(TAG, "Error parseando YAML al importar", e)
+            // Logging mejorado: el filename ya está incluido en el mensaje de YamlParseException
+            Log.e(TAG, "Error parseando YAML al importar: ${e.message}", e)
             Result.failure(RepositoryException.ParseError(e.message ?: "Error parseando YAML", e))
         } catch (e: Exception) {
-            Log.e(TAG, "Error inesperado importando", e)
+            Log.e(TAG, "Error inesperado importando desde URI: $uri - ${e::class.simpleName}", e)
             Result.failure(RepositoryException.UnknownError("Error inesperado: ${e.message}", e))
         }
     }
@@ -445,6 +459,7 @@ class ChecklistRepository(private val context: Context) {
  * Excepciones específicas del repositorio para mejor manejo de errores
  */
 sealed class RepositoryException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    class FileNotFound(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class IOError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class PermissionError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class ParseError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)

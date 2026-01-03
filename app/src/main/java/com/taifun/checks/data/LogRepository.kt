@@ -3,6 +3,7 @@ package com.taifun.checks.data
 import android.content.Context
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -219,6 +220,7 @@ class LogRepository(
                     val parts = line.split(";")
                     if (parts.size >= 6) {
                         try {
+                            // toDoubleOrNull() usa formato invariante (punto decimal), consistente con Locale.US en escritura
                             entries.add(
                                 LogEntry(
                                     utcTime = parts[0],
@@ -245,9 +247,16 @@ class LogRepository(
 
     /**
      * Obtiene la ruta del archivo de log para compartir/exportar
+     * Usa canonicalPath para obtener la ruta real resuelta (sin symlinks)
      */
     fun getLogFilePath(): String {
-        return getLogFile().absolutePath
+        return try {
+            getLogFile().canonicalPath
+        } catch (e: Exception) {
+            // Fallback a absolutePath si canonicalPath falla
+            Log.w(TAG, "Error obteniendo canonicalPath, usando absolutePath", e)
+            getLogFile().absolutePath
+        }
     }
 
     /**
@@ -558,5 +567,9 @@ class LogRepository(
             e.printStackTrace()
             false
         }
+    }
+
+    companion object {
+        private const val TAG = "LogRepository"
     }
 }

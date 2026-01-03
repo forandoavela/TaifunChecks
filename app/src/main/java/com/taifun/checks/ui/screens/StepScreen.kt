@@ -142,8 +142,12 @@ fun StepScreen(
                 val cl = cat.checklists.firstOrNull { it.id == checklistId }
                 checklist = cl
                 total = cl?.pasos?.size ?: 0
-                // Validar que el index no esté fuera de rango
-                if (index >= total && total > 0) {
+
+                // Validar que el checklist exista y el índice esté en rango
+                if (cl == null) {
+                    android.util.Log.e("StepScreen", "Checklist not found: id=$checklistId in file=$activeChecklist")
+                } else if (index >= total && total > 0) {
+                    // Index fuera de rango, resetear a 0
                     vm.setIndex(0)
                 }
 

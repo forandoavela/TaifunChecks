@@ -71,13 +71,17 @@ fun HomeScreen(
     var categoryToEdit by remember { mutableStateOf("") }
     var newCategoryName by remember { mutableStateOf("") }
 
-    // Filtrar y agrupar por categoría
-    val filteredLists = catalogo.checklists.filter {
-        it.titulo.contains(searchQuery, ignoreCase = true) ||
-                it.categoria?.contains(searchQuery, ignoreCase = true) == true
+    // Filtrar y agrupar por categoría (optimizado con remember)
+    val filteredLists = remember(catalogo, searchQuery) {
+        catalogo.checklists.filter {
+            it.titulo.contains(searchQuery, ignoreCase = true) ||
+                    it.categoria?.contains(searchQuery, ignoreCase = true) == true
+        }
     }
 
-    val groupedByCategory = filteredLists.groupBy { it.categoria ?: ctx.getString(R.string.uncategorized) }
+    val groupedByCategory = remember(filteredLists, ctx) {
+        filteredLists.groupBy { it.categoria ?: ctx.getString(R.string.uncategorized) }
+    }
 
     Scaffold(
         topBar = {
@@ -218,11 +222,10 @@ fun HomeScreen(
         }
     }
 
-    // Recargar en composición inicial y cuando regresamos de otras pantallas
-    // Esto resuelve el problema de que los cambios del editor no se reflejaban
-    DisposableEffect(Unit) {
+    // Recargar solo en composición inicial (no en cada recomposición)
+    // El ViewModel ya observa cambios en activeChecklistFlow
+    LaunchedEffect(Unit) {
         vm.reload()
-        onDispose { }
     }
 
     // Mostrar diálogo de error si existe

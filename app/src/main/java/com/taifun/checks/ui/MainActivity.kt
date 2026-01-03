@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -38,9 +39,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Habilitar edge-to-edge para compatibilidad con Android 15+
-        // Scaffold de Material3 maneja automáticamente los system bars insets
+        // Configurar edge-to-edge correctamente para Android 15+
+        // enableEdgeToEdge() maneja automáticamente los system bars y cutout mode
+        // usando las APIs modernas sin depender de LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         enableEdgeToEdge()
+
+        // Asegurar que el contenido se renderiza detrás de las barras del sistema
+        // Esto es manejado automáticamente por enableEdgeToEdge() pero lo hacemos
+        // explícito para mayor claridad
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         settingsRepo = SettingsRepository(this)
         sensorDataRepo = SensorDataRepository(this)
@@ -55,14 +62,13 @@ class MainActivity : ComponentActivity() {
         setupContent(startDestination)
 
         // Observar configuración de pantalla encendida
+        // Aplicar configuración en onCreate y mantener observación durante toda la vida de la Activity
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsRepo.screenOnFlow.collect { keepOn ->
-                    if (keepOn) {
-                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    } else {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    }
+            settingsRepo.screenOnFlow.collect { keepOn ->
+                if (keepOn) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
         }

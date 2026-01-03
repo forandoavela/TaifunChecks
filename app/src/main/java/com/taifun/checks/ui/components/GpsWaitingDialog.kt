@@ -196,7 +196,15 @@ fun isGpsAccurateForLogging(
     if (!hasValidAltitude) return false
 
     // Fix must not be too old (if we have age info)
-    if (fixAgeMs != null && fixAgeMs > SensorDataRepository.MAX_FIX_AGE_MS) return false
+    // Note: fixAgeMs can be null for internal GPS before first fix, or if source doesn't provide timestamps
+    // In production, fixAgeMs should always be set for valid GPS data
+    if (fixAgeMs != null && fixAgeMs > SensorDataRepository.MAX_FIX_AGE_MS) {
+        return false
+    }
+    // Log warning if fix age is unknown but we're accepting the data
+    if (fixAgeMs == null) {
+        android.util.Log.w("GpsWaitingDialog", "GPS fix age unknown - accepting data without age validation (hasValidAltitude=$hasValidAltitude)")
+    }
 
     // Check horizontal accuracy if available
     // If accuracy is null (e.g., Bluetooth/NMEA GPS without accuracy data), skip accuracy check
