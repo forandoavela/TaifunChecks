@@ -13,32 +13,40 @@ import com.taifun.checks.data.SettingsRepository
 
 /**
  * Utilidad para realizar feedback háptico en la interfaz
+ * Optimizado para uso en aviación: feedback más fuerte para uso con guantes
+ * y en condiciones de turbulencia
  */
 object HapticUtils {
     /**
      * Realiza feedback háptico estándar para interacciones de botones
-     * Usa FLAG_IGNORE_GLOBAL_SETTING para asegurar que el feedback se ejecute
-     * incluso si el usuario ha deshabilitado el feedback háptico a nivel de sistema
+     * Usa CONTEXT_CLICK que es más fuerte que VIRTUAL_KEY, apropiado para
+     * uso en cabina con guantes de vuelo
+     * FLAG_IGNORE_GLOBAL_SETTING asegura que funcione independientemente
+     * de la configuración del sistema
      */
     fun performHapticFeedback(view: View) {
         view.performHapticFeedback(
-            HapticFeedbackConstants.VIRTUAL_KEY,
+            HapticFeedbackConstants.CONTEXT_CLICK,
             HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
         )
     }
 
     /**
      * Realiza feedback háptico suave para interacciones menores
+     * Usa CONTEXT_CLICK en lugar de CLOCK_TICK para mejor percepción
+     * en condiciones de vuelo
      */
     fun performLightHapticFeedback(view: View) {
         view.performHapticFeedback(
-            HapticFeedbackConstants.CLOCK_TICK,
+            HapticFeedbackConstants.CONTEXT_CLICK,
             HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
         )
     }
 
     /**
      * Realiza feedback háptico fuerte para confirmaciones importantes
+     * Usa LONG_PRESS que es el feedback más fuerte disponible
+     * universalmente (API < 30), ideal para acciones críticas
      */
     fun performStrongHapticFeedback(view: View) {
         view.performHapticFeedback(
