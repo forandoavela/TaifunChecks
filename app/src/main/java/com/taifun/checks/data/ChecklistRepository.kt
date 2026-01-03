@@ -150,14 +150,18 @@ class ChecklistRepository(private val context: Context) {
             } catch (e: Exception) {
                 Log.w(TAG, "Error listando assets con list(\"\"), usando lista explícita", e)
                 null
-            } ?: listOf(
-                "Taifun17E_ES.yaml",
-                "Taifun17E_EN.yaml",
-                "Grob_G109B_ES.yaml",
-                "Grob_G109B_EN.yaml",
-                "SF-28A_ES.yaml",
-                "SF-28A_EN.yaml"
-            )
+            } ?: run {
+                // NOTA: Si se añaden nuevos archivos .yaml a assets, actualizar esta lista
+                Log.i(TAG, "Usando lista fallback hardcodeada de archivos YAML")
+                listOf(
+                    "Taifun17E_ES.yaml",
+                    "Taifun17E_EN.yaml",
+                    "Grob_G109B_ES.yaml",
+                    "Grob_G109B_EN.yaml",
+                    "SF-28A_ES.yaml",
+                    "SF-28A_EN.yaml"
+                )
+            }
 
             Log.i(TAG, "Detectados ${defaultFiles.size} archivos YAML en assets: $defaultFiles")
 

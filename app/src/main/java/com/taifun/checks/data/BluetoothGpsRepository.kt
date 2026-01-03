@@ -179,18 +179,20 @@ class BluetoothGpsRepository(private val context: Context) {
 
                 Log.d(TAG, "Started reading NMEA data")
                 var accumulatedData = NmeaParser.NmeaData()
+                // Usar ArrayDeque para operaciones eficientes de add/removeFirst
+                val rawSentencesBuffer = ArrayDeque<String>(20)
 
                 while (isActive && socket.isConnected) {
                     try {
                         val line = reader.readLine()
                         if (line != null && line.isNotEmpty()) {
-                            // Add to raw sentences list (keep last 20)
-                            val currentList = _rawNmeaSentences.value.toMutableList()
-                            currentList.add(line)
-                            if (currentList.size > 20) {
-                                currentList.removeAt(0)
+                            // Add to raw sentences buffer (keep last 20) - más eficiente que recrear lista
+                            rawSentencesBuffer.add(line)
+                            if (rawSentencesBuffer.size > 20) {
+                                rawSentencesBuffer.removeFirst()
                             }
-                            _rawNmeaSentences.value = currentList
+                            // Actualizar StateFlow con copia de la lista (solo cuando cambia)
+                            _rawNmeaSentences.value = rawSentencesBuffer.toList()
 
                             // Parse sentence (NMEA or BlueFlyVario)
                             val parsedData = NmeaParser.parse(line)
