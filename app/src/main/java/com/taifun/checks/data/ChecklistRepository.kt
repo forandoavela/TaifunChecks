@@ -71,7 +71,9 @@ class ChecklistRepository(private val context: Context) {
     /**
      * Migra archivos antiguos borrando el checklists.yaml obsoleto
      * y moviendo archivos del directorio antiguo al nuevo
+     * Thread-safe: sincronizada para prevenir accesos concurrentes durante migración
      */
+    @Synchronized
     private fun migrateOldFiles() {
         try {
             // Borrar archivo antiguo checklists.yaml si existe
@@ -112,7 +114,9 @@ class ChecklistRepository(private val context: Context) {
      * Inicializa los archivos YAML por defecto desde assets si no existen
      * o si la versión de la app ha cambiado (actualización automática)
      * Detecta automáticamente todos los archivos .yaml en assets
+     * Thread-safe: sincronizada para prevenir accesos concurrentes durante inicialización
      */
+    @Synchronized
     private fun initializeDefaultChecklists() {
         try {
             // Verificar si la versión de la app cambió

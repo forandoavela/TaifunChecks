@@ -43,8 +43,11 @@ class AerodromeRepository(private val context: Context) {
     /**
      * Carga la base de datos de aeródromos desde assets (formato gzip)
      * Solo se carga una vez en memoria
+     * Thread-safe: usa @Synchronized para prevenir cargas concurrentes
      */
+    @Synchronized
     private fun loadAerodromes() {
+        // Double-check locking: verificar de nuevo después de obtener el lock
         if (isLoaded) return
 
         try {

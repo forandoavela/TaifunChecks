@@ -15,12 +15,13 @@ import java.util.*
 
 /**
  * Representa una entrada en el log de vuelo
+ * Los campos GPS pueden ser null si no había fix GPS válido al momento del log
  */
 data class LogEntry(
     val utcTime: String,
-    val latitude: Double,
-    val longitude: Double,
-    val altitudeMeters: Double,
+    val latitude: Double?,
+    val longitude: Double?,
+    val altitudeMeters: Double?,
     val icaoCode: String?,  // null si no hay aeródromo cercano
     val logText: String
 )
@@ -155,12 +156,12 @@ class LogRepository(
                 null
             }
 
-            // Crear entrada (permitiendo coordenadas NULL)
+            // Crear entrada (con coordenadas null si no hay fix GPS válido)
             val entry = LogEntry(
                 utcTime = utcTime,
-                latitude = latitude ?: 0.0,
-                longitude = longitude ?: 0.0,
-                altitudeMeters = altitudeMeters ?: 0.0,
+                latitude = latitude,
+                longitude = longitude,
+                altitudeMeters = altitudeMeters,
                 icaoCode = icaoCode,
                 logText = logText
             )
@@ -212,25 +213,24 @@ class LogRepository(
             BufferedReader(FileReader(file)).use { reader ->
                 reader.readLine() // Skip header
 
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    line?.let {
-                        val parts = it.split(";")
-                        if (parts.size >= 6) {
-                            try {
-                                entries.add(
-                                    LogEntry(
-                                        utcTime = parts[0],
-                                        latitude = parts[1].toDouble(),
-                                        longitude = parts[2].toDouble(),
-                                        altitudeMeters = parts[3].toDouble(),
-                                        icaoCode = parts[4].ifBlank { null },
-                                        logText = parts[5]
-                                    )
+                // Usar readLine() en el while condition directamente (más seguro que .also pattern)
+                while (true) {
+                    val line = reader.readLine() ?: break
+                    val parts = line.split(";")
+                    if (parts.size >= 6) {
+                        try {
+                            entries.add(
+                                LogEntry(
+                                    utcTime = parts[0],
+                                    latitude = parts[1].ifBlank { null }?.toDoubleOrNull(),
+                                    longitude = parts[2].ifBlank { null }?.toDoubleOrNull(),
+                                    altitudeMeters = parts[3].ifBlank { null }?.toDoubleOrNull(),
+                                    icaoCode = parts[4].ifBlank { null },
+                                    logText = parts[5]
                                 )
-                            } catch (e: NumberFormatException) {
-                                // Skip invalid entries
-                            }
+                            )
+                        } catch (e: NumberFormatException) {
+                            // Skip invalid entries
                         }
                     }
                 }
@@ -295,11 +295,17 @@ class LogRepository(
                             val line = buildString {
                                 append(entry.utcTime)
                                 append(";")
-                                append(String.format(Locale.US, "%.6f", entry.latitude))
+                                if (entry.latitude != null) {
+                                    append(String.format(Locale.US, "%.6f", entry.latitude))
+                                }
                                 append(";")
-                                append(String.format(Locale.US, "%.6f", entry.longitude))
+                                if (entry.longitude != null) {
+                                    append(String.format(Locale.US, "%.6f", entry.longitude))
+                                }
                                 append(";")
-                                append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                                if (entry.altitudeMeters != null) {
+                                    append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                                }
                                 append(";")
                                 append(entry.icaoCode ?: "")
                                 append(";")
@@ -313,8 +319,13 @@ class LogRepository(
                     // Operación atómica: renombrar archivo temporal al archivo final
                     if (!tempFile.renameTo(file)) {
                         // Fallback si renameTo falla (puede pasar entre filesystems)
-                        tempFile.copyTo(file, overwrite = true)
-                        tempFile.delete()
+                        val copied = tempFile.copyTo(file, overwrite = true)
+                        // Verificar que la copia tuvo éxito antes de borrar temp
+                        if (copied.exists() && copied.length() > 0) {
+                            tempFile.delete()
+                        } else {
+                            throw java.io.IOException("File copy failed - target file empty or doesn't exist")
+                        }
                     }
                 } else {
                     // Si no quedan entradas, simplemente eliminar el archivo
@@ -504,11 +515,17 @@ class LogRepository(
                         val line = buildString {
                             append(entry.utcTime)
                             append(";")
-                            append(String.format(Locale.US, "%.6f", entry.latitude))
+                            if (entry.latitude != null) {
+                                append(String.format(Locale.US, "%.6f", entry.latitude))
+                            }
                             append(";")
-                            append(String.format(Locale.US, "%.6f", entry.longitude))
+                            if (entry.longitude != null) {
+                                append(String.format(Locale.US, "%.6f", entry.longitude))
+                            }
                             append(";")
-                            append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                            if (entry.altitudeMeters != null) {
+                                append(String.format(Locale.US, "%.1f", entry.altitudeMeters))
+                            }
                             append(";")
                             append(entry.icaoCode ?: "")
                             append(";")
@@ -522,8 +539,13 @@ class LogRepository(
                 // Operación atómica: renombrar archivo temporal al archivo final
                 if (!tempFile.renameTo(file)) {
                     // Fallback si renameTo falla (puede pasar entre filesystems)
-                    tempFile.copyTo(file, overwrite = true)
-                    tempFile.delete()
+                    val copied = tempFile.copyTo(file, overwrite = true)
+                    // Verificar que la copia tuvo éxito antes de borrar temp
+                    if (copied.exists() && copied.length() > 0) {
+                        tempFile.delete()
+                    } else {
+                        throw java.io.IOException("File copy failed - target file empty or doesn't exist")
+                    }
                 }
 
                 true
