@@ -55,14 +55,13 @@ class MainActivity : ComponentActivity() {
         setupContent(startDestination)
 
         // Observar configuración de pantalla encendida
+        // Aplicar configuración en onCreate y mantener observación durante toda la vida de la Activity
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsRepo.screenOnFlow.collect { keepOn ->
-                    if (keepOn) {
-                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    } else {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    }
+            settingsRepo.screenOnFlow.collect { keepOn ->
+                if (keepOn) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
         }

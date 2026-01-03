@@ -17,23 +17,34 @@ import com.taifun.checks.data.SettingsRepository
 object HapticUtils {
     /**
      * Realiza feedback háptico estándar para interacciones de botones
+     * Usa FLAG_IGNORE_GLOBAL_SETTING para asegurar que el feedback se ejecute
+     * incluso si el usuario ha deshabilitado el feedback háptico a nivel de sistema
      */
     fun performHapticFeedback(view: View) {
-        view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        view.performHapticFeedback(
+            HapticFeedbackConstants.VIRTUAL_KEY,
+            HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+        )
     }
 
     /**
      * Realiza feedback háptico suave para interacciones menores
      */
     fun performLightHapticFeedback(view: View) {
-        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        view.performHapticFeedback(
+            HapticFeedbackConstants.CLOCK_TICK,
+            HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+        )
     }
 
     /**
      * Realiza feedback háptico fuerte para confirmaciones importantes
      */
     fun performStrongHapticFeedback(view: View) {
-        view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        view.performHapticFeedback(
+            HapticFeedbackConstants.LONG_PRESS,
+            HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+        )
     }
 }
 
