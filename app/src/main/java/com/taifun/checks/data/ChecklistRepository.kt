@@ -459,6 +459,7 @@ class ChecklistRepository(private val context: Context) {
  * Excepciones específicas del repositorio para mejor manejo de errores
  */
 sealed class RepositoryException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    class FileNotFound(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class IOError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class PermissionError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
     class ParseError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)

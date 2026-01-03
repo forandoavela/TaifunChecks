@@ -3,6 +3,7 @@ package com.taifun.checks.data
 import android.content.Context
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -566,5 +567,9 @@ class LogRepository(
             e.printStackTrace()
             false
         }
+    }
+
+    companion object {
+        private const val TAG = "LogRepository"
     }
 }
