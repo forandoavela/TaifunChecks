@@ -67,7 +67,11 @@ class StepViewModel(
                     _voiceControl.value = state.voiceControl
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error cargando estado persistido", e)
+                // Error crítico en la inicialización: mantener valores por defecto
+                Log.e(TAG, "Error crítico cargando estado persistido para checklist '$checklistId', usando valores por defecto", e)
+                // Los valores por defecto ya están establecidos en las declaraciones de los StateFlows:
+                // _index = 0, _page = 0, _checked = emptySet(), _fullList = null, _voiceControl = false
+                // No es necesario restablecerlos aquí, solo registrar el error
             }
         }
     }

@@ -31,10 +31,23 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private var loadJob: Job? = null
 
     init {
-        // Observar cambios en el checklist activo
+        // Observar cambios en el checklist activo con error handling robusto
         viewModelScope.launch {
-            settingsRepo.activeChecklistFlow.collect { activeFile ->
-                loadChecklist(activeFile)
+            try {
+                settingsRepo.activeChecklistFlow.collect { activeFile ->
+                    loadChecklist(activeFile)
+                }
+            } catch (e: Exception) {
+                // Error crítico en la inicialización: intentar cargar checklist por defecto
+                Log.e(TAG, "Error crítico observando activeChecklistFlow en init, intentando cargar checklist por defecto", e)
+                _error.value = "Error de inicialización: ${e.message}"
+                try {
+                    // Intentar cargar checklist por defecto como fallback
+                    loadChecklist("Taifun17E_ES.yaml")
+                } catch (fallbackError: Exception) {
+                    Log.e(TAG, "Error cargando checklist por defecto como fallback", fallbackError)
+                    // Mantener catálogo vacío y mostrar error al usuario
+                }
             }
         }
     }

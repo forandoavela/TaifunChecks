@@ -30,30 +30,37 @@ object YamlIO {
 
     /**
      * Parsea un catálogo desde InputStream con información detallada sobre warnings.
+     * @param input InputStream con el contenido YAML
+     * @param filename Nombre del archivo (opcional, solo para logging mejorado)
      * @return ParseResult con el catálogo y lista de warnings si hubo elementos omitidos
      * @throws YamlParseException si el YAML es inválido
      */
-    fun parseCatalogWithWarnings(input: InputStream): ParseResult {
+    fun parseCatalogWithWarnings(input: InputStream, filename: String? = null): ParseResult {
         val warnings = mutableListOf<String>()
+        val fileContext = filename?.let { " en '$it'" } ?: ""
 
         try {
             val yaml = Yaml(SafeConstructor(LoaderOptions()))
             val root = yaml.load<Any>(input)
-                ?: throw YamlParseException("Archivo YAML vacío")
+                ?: throw YamlParseException("Archivo YAML vacío$fileContext")
 
             @Suppress("UNCHECKED_CAST")
             val map = root as? Map<String, Any?>
-                ?: throw YamlParseException("Formato inválido: se esperaba un mapa en la raíz")
+                ?: throw YamlParseException("Formato inválido: se esperaba un mapa en la raíz$fileContext")
 
             val rawChecklists = map["checklists"] as? List<*>
-                ?: throw YamlParseException("Falta campo 'checklists'")
+                ?: throw YamlParseException("Falta campo 'checklists'$fileContext")
 
             var omittedChecklists = 0
             val cl = rawChecklists.mapIndexedNotNull { index, item ->
                 try {
                     parseChecklist(item, index)
                 } catch (e: YamlParseException) {
-                    Log.w(TAG, "Checklist #$index omitido: ${e.message}")
+                    // Logging mejorado: incluye filename, causa raíz, y stack trace completo en nivel DEBUG
+                    Log.w(TAG, "Checklist #$index omitido$fileContext: ${e.message}. Causa: ${e.cause?.message ?: "N/A"}")
+                    if (Log.isLoggable(TAG, Log.DEBUG)) {
+                        Log.d(TAG, "Stack trace completo para checklist omitido #$index:", e)
+                    }
                     warnings.add("Checklist #${index + 1} omitido: ${e.message}")
                     omittedChecklists++
                     null // omitir checklist inválido
@@ -61,42 +68,73 @@ object YamlIO {
             }
 
             if (omittedChecklists > 0) {
-                Log.w(TAG, "Se omitieron $omittedChecklists checklists inválidos")
+                Log.w(TAG, "Se omitieron $omittedChecklists checklists inválidos$fileContext")
             }
 
-            Log.i(TAG, "Catálogo cargado: ${cl.size} checklists, $omittedChecklists omitidos")
+            Log.i(TAG, "Catálogo cargado$fileContext: ${cl.size} checklists válidos, $omittedChecklists omitidos")
             return ParseResult(
                 catalogo = Catalogo(checklists = cl),
                 warnings = warnings
             )
 
         } catch (e: YAMLException) {
-            Log.e(TAG, "Error de sintaxis YAML", e)
-            throw YamlParseException("Error de sintaxis YAML: ${e.message}", e)
+            // Logging mejorado: extraer información de línea/columna si está disponible
+            val locationInfo = extractYamlErrorLocation(e)
+            val errorMsg = "Error de sintaxis YAML$fileContext$locationInfo: ${e.message}"
+            Log.e(TAG, errorMsg, e)
+            throw YamlParseException(errorMsg, e)
         } catch (e: ClassCastException) {
-            Log.e(TAG, "Error de tipo en YAML", e)
-            throw YamlParseException("Tipo de dato incorrecto en YAML", e)
+            val errorMsg = "Error de tipo en YAML$fileContext: tipo de dato incorrecto - ${e.message}"
+            Log.e(TAG, errorMsg, e)
+            throw YamlParseException(errorMsg, e)
         } catch (e: YamlParseException) {
             throw e // re-throw our custom exception
         } catch (e: Exception) {
-            Log.e(TAG, "Error inesperado parseando YAML", e)
-            throw YamlParseException("Error inesperado: ${e.message}", e)
+            val errorMsg = "Error inesperado parseando YAML$fileContext: ${e::class.simpleName} - ${e.message}"
+            Log.e(TAG, errorMsg, e)
+            throw YamlParseException(errorMsg, e)
+        }
+    }
+
+    /**
+     * Extrae información de ubicación (línea/columna) de YAMLException si está disponible
+     */
+    private fun extractYamlErrorLocation(e: YAMLException): String {
+        return try {
+            // YAMLException puede contener información de línea/columna en el mensaje
+            // Formato común: "... at line N, column M"
+            val msg = e.message ?: ""
+            val linePattern = Regex("line\\s+(\\d+)")
+            val columnPattern = Regex("column\\s+(\\d+)")
+
+            val line = linePattern.find(msg)?.groupValues?.getOrNull(1)
+            val column = columnPattern.find(msg)?.groupValues?.getOrNull(1)
+
+            when {
+                line != null && column != null -> " (línea $line, columna $column)"
+                line != null -> " (línea $line)"
+                else -> ""
+            }
+        } catch (ex: Exception) {
+            "" // Si falla la extracción, retornar string vacío
         }
     }
 
     /**
      * Parsea un catálogo desde InputStream.
+     * @param input InputStream con el contenido YAML
+     * @param filename Nombre del archivo (opcional, solo para logging mejorado)
      * @throws YamlParseException si el YAML es inválido
      */
-    fun parseCatalog(input: InputStream): Catalogo {
-        return parseCatalogWithWarnings(input).catalogo
+    fun parseCatalog(input: InputStream, filename: String? = null): Catalogo {
+        return parseCatalogWithWarnings(input, filename).catalogo
     }
 
     /**
      * Parsea desde String (para validación en tiempo real).
      */
     fun parseCatalog(yamlString: String): Catalogo {
-        return parseCatalog(yamlString.byteInputStream())
+        return parseCatalog(yamlString.byteInputStream(), filename = null)
     }
 
     private fun parseChecklist(item: Any?, index: Int): Checklist {
@@ -116,13 +154,23 @@ object YamlIO {
         val color = m["color"]?.toString()
 
         val pasosRaw = m["pasos"] as? List<*> ?: emptyList<Any?>()
+        var omittedSteps = 0
         val pasos = pasosRaw.mapIndexedNotNull { pIndex, p ->
             try {
                 parsePaso(p, pIndex)
             } catch (e: YamlParseException) {
-                Log.w(TAG, "Checklist '$id' paso #$pIndex omitido: ${e.message}")
+                // Logging mejorado: incluye ID de checklist, índice de paso, causa raíz
+                Log.w(TAG, "Checklist '$id' (índice #$index) paso #$pIndex omitido: ${e.message}. Causa: ${e.cause?.message ?: "N/A"}")
+                if (Log.isLoggable(TAG, Log.DEBUG)) {
+                    Log.d(TAG, "Stack trace completo para paso omitido '$id' #$pIndex:", e)
+                }
+                omittedSteps++
                 null
             }
+        }
+
+        if (omittedSteps > 0) {
+            Log.w(TAG, "Checklist '$id': se omitieron $omittedSteps pasos inválidos de ${pasosRaw.size} totales")
         }
 
         return Checklist(
