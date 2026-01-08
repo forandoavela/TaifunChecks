@@ -24,7 +24,7 @@ android {
         val majorVersion = 1      // w - versión principal
         val minorVersion = 0      // x - grandes funcionalidades
         val patchVersion = 9      // yy - grupos de mejoras (00-99)
-        val baseCommitCount = 190 // Número de commit en el que se actualizó yy (para que zz = 0)
+        val baseCommitCount = 165 // Número de commit en el que se actualizó yy (para que zz = 0)
 
         // Calcular zz como: commits actuales - baseCommitCount
         val buildVersion = try {
