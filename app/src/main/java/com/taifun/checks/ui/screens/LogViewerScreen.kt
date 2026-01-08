@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Create
@@ -571,6 +572,21 @@ fun LogViewerScreen(
                             onEdit = {
                                 haptic.performHapticFeedback()
                                 entryToEdit = index to entry
+                            },
+                            onMap = {
+                                haptic.performHapticFeedback()
+                                // Abrir aplicación de mapas con las coordenadas
+                                if (entry.latitude != null && entry.longitude != null) {
+                                    val geoUri = android.net.Uri.parse(
+                                        "geo:${entry.latitude},${entry.longitude}?q=${entry.latitude},${entry.longitude}(${entry.logText})"
+                                    )
+                                    val mapIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, geoUri)
+                                    try {
+                                        ctx.startActivity(mapIntent)
+                                    } catch (e: android.content.ActivityNotFoundException) {
+                                        Toast.makeText(ctx, ctx.getString(R.string.no_map_app), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
                         )
                     }
@@ -584,7 +600,8 @@ fun LogViewerScreen(
 private fun LogEntryCard(
     entry: LogEntry,
     onDelete: () -> Unit,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onMap: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -618,6 +635,17 @@ private fun LogEntryCard(
                 )
 
                 Row {
+                    // Botón mapa (solo si hay coordenadas)
+                    if (entry.latitude != null && entry.longitude != null) {
+                        IconButton(onClick = onMap) {
+                            Icon(
+                                Icons.Default.Map,
+                                contentDescription = stringResource(R.string.open_in_map),
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+
                     // Botón editar
                     IconButton(onClick = onEdit) {
                         Icon(

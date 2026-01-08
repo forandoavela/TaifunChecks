@@ -351,6 +351,7 @@
     <string name="error_launching_app">Error al iniciar aplicación: %1$s</string>
     <string name="error_sharing_file">Error al compartir archivo: %1$s</string>
     <string name="error_generic">Error: %1$s</string>
+    <string name="no_map_app">No hay aplicación de mapas instalada</string>
 
     <!-- Accessibility - Additional -->
     <string name="accessibility_bluetooth">Bluetooth</string>
@@ -364,4 +365,5 @@
     <string name="accessibility_collapse">Contraer</string>
     <string name="accessibility_move_up">Mover arriba</string>
     <string name="accessibility_move_down">Mover abajo</string>
+    <string name="open_in_map">Abrir en mapa</string>
 </resources>
