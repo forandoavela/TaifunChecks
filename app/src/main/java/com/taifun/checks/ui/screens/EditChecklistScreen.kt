@@ -185,8 +185,7 @@ fun EditChecklistScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad)
-                    .padding(16.dp)
-                    .then(reorderableLazyListState.reorderingModifier),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Sección de información del checklist
