@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.animation.core.animateDpAsState
 import com.taifun.checks.R
 import com.taifun.checks.data.ChecklistRepository
 import com.taifun.checks.data.SettingsRepository
@@ -29,6 +31,9 @@ import com.taifun.checks.ui.components.ColorPickerDialog
 import com.taifun.checks.ui.components.hexToColor
 import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.draggableHandle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,11 +172,21 @@ fun EditChecklistScreen(
                 CircularProgressIndicator()
             }
         } else {
+            // State for drag & drop reordering
+            val lazyListState = rememberLazyListState()
+            val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+                pasos = pasos.toMutableList().apply {
+                    add(to.index, removeAt(from.index))
+                }
+            }
+
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad)
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .then(reorderableLazyListState.reorderingModifier),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Sección de información del checklist
@@ -353,104 +368,82 @@ fun EditChecklistScreen(
                 }
 
                 // Lista de pasos
-                itemsIndexed(pasos) { index, paso ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                                shape = MaterialTheme.shapes.medium
-                            ),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
+                itemsIndexed(pasos, key = { _, paso -> paso.id }) { index, paso ->
+                    ReorderableItem(reorderableLazyListState, key = paso.id) { isDragging ->
+                        val elevation by animateDpAsState(
+                            if (isDragging) 8.dp else 0.dp,
+                            label = "elevation"
                         )
-                    ) {
-                        Row(
+
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = elevation)
                         ) {
-                            // Botones de reordenamiento
-                            Column {
-                                IconButton(
-                                    onClick = {
-                                        haptic.performHapticFeedback()
-                                        if (index > 0) {
-                                            pasos = pasos.toMutableList().apply {
-                                                val temp = this[index]
-                                                this[index] = this[index - 1]
-                                                this[index - 1] = temp
-                                            }
-                                        }
-                                    },
-                                    enabled = index > 0
-                                ) {
-                                    Icon(
-                                        Icons.Default.KeyboardArrowUp,
-                                        contentDescription = stringResource(R.string.accessibility_move_up),
-                                        tint = if (index > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = {
-                                        haptic.performHapticFeedback()
-                                        if (index < pasos.size - 1) {
-                                            pasos = pasos.toMutableList().apply {
-                                                val temp = this[index]
-                                                this[index] = this[index + 1]
-                                                this[index + 1] = temp
-                                            }
-                                        }
-                                    },
-                                    enabled = index < pasos.size - 1
-                                ) {
-                                    Icon(
-                                        Icons.Default.KeyboardArrowDown,
-                                        contentDescription = stringResource(R.string.accessibility_move_down),
-                                        tint = if (index < pasos.size - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                                    )
-                                }
-                            }
-
-                            // Contenido del paso
-                            Column(
-                                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "${index + 1}. ${paso.texto}",
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                if (paso.icono != null) {
-                                    Text(
-                                        text = stringResource(R.string.icon_colon, paso.icono!!),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                // Drag handle
+                                IconButton(
+                                    onClick = { /* Drag handle, no onClick needed */ },
+                                    modifier = Modifier.draggableHandle()
+                                ) {
+                                    Icon(
+                                        Icons.Default.Menu,
+                                        contentDescription = stringResource(R.string.accessibility_drag_handle),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                            }
 
-                            // Botón editar
-                            IconButton(onClick = {
-                                haptic.performHapticFeedback()
-                                editingStepIndex = index
-                                showEditStepDialog = true
-                            }) {
-                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
-                            }
+                                // Contenido del paso
+                                Column(
+                                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "${index + 1}. ${paso.texto}",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                    if (paso.icono != null) {
+                                        Text(
+                                            text = stringResource(R.string.icon_colon, paso.icono!!),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
 
-                            // Botón eliminar
-                            IconButton(onClick = {
-                                haptic.performHapticFeedback()
-                                stepToDelete = index
-                                showDeleteDialog = true
-                            }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = stringResource(R.string.delete),
-                                    tint = MaterialTheme.colorScheme.error
-                                )
+                                // Botón editar
+                                IconButton(onClick = {
+                                    haptic.performHapticFeedback()
+                                    editingStepIndex = index
+                                    showEditStepDialog = true
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                                }
+
+                                // Botón eliminar
+                                IconButton(onClick = {
+                                    haptic.performHapticFeedback()
+                                    stepToDelete = index
+                                    showDeleteDialog = true
+                                }) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = stringResource(R.string.delete),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
                     }
@@ -528,13 +521,23 @@ fun EditChecklistScreen(
         if (paso != null) {
             EditStepDialog(
                 paso = paso,
+                currentPosition = editingStepIndex + 1, // Convert to 1-based
+                totalSteps = pasos.size,
                 onDismiss = {
                     showEditStepDialog = false
                     editingStepIndex = -1
                 },
-                onSave = { newPaso ->
+                onSave = { newPaso, targetPosition ->
                     pasos = pasos.toMutableList().apply {
+                        // Update the step content
                         this[editingStepIndex] = newPaso
+
+                        // If target position specified and different, move the step
+                        if (targetPosition != null && targetPosition != editingStepIndex + 1) {
+                            val targetIndex = targetPosition - 1 // Convert to 0-based
+                            val step = this.removeAt(editingStepIndex)
+                            this.add(targetIndex.coerceIn(0, this.size), step)
+                        }
                     }
                     showEditStepDialog = false
                     editingStepIndex = -1
@@ -547,9 +550,20 @@ fun EditChecklistScreen(
     if (showAddStepDialog) {
         EditStepDialog(
             paso = null,
+            currentPosition = null,
+            totalSteps = pasos.size,
             onDismiss = { showAddStepDialog = false },
-            onSave = { newPaso ->
-                pasos = pasos + newPaso
+            onSave = { newPaso, targetPosition ->
+                pasos = if (targetPosition != null) {
+                    // Insert at specific position
+                    pasos.toMutableList().apply {
+                        val targetIndex = (targetPosition - 1).coerceIn(0, this.size)
+                        add(targetIndex, newPaso)
+                    }
+                } else {
+                    // Append at end
+                    pasos + newPaso
+                }
                 showAddStepDialog = false
             }
         )
@@ -633,8 +647,10 @@ private fun EditTextDialog(
 @Composable
 private fun EditStepDialog(
     paso: Paso?,
+    currentPosition: Int?, // 1-based position, null if new step
+    totalSteps: Int,
     onDismiss: () -> Unit,
-    onSave: (Paso) -> Unit
+    onSave: (Paso, Int?) -> Unit // Paso + target position (1-based, null = no change/append)
 ) {
     var texto by remember { mutableStateOf(paso?.texto ?: "") }
     var selectedIconId by remember { mutableStateOf(paso?.icono ?: "") }
@@ -645,7 +661,11 @@ private fun EditStepDialog(
     var localtime by remember { mutableStateOf(paso?.localtime ?: false) }
     var utctime by remember { mutableStateOf(paso?.utctime ?: false) }
     var log by remember { mutableStateOf(paso?.log ?: "") }
+    var targetPositionText by remember { mutableStateOf("") }
     val id = paso?.id ?: "step_${System.currentTimeMillis()}"
+
+    // Calculate max position: if editing, totalSteps; if new, totalSteps+1
+    val maxPosition = if (paso == null) totalSteps + 1 else totalSteps
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -672,6 +692,50 @@ private fun EditStepDialog(
                     label = { Text(stringResource(R.string.step_text)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2
+                )
+
+                // Position field (optional)
+                OutlinedTextField(
+                    value = targetPositionText,
+                    onValueChange = { newValue ->
+                        // Only allow numbers
+                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                            targetPositionText = newValue
+                        }
+                    },
+                    label = {
+                        Text(
+                            if (paso == null) {
+                                stringResource(R.string.step_position_insert)
+                            } else {
+                                stringResource(R.string.step_position_move)
+                            }
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            if (paso == null) {
+                                stringResource(R.string.step_position_hint_new, maxPosition)
+                            } else {
+                                stringResource(R.string.step_position_hint_edit, currentPosition ?: 0, maxPosition)
+                            }
+                        )
+                    },
+                    supportingText = {
+                        val posNum = targetPositionText.toIntOrNull()
+                        when {
+                            targetPositionText.isNotEmpty() && posNum == null ->
+                                Text(stringResource(R.string.step_position_invalid))
+                            posNum != null && (posNum < 1 || posNum > maxPosition) ->
+                                Text(stringResource(R.string.step_position_out_of_range, maxPosition))
+                            else ->
+                                Text(stringResource(R.string.step_position_optional))
+                        }
+                    },
+                    isError = targetPositionText.isNotEmpty() &&
+                              (targetPositionText.toIntOrNull()?.let { it < 1 || it > maxPosition } ?: true),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 IconSelector(
@@ -765,9 +829,13 @@ private fun EditStepDialog(
             }
         },
         confirmButton = {
+            val targetPosition = targetPositionText.toIntOrNull()
+            val isValidPosition = targetPositionText.isEmpty() ||
+                                  (targetPosition != null && targetPosition in 1..maxPosition)
+
             TextButton(
                 onClick = {
-                    if (texto.isNotBlank()) {
+                    if (texto.isNotBlank() && isValidPosition) {
                         onSave(
                             Paso(
                                 id = id,
@@ -780,11 +848,12 @@ private fun EditStepDialog(
                                 localtime = if (localtime) true else null,
                                 utctime = if (utctime) true else null,
                                 log = log.ifBlank { null }
-                            )
+                            ),
+                            targetPosition // Pass the 1-based position or null
                         )
                     }
                 },
-                enabled = texto.isNotBlank()
+                enabled = texto.isNotBlank() && isValidPosition
             ) {
                 Text(stringResource(R.string.save))
                 }

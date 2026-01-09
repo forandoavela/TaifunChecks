@@ -229,6 +229,13 @@
     <string name="delete">Delete</string>
     <string name="edit_step">Edit Step</string>
     <string name="step_text">Step Text</string>
+    <string name="step_position_insert">Insert at Position (optional)</string>
+    <string name="step_position_move">Move to Position (optional)</string>
+    <string name="step_position_hint_new">Leave empty to add at the end (max: %1$d)</string>
+    <string name="step_position_hint_edit">Current position: %1$d (max: %2$d)</string>
+    <string name="step_position_invalid">Must be a number</string>
+    <string name="step_position_out_of_range">Must be between 1 and %1$d</string>
+    <string name="step_position_optional">Optional - specify where to insert/move the step</string>
     <string name="icon_optional">Icon (optional)</string>
     <string name="select_icon">Select an icon</string>
     <string name="no_icon">No icon</string>
@@ -366,5 +373,6 @@
     <string name="accessibility_collapse">Collapse</string>
     <string name="accessibility_move_up">Move up</string>
     <string name="accessibility_move_down">Move down</string>
+    <string name="accessibility_drag_handle">Drag to reorder</string>
     <string name="open_in_map">Open in map</string>
 </resources>
