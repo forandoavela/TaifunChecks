@@ -379,9 +379,6 @@ fun EditChecklistScreen(
                         // Capture the ReorderableCollectionItemScope before entering Card
                         val reorderableScope = this
 
-                        // Calculate current index for display (stable during drag)
-                        val index = remember(pasos) { pasos.indexOf(paso) }
-
                         val elevation by animateDpAsState(
                             if (isDragging) 8.dp else 0.dp,
                             label = "elevation"
@@ -402,8 +399,8 @@ fun EditChecklistScreen(
                             elevation = CardDefaults.cardElevation(defaultElevation = elevation)
                         ) {
                             StepItemContent(
-                                index = index,
                                 paso = paso,
+                                pasos = pasos,
                                 onEdit = {
                                     haptic.performHapticFeedback()
                                     editingStepIndex = pasos.indexOf(paso)
@@ -583,12 +580,15 @@ fun EditChecklistScreen(
 
 @Composable
 private fun StepItemContent(
-    index: Int,
     paso: Paso,
+    pasos: List<Paso>,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     reorderableScope: ReorderableCollectionItemScope
 ) {
+    // Calculate index lazily only when text is composed
+    val displayNumber = pasos.indexOf(paso) + 1
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -614,7 +614,7 @@ private fun StepItemContent(
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
         ) {
             Text(
-                text = "${index + 1}. ${paso.texto}",
+                text = "$displayNumber. ${paso.texto}",
                 style = MaterialTheme.typography.bodyLarge
             )
             if (paso.icono != null) {
