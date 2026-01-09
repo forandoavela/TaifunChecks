@@ -4,8 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.animation.core.animateDpAsState
 import com.taifun.checks.R
 import com.taifun.checks.data.ChecklistRepository
 import com.taifun.checks.data.SettingsRepository
@@ -31,9 +29,6 @@ import com.taifun.checks.ui.components.ColorPickerDialog
 import com.taifun.checks.ui.components.hexToColor
 import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyListState
-import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -172,23 +167,7 @@ fun EditChecklistScreen(
                 CircularProgressIndicator()
             }
         } else {
-            // State for drag & drop reordering
-            val lazyListState = rememberLazyListState()
-            val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-                // Find items by their keys to ensure correct reordering
-                val fromIndex = from.index
-                val toIndex = to.index
-
-                if (fromIndex != toIndex) {
-                    pasos = pasos.toMutableList().apply {
-                        val item = removeAt(fromIndex)
-                        add(toIndex, item)
-                    }
-                }
-            }
-
             LazyColumn(
-                state = lazyListState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(pad)
@@ -374,45 +353,105 @@ fun EditChecklistScreen(
                 }
 
                 // Lista de pasos
-                items(pasos, key = { paso -> paso.id }) { paso ->
-                    ReorderableItem(reorderableLazyListState, key = paso.id) { isDragging ->
-                        // Capture the ReorderableCollectionItemScope before entering Card
-                        val reorderableScope = this
-
-                        val elevation by animateDpAsState(
-                            if (isDragging) 8.dp else 0.dp,
-                            label = "elevation"
-                        )
-
-                        Card(
-                            modifier = Modifier
-                                .animateItem()
-                                .fillMaxWidth()
-                                .border(
-                                    width = 2.dp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                                    shape = MaterialTheme.shapes.medium
-                                ),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
+                itemsIndexed(pasos) { index, paso ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .border(
+                                width = 2.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                                shape = MaterialTheme.shapes.medium
                             ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = elevation)
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            StepItemContent(
-                                paso = paso,
-                                pasos = pasos,
-                                onEdit = {
-                                    haptic.performHapticFeedback()
-                                    editingStepIndex = pasos.indexOf(paso)
-                                    showEditStepDialog = true
-                                },
-                                onDelete = {
-                                    haptic.performHapticFeedback()
-                                    stepToDelete = pasos.indexOf(paso)
-                                    showDeleteDialog = true
-                                },
-                                reorderableScope = reorderableScope
-                            )
+                            // Botones de reordenamiento
+                            Column {
+                                IconButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback()
+                                        if (index > 0) {
+                                            pasos = pasos.toMutableList().apply {
+                                                val temp = this[index]
+                                                this[index] = this[index - 1]
+                                                this[index - 1] = temp
+                                            }
+                                        }
+                                    },
+                                    enabled = index > 0
+                                ) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowUp,
+                                        contentDescription = stringResource(R.string.accessibility_move_up),
+                                        tint = if (index > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback()
+                                        if (index < pasos.size - 1) {
+                                            pasos = pasos.toMutableList().apply {
+                                                val temp = this[index]
+                                                this[index] = this[index + 1]
+                                                this[index + 1] = temp
+                                            }
+                                        }
+                                    },
+                                    enabled = index < pasos.size - 1
+                                ) {
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = stringResource(R.string.accessibility_move_down),
+                                        tint = if (index < pasos.size - 1) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                    )
+                                }
+                            }
+
+                            // Contenido del paso
+                            Column(
+                                modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+                            ) {
+                                Text(
+                                    text = "${index + 1}. ${paso.texto}",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                                if (paso.icono != null) {
+                                    Text(
+                                        text = stringResource(R.string.icon_colon, paso.icono!!),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+
+                            // Botón editar
+                            IconButton(onClick = {
+                                haptic.performHapticFeedback()
+                                editingStepIndex = index
+                                showEditStepDialog = true
+                            }) {
+                                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                            }
+
+                            // Botón eliminar
+                            IconButton(onClick = {
+                                haptic.performHapticFeedback()
+                                stepToDelete = index
+                                showDeleteDialog = true
+                            }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }
@@ -575,70 +614,6 @@ fun EditChecklistScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun StepItemContent(
-    paso: Paso,
-    pasos: List<Paso>,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    reorderableScope: ReorderableCollectionItemScope
-) {
-    // Calculate index lazily only when text is composed
-    val displayNumber = pasos.indexOf(paso) + 1
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Drag handle icon - press and hold to drag
-        with(reorderableScope) {
-            IconButton(
-                onClick = { /* Long press to drag */ },
-                modifier = Modifier.longPressDraggableHandle()
-            ) {
-                Icon(
-                    Icons.Default.Menu,
-                    contentDescription = stringResource(R.string.accessibility_drag_handle),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        // Contenido del paso
-        Column(
-            modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
-        ) {
-            Text(
-                text = "$displayNumber. ${paso.texto}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            if (paso.icono != null) {
-                Text(
-                    text = stringResource(R.string.icon_colon, paso.icono!!),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        // Botón editar
-        IconButton(onClick = onEdit) {
-            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
-        }
-
-        // Botón eliminar
-        IconButton(onClick = onDelete) {
-            Icon(
-                Icons.Default.Delete,
-                contentDescription = stringResource(R.string.delete),
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
     }
 }
 

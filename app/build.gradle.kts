@@ -164,9 +164,6 @@ dependencies {
     // Compose Icons - Font Awesome (para iconos de aviación)
     implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
 
-    // Reorderable list for drag & drop (modern fork maintained by sh.calvin)
-    implementation("sh.calvin.reorderable:reorderable:3.0.0")
-
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
