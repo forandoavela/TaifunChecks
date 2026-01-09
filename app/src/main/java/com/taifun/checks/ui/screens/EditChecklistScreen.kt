@@ -380,6 +380,7 @@ fun EditChecklistScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .animateItem()
                                 .border(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
