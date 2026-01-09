@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -175,8 +175,15 @@ fun EditChecklistScreen(
             // State for drag & drop reordering
             val lazyListState = rememberLazyListState()
             val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-                pasos = pasos.toMutableList().apply {
-                    add(to.index, removeAt(from.index))
+                // Find items by their keys to ensure correct reordering
+                val fromIndex = from.index
+                val toIndex = to.index
+
+                if (fromIndex != toIndex) {
+                    pasos = pasos.toMutableList().apply {
+                        val item = removeAt(fromIndex)
+                        add(toIndex, item)
+                    }
                 }
             }
 
@@ -367,10 +374,13 @@ fun EditChecklistScreen(
                 }
 
                 // Lista de pasos
-                itemsIndexed(pasos, key = { _, paso -> paso.id }) { index, paso ->
+                items(pasos, key = { paso -> paso.id }) { paso ->
                     ReorderableItem(reorderableLazyListState, key = paso.id) { isDragging ->
                         // Capture the ReorderableCollectionItemScope before entering Card
                         val reorderableScope = this
+
+                        // Calculate current index for display (stable during drag)
+                        val index = remember(pasos) { pasos.indexOf(paso) }
 
                         val elevation by animateDpAsState(
                             if (isDragging) 8.dp else 0.dp,
@@ -379,8 +389,8 @@ fun EditChecklistScreen(
 
                         Card(
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .animateItem()
+                                .fillMaxWidth()
                                 .border(
                                     width = 2.dp,
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
@@ -396,12 +406,12 @@ fun EditChecklistScreen(
                                 paso = paso,
                                 onEdit = {
                                     haptic.performHapticFeedback()
-                                    editingStepIndex = index
+                                    editingStepIndex = pasos.indexOf(paso)
                                     showEditStepDialog = true
                                 },
                                 onDelete = {
                                     haptic.performHapticFeedback()
-                                    stepToDelete = index
+                                    stepToDelete = pasos.indexOf(paso)
                                     showDeleteDialog = true
                                 },
                                 reorderableScope = reorderableScope
