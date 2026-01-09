@@ -369,6 +369,9 @@ fun EditChecklistScreen(
                 // Lista de pasos
                 itemsIndexed(pasos, key = { _, paso -> paso.id }) { index, paso ->
                     ReorderableItem(reorderableLazyListState, key = paso.id) { isDragging ->
+                        // Capture the ReorderableCollectionItemScope before entering Card
+                        val reorderableScope = this
+
                         val elevation by animateDpAsState(
                             if (isDragging) 8.dp else 0.dp,
                             label = "elevation"
@@ -400,7 +403,7 @@ fun EditChecklistScreen(
                                     stepToDelete = index
                                     showDeleteDialog = true
                                 },
-                                reorderableScope = this
+                                reorderableScope = reorderableScope
                             )
                         }
                     }
