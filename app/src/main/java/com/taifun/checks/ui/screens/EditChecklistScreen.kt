@@ -33,6 +33,7 @@ import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -386,59 +387,21 @@ fun EditChecklistScreen(
                             ),
                             elevation = CardDefaults.cardElevation(defaultElevation = elevation)
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Drag handle icon (visual cue only, long press anywhere on card to drag)
-                                Icon(
-                                    Icons.Default.Menu,
-                                    contentDescription = stringResource(R.string.accessibility_drag_handle),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(horizontal = 8.dp)
-                                )
-
-                                // Contenido del paso
-                                Column(
-                                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
-                                ) {
-                                    Text(
-                                        text = "${index + 1}. ${paso.texto}",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    if (paso.icono != null) {
-                                        Text(
-                                            text = stringResource(R.string.icon_colon, paso.icono!!),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-
-                                // Botón editar
-                                IconButton(onClick = {
+                            StepItemContent(
+                                index = index,
+                                paso = paso,
+                                onEdit = {
                                     haptic.performHapticFeedback()
                                     editingStepIndex = index
                                     showEditStepDialog = true
-                                }) {
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
-                                }
-
-                                // Botón eliminar
-                                IconButton(onClick = {
+                                },
+                                onDelete = {
                                     haptic.performHapticFeedback()
                                     stepToDelete = index
                                     showDeleteDialog = true
-                                }) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = stringResource(R.string.delete),
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
+                                },
+                                reorderableScope = this
+                            )
                         }
                     }
                 }
@@ -601,6 +564,67 @@ fun EditChecklistScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun StepItemContent(
+    index: Int,
+    paso: Paso,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    reorderableScope: ReorderableCollectionItemScope
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Drag handle icon - press and hold to drag
+        with(reorderableScope) {
+            IconButton(
+                onClick = { /* Long press to drag */ },
+                modifier = Modifier.longPressDraggableHandle()
+            ) {
+                Icon(
+                    Icons.Default.Menu,
+                    contentDescription = stringResource(R.string.accessibility_drag_handle),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Contenido del paso
+        Column(
+            modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = "${index + 1}. ${paso.texto}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if (paso.icono != null) {
+                Text(
+                    text = stringResource(R.string.icon_colon, paso.icono!!),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Botón editar
+        IconButton(onClick = onEdit) {
+            Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+        }
+
+        // Botón eliminar
+        IconButton(onClick = onDelete) {
+            Icon(
+                Icons.Default.Delete,
+                contentDescription = stringResource(R.string.delete),
+                tint = MaterialTheme.colorScheme.error
+            )
+        }
     }
 }
 
