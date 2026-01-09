@@ -372,6 +372,6 @@
     <string name="accessibility_collapse">Contraer</string>
     <string name="accessibility_move_up">Mover arriba</string>
     <string name="accessibility_move_down">Mover abajo</string>
-    <string name="accessibility_drag_handle">Arrastrar para reordenar</string>
+    <string name="accessibility_drag_handle">Mantener presionado para reordenar</string>
     <string name="open_in_map">Abrir en mapa</string>
 </resources>

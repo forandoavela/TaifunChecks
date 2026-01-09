@@ -373,6 +373,6 @@
     <string name="accessibility_collapse">Collapse</string>
     <string name="accessibility_move_up">Move up</string>
     <string name="accessibility_move_down">Move down</string>
-    <string name="accessibility_drag_handle">Drag to reorder</string>
+    <string name="accessibility_drag_handle">Long press to reorder</string>
     <string name="open_in_map">Open in map</string>
 </resources>

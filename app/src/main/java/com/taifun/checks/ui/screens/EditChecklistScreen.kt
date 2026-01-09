@@ -33,7 +33,6 @@ import com.taifun.checks.ui.rememberHapticFeedback
 import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import sh.calvin.reorderable.draggableHandle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -393,17 +392,13 @@ fun EditChecklistScreen(
                                     .padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Drag handle
-                                IconButton(
-                                    onClick = { /* Drag handle, no onClick needed */ },
-                                    modifier = Modifier.draggableHandle()
-                                ) {
-                                    Icon(
-                                        Icons.Default.Menu,
-                                        contentDescription = stringResource(R.string.accessibility_drag_handle),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                                // Drag handle icon (visual cue only, long press anywhere on card to drag)
+                                Icon(
+                                    Icons.Default.Menu,
+                                    contentDescription = stringResource(R.string.accessibility_drag_handle),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 8.dp)
+                                )
 
                                 // Contenido del paso
                                 Column(
