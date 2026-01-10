@@ -528,13 +528,23 @@ fun EditChecklistScreen(
         if (paso != null) {
             EditStepDialog(
                 paso = paso,
+                currentPosition = editingStepIndex + 1, // Convert to 1-based
+                totalSteps = pasos.size,
                 onDismiss = {
                     showEditStepDialog = false
                     editingStepIndex = -1
                 },
-                onSave = { newPaso ->
+                onSave = { newPaso, targetPosition ->
                     pasos = pasos.toMutableList().apply {
+                        // Update the step content
                         this[editingStepIndex] = newPaso
+
+                        // If target position specified and different, move the step
+                        if (targetPosition != null && targetPosition != editingStepIndex + 1) {
+                            val targetIndex = targetPosition - 1 // Convert to 0-based
+                            val step = this.removeAt(editingStepIndex)
+                            this.add(targetIndex.coerceIn(0, this.size), step)
+                        }
                     }
                     showEditStepDialog = false
                     editingStepIndex = -1
@@ -547,9 +557,20 @@ fun EditChecklistScreen(
     if (showAddStepDialog) {
         EditStepDialog(
             paso = null,
+            currentPosition = null,
+            totalSteps = pasos.size,
             onDismiss = { showAddStepDialog = false },
-            onSave = { newPaso ->
-                pasos = pasos + newPaso
+            onSave = { newPaso, targetPosition ->
+                pasos = if (targetPosition != null) {
+                    // Insert at specific position
+                    pasos.toMutableList().apply {
+                        val targetIndex = (targetPosition - 1).coerceIn(0, this.size)
+                        add(targetIndex, newPaso)
+                    }
+                } else {
+                    // Append at end
+                    pasos + newPaso
+                }
                 showAddStepDialog = false
             }
         )
@@ -633,8 +654,10 @@ private fun EditTextDialog(
 @Composable
 private fun EditStepDialog(
     paso: Paso?,
+    currentPosition: Int?, // 1-based position, null if new step
+    totalSteps: Int,
     onDismiss: () -> Unit,
-    onSave: (Paso) -> Unit
+    onSave: (Paso, Int?) -> Unit // Paso + target position (1-based, null = no change/append)
 ) {
     var texto by remember { mutableStateOf(paso?.texto ?: "") }
     var selectedIconId by remember { mutableStateOf(paso?.icono ?: "") }
@@ -645,7 +668,11 @@ private fun EditStepDialog(
     var localtime by remember { mutableStateOf(paso?.localtime ?: false) }
     var utctime by remember { mutableStateOf(paso?.utctime ?: false) }
     var log by remember { mutableStateOf(paso?.log ?: "") }
+    var targetPositionText by remember { mutableStateOf("") }
     val id = paso?.id ?: "step_${System.currentTimeMillis()}"
+
+    // Calculate max position: if editing, totalSteps; if new, totalSteps+1
+    val maxPosition = if (paso == null) totalSteps + 1 else totalSteps
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -672,6 +699,50 @@ private fun EditStepDialog(
                     label = { Text(stringResource(R.string.step_text)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2
+                )
+
+                // Position field (optional)
+                OutlinedTextField(
+                    value = targetPositionText,
+                    onValueChange = { newValue ->
+                        // Only allow numbers
+                        if (newValue.isEmpty() || newValue.all { it.isDigit() }) {
+                            targetPositionText = newValue
+                        }
+                    },
+                    label = {
+                        Text(
+                            if (paso == null) {
+                                stringResource(R.string.step_position_insert)
+                            } else {
+                                stringResource(R.string.step_position_move)
+                            }
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            if (paso == null) {
+                                stringResource(R.string.step_position_hint_new, maxPosition)
+                            } else {
+                                stringResource(R.string.step_position_hint_edit, currentPosition ?: 0, maxPosition)
+                            }
+                        )
+                    },
+                    supportingText = {
+                        val posNum = targetPositionText.toIntOrNull()
+                        when {
+                            targetPositionText.isNotEmpty() && posNum == null ->
+                                Text(stringResource(R.string.step_position_invalid))
+                            posNum != null && (posNum < 1 || posNum > maxPosition) ->
+                                Text(stringResource(R.string.step_position_out_of_range, maxPosition))
+                            else ->
+                                Text(stringResource(R.string.step_position_optional))
+                        }
+                    },
+                    isError = targetPositionText.isNotEmpty() &&
+                              (targetPositionText.toIntOrNull()?.let { it < 1 || it > maxPosition } ?: true),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 IconSelector(
@@ -765,9 +836,13 @@ private fun EditStepDialog(
             }
         },
         confirmButton = {
+            val targetPosition = targetPositionText.toIntOrNull()
+            val isValidPosition = targetPositionText.isEmpty() ||
+                                  (targetPosition != null && targetPosition in 1..maxPosition)
+
             TextButton(
                 onClick = {
-                    if (texto.isNotBlank()) {
+                    if (texto.isNotBlank() && isValidPosition) {
                         onSave(
                             Paso(
                                 id = id,
@@ -780,11 +855,12 @@ private fun EditStepDialog(
                                 localtime = if (localtime) true else null,
                                 utctime = if (utctime) true else null,
                                 log = log.ifBlank { null }
-                            )
+                            ),
+                            targetPosition // Pass the 1-based position or null
                         )
                     }
                 },
-                enabled = texto.isNotBlank()
+                enabled = texto.isNotBlank() && isValidPosition
             ) {
                 Text(stringResource(R.string.save))
                 }

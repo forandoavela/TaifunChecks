@@ -228,6 +228,13 @@
     <string name="delete">Eliminar</string>
     <string name="edit_step">Editar Paso</string>
     <string name="step_text">Texto del Paso</string>
+    <string name="step_position_insert">Insertar en Posición (opcional)</string>
+    <string name="step_position_move">Mover a Posición (opcional)</string>
+    <string name="step_position_hint_new">Dejar vacío para añadir al final (máx: %1$d)</string>
+    <string name="step_position_hint_edit">Posición actual: %1$d (máx: %2$d)</string>
+    <string name="step_position_invalid">Debe ser un número</string>
+    <string name="step_position_out_of_range">Debe estar entre 1 y %1$d</string>
+    <string name="step_position_optional">Opcional - especifica dónde insertar/mover el paso</string>
     <string name="icon_optional">Icono (opcional)</string>
     <string name="select_icon">Seleccionar icono</string>
     <string name="no_icon">Sin icono</string>
@@ -365,5 +372,6 @@
     <string name="accessibility_collapse">Contraer</string>
     <string name="accessibility_move_up">Mover arriba</string>
     <string name="accessibility_move_down">Mover abajo</string>
+    <string name="accessibility_drag_handle">Mantener presionado para reordenar</string>
     <string name="open_in_map">Abrir en mapa</string>
 </resources>
