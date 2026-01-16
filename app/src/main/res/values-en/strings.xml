@@ -323,6 +323,10 @@
     <string name="custom_log_required">Text required</string>
     <string name="custom_log_no_permission">Location permissions are required to create custom logs</string>
 
+    <!-- GPS Data Waiting Messages -->
+    <string name="altitude_waiting_fix">Altitude: waiting for GPS fix</string>
+    <string name="qnh_waiting_fix">QNH: waiting for GPS fix</string>
+
     <!-- GPS Accuracy Dialog -->
     <string name="gps_waiting_title">Waiting for GPS</string>
     <string name="gps_timeout_title">GPS unavailable</string>

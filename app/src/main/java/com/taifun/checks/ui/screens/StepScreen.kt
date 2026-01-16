@@ -672,38 +672,48 @@ private fun StepByStepMode(
                 val data = mutableListOf<String>()
 
                 // Altitud
-                if (!p.altitud.isNullOrBlank() && altitude != null) {
-                    val value = when (p.altitud.lowercase()) {
-                        "ft" -> sensorRepo.metersToFeet(altitude)
-                        else -> altitude // "m" o cualquier otro valor
+                if (!p.altitud.isNullOrBlank()) {
+                    if (altitude != null) {
+                        val value = when (p.altitud.lowercase()) {
+                            "ft" -> sensorRepo.metersToFeet(altitude)
+                            else -> altitude // "m" o cualquier otro valor
+                        }
+                        val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
+                            maximumFractionDigits = 0
+                            minimumFractionDigits = 0
+                            isGroupingUsed = true
+                        }
+                        val unit = if (p.altitud.lowercase() == "ft") "ft" else "m"
+                        data.add("${formatter.format(value)} $unit")
+                    } else {
+                        // No hay fix de GPS, mostrar mensaje de espera
+                        data.add(ctx.getString(R.string.altitude_waiting_fix))
                     }
-                    val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
-                        maximumFractionDigits = 0
-                        minimumFractionDigits = 0
-                        isGroupingUsed = true
-                    }
-                    val unit = if (p.altitud.lowercase() == "ft") "ft" else "m"
-                    data.add("${formatter.format(value)} $unit")
                 }
 
                 // QNH
-                if (!p.qnh.isNullOrBlank() && altitude != null && pressure != null) {
-                    val qnh = sensorRepo.calculateQNH(pressure, altitude)
-                    val formatted = when (p.qnh.lowercase()) {
-                        "inhg" -> {
-                            val inHg = sensorRepo.hPaToInHg(qnh)
-                            String.format(Locale.US, "%.2f inHg", inHg)
-                        }
-                        else -> { // "hpa" o cualquier otro valor
-                            val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
-                                maximumFractionDigits = 0
-                                minimumFractionDigits = 0
-                                isGroupingUsed = true
+                if (!p.qnh.isNullOrBlank()) {
+                    if (altitude != null && pressure != null) {
+                        val qnh = sensorRepo.calculateQNH(pressure, altitude)
+                        val formatted = when (p.qnh.lowercase()) {
+                            "inhg" -> {
+                                val inHg = sensorRepo.hPaToInHg(qnh)
+                                String.format(Locale.US, "%.2f inHg", inHg)
                             }
-                            "${formatter.format(qnh.toInt())} hPa"
+                            else -> { // "hpa" o cualquier otro valor
+                                val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
+                                    maximumFractionDigits = 0
+                                    minimumFractionDigits = 0
+                                    isGroupingUsed = true
+                                }
+                                "${formatter.format(qnh.toInt())} hPa"
+                            }
                         }
+                        data.add("QNH: $formatted")
+                    } else {
+                        // No hay fix de GPS o presión, mostrar mensaje de espera
+                        data.add(ctx.getString(R.string.qnh_waiting_fix))
                     }
-                    data.add("QNH: $formatted")
                 }
 
                 // Hora local
@@ -1212,38 +1222,48 @@ private fun FullListMode(
                 // Calcular datos opcionales para este paso
                 val optionalInfo = buildList {
                     // Altitud
-                    if (!p.altitud.isNullOrBlank() && altitude != null) {
-                        val value = when (p.altitud.lowercase()) {
-                            "ft" -> sensorRepo.metersToFeet(altitude)
-                            else -> altitude
+                    if (!p.altitud.isNullOrBlank()) {
+                        if (altitude != null) {
+                            val value = when (p.altitud.lowercase()) {
+                                "ft" -> sensorRepo.metersToFeet(altitude)
+                                else -> altitude
+                            }
+                            val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
+                                maximumFractionDigits = 0
+                                minimumFractionDigits = 0
+                                isGroupingUsed = true
+                            }
+                            val unit = if (p.altitud.lowercase() == "ft") "ft" else "m"
+                            add("${formatter.format(value)} $unit")
+                        } else {
+                            // No hay fix de GPS, mostrar mensaje de espera
+                            add(ctx.getString(R.string.altitude_waiting_fix))
                         }
-                        val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
-                            maximumFractionDigits = 0
-                            minimumFractionDigits = 0
-                            isGroupingUsed = true
-                        }
-                        val unit = if (p.altitud.lowercase() == "ft") "ft" else "m"
-                        add("${formatter.format(value)} $unit")
                     }
 
                     // QNH
-                    if (!p.qnh.isNullOrBlank() && altitude != null && pressure != null) {
-                        val qnh = sensorRepo.calculateQNH(pressure, altitude)
-                        val formatted = when (p.qnh.lowercase()) {
-                            "inhg" -> {
-                                val inHg = sensorRepo.hPaToInHg(qnh)
-                                String.format(java.util.Locale.US, "%.2f inHg", inHg)
-                            }
-                            else -> {
-                                val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
-                                    maximumFractionDigits = 0
-                                    minimumFractionDigits = 0
-                                    isGroupingUsed = true
+                    if (!p.qnh.isNullOrBlank()) {
+                        if (altitude != null && pressure != null) {
+                            val qnh = sensorRepo.calculateQNH(pressure, altitude)
+                            val formatted = when (p.qnh.lowercase()) {
+                                "inhg" -> {
+                                    val inHg = sensorRepo.hPaToInHg(qnh)
+                                    String.format(java.util.Locale.US, "%.2f inHg", inHg)
                                 }
-                                "${formatter.format(qnh.toInt())} hPa"
+                                else -> {
+                                    val formatter = java.text.NumberFormat.getNumberInstance(java.util.Locale.getDefault()).apply {
+                                        maximumFractionDigits = 0
+                                        minimumFractionDigits = 0
+                                        isGroupingUsed = true
+                                    }
+                                    "${formatter.format(qnh.toInt())} hPa"
+                                }
                             }
+                            add("QNH: $formatted")
+                        } else {
+                            // No hay fix de GPS o presión, mostrar mensaje de espera
+                            add(ctx.getString(R.string.qnh_waiting_fix))
                         }
-                        add("QNH: $formatted")
                     }
 
                     // Hora local
