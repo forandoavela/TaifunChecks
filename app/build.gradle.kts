@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.taifun.checks"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.taifun.checks"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
 
         // Sistema de versiones: w.x.yy.zz donde:
         //   w = versión principal (cambios muy importantes) - cambiar manualmente
