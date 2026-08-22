@@ -187,8 +187,8 @@ FlightChecks/
 | **Jetpack Compose** | BOM 2024.08.00 | Modern declarative UI |
 | **Material Design 3** | Latest | Design system |
 | **Compose Navigation** | 2.8.0 | Screen routing |
-| **Android Gradle Plugin** | 8.6.1 | Build system |
-| **Gradle** | 8.6.1 | Build automation |
+| **Android Gradle Plugin** | 8.9.3 | Build system |
+| **Gradle** | 8.11.1 | Build automation |
 
 ### Android Libraries
 
@@ -209,8 +209,8 @@ FlightChecks/
 ### Platform Requirements
 
 - **Minimum SDK**: 24 (Android 7.0)
-- **Target SDK**: 35 (Android 15)
-- **Compile SDK**: 35
+- **Target SDK**: 36 (Android 16)
+- **Compile SDK**: 36
 - **Java Version**: 17 (Temurin distribution)
 
 ---

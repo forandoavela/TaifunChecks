@@ -481,9 +481,9 @@ checklists:
 
 ### Prerequisites
 - Android Studio Arctic Fox or newer
-- JDK 11 or newer
-- Android SDK with API 24-35
-- Gradle 8.6.1 (included via wrapper)
+- JDK 17 or newer
+- Android SDK with API 24-36
+- Gradle 8.11.1 (included via wrapper)
 
 ### Build Steps
 
@@ -498,8 +498,8 @@ checklists:
    - Wait for Gradle sync to complete
 
 3. **Install required SDK components**
-   - API 35 (Android 15)
-   - Build-Tools 35.x
+   - API 36 (Android 16)
+   - Build-Tools 36.x
    - Android Studio will prompt to install missing components
 
 4. **Build the app**
@@ -535,8 +535,8 @@ checklists:
 - **UI Framework**: Jetpack Compose (declarative UI)
 - **Language**: Kotlin 2.0.20
 - **Min SDK**: 24 (Android 7.0)
-- **Target SDK**: 35 (Android 15)
-- **Gradle**: 8.6.1
+- **Target SDK**: 36 (Android 16)
+- **Gradle**: 8.11.1
 
 ### Key Technologies
 - **Jetpack Compose**: Modern declarative UI framework
